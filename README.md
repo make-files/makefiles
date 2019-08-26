@@ -1,5 +1,7 @@
 # Go Makefile
 
+## Usage
+
 ```Makefile
 -include artifacts/make/go/Makefile
 
