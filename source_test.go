@@ -1,7 +1,8 @@
-package gomakefile_test
+package go1_test
 
 import "testing"
+import . "github.com/make-files/make-go1"
 
 func Test(t *testing.T) {
-	gomakefile.TestMessage = &Test{}
+	Global = &TestMessage{}
 }

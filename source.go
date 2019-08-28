@@ -1,3 +1,3 @@
-package gomakefile
+package go1
 
-var TestMessage *Test
+var Global *TestMessage
