@@ -9,6 +9,6 @@ case $1 in
         echo 1
         ;;
     *)
-        echo "unknown command '$1'"
+        echo "unknown command '$1'" >&2
         exit 1
 esac
