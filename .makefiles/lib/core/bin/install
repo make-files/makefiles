@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p "$MF_ROOT/bin"
+mkdir -p "$MF_ROOT/cache"
+
+ln -s "$MF_ROOT/lib/core/bin/mf" "$MF_ROOT/bin/mf"
