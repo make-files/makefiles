@@ -40,14 +40,17 @@ fi
 DIR=$(mktemp -d)
 trap "rm -rf '$DIR'" EXIT
 
-curl \
+if ! curl \
     --fail \
     --silent \
     --show-error \
     --location \
     --create-dirs \
     --output "$DIR/archive.zip" \
-    "$URL?nonce=$(uuidgen)"
+    "$URL?nonce=$(uuidgen)"; then
+    2>&1 echo "failed downloading $URL"
+    exit 1
+fi
 
 unzip -q "$DIR/archive.zip" -d "$DIR"
 cd "$(find "$DIR" -depth 1 -type d)"

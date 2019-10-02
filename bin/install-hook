@@ -4,10 +4,10 @@ set -euo pipefail
 mkdir -p "$MF_ROOT/bin"
 mkdir -p "$MF_ROOT/cache"
 
-ln -s "$MF_ROOT/lib/core/bin/mf" "$MF_ROOT/bin/mf"
+ln -s "$MF_ROOT/lib/core/bin/mf" "$MF"
 
 for lib in "$MF_ROOT/lib/core/bin/libtests/"*; do
     if "$lib"; then
-        "$MF_ROOT/bin/mf" install "$lib"
+        "$MF" install "$lib"
     fi
 done
