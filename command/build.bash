@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+source "$MF_ROOT/lib/core/include/common.bash"
 
-echo "BUILDING $1"
 TARGET="$1"
 
 if ! [[ $TARGET =~ ^\.makefiles/(.+)/v([0-9]+)/ ]]; then
@@ -10,5 +10,6 @@ fi
 
 REPO="${BASH_REMATCH[1]}"
 VER="${BASH_REMATCH[2]}"
+
 ARCHIVE=$("$MF" fetch "make-$REPO" "v$VER")
 unzip -q "$ARCHIVE" -d "$MF_ROOT/$REPO"

@@ -1,4 +1,5 @@
-set -euo pipefail
+#!/usr/bin/env bash
+source "$MF_ROOT/lib/core/include/common.bash"
 
 DEFAULT_ORG='make-files'
 
@@ -49,7 +50,7 @@ curl \
     "$URL?nonce=$(uuidgen)"
 
 unzip -q "$DIR/archive.zip" -d "$DIR"
-cd "$DIR/${REPO}-${BRANCH}"
+cd "$(find "$DIR" -depth 1 -type d)"
 zip -q "$DIR/archive.zip" --move --recurse-paths .
 mkdir -p $(dirname "$CACHE")
 mv "$DIR/archive.zip" "$CACHE"
