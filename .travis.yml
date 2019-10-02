@@ -1,10 +1,6 @@
 language: go
-go: '1.12'
-env:
-- GO111MODULE=on
+go: '1.13'
 install:
-- make .makefiles/travisci/v1/bin/install-protoc
-- bash .makefiles/travisci/v1/bin/install-protoc
 - go mod download
 - go install github.com/golang/protobuf/protoc-gen-go
 script: make ci
