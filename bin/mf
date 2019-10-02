@@ -7,23 +7,16 @@ while [ -h "$file" ]; do
     file="$(readlink "$file")"
 done
 
+if [ -z "${MF_PROJECT_ROOT:-}" ]; then
+    2>&1 echo "MF_PROJECT_ROOT must be defined"
+    exit 1
+elif [[ "$MF_PROJECT_ROOT" != /* ]]; then
+    2>&1 echo "MF_PROJECT_ROOT must be an absolute path"
+    exit 1
+fi
+
 export MF="$file"
 export MF_VERSION="1"
-
-if [ -n "${MF_ROOT:-}" ]; then
-    if [[ "$MF_ROOT" != /* ]]; then
-        2>&1 echo "MF_ROOT must be an absolute path"
-        exit 1
-    fi
-else
-    # If MF_ROOT is not set explicitly, then look for a ".makefiles" atom
-    # in the directory name in order to locate the root.
-    if [[ $file =~ ^(.+/.makefiles)/.+$ ]]; then
-        export MF_ROOT="${BASH_REMATCH[1]}"
-    else
-        2>&1 echo "MF_ROOT is not defined and the root could not be determined automatically"
-        exit 1
-    fi
-fi
+export MF_ROOT="$MF_PROJECT_ROOT/.makefiles"
 
 "$MF_ROOT/lib/core/command/$1.bash" "${@:2}"

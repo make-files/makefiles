@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-mkdir -p "$MF_ROOT/bin"
-mkdir -p "$MF_ROOT/cache"
-
-ln -s "$MF_ROOT/lib/core/bin/mf" "$MF"
+source "$MF_ROOT/lib/core/include/common.bash"
 
 for lib in "$MF_ROOT/lib/core/bin/libtests/"*; do
     if "$lib"; then
