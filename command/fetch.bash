@@ -25,12 +25,12 @@ if [[ $SLUG =~ ^.+/(.+)$ ]]; then
     REPO="${BASH_REMATCH[1]}"
 else
     REPO="$SLUG"
-    SLUG="${DEFAULT_ORG}/${SLUG}"
+    SLUG="$DEFAULT_ORG/$SLUG"
 fi
 
 BRANCH="${2:-master}"
-URL="https://github.com/${SLUG}/archive/${BRANCH}.zip"
-CACHE="$MF_ROOT/cache/github/${SLUG}/${BRANCH}.zip"
+URL="https://github.com/$SLUG/archive/$BRANCH.zip"
+CACHE="$MF_ROOT/cache/github/$SLUG/$BRANCH.zip"
 
 if [[ -f "$CACHE" ]]; then
     echo $CACHE
