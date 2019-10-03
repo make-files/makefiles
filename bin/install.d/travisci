@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [[ -n "$TRAVIS" ]]; then
+    "$MF" install travisci
+fi

@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
 source "$MF_ROOT/lib/core/include/common.bash"
 
-for test in "$MF_ROOT/lib/core/bin/libtests/"*; do
-    if "$test"; then
-        "$MF" install "$(basename "$lib")"
-    fi
-done
+"$MF_ROOT/lib/core/bin/install.d/"*
