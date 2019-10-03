@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-import "google/protobuf/any.proto";
-option go_package = "go1";
-
-message TestMessage {
-  google.protobuf.Any any = 1;
-}
