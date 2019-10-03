@@ -53,7 +53,7 @@ if ! curl \
 fi
 
 unzip -q "$DIR/archive.zip" -d "$DIR"
-cd "$(find "$DIR" -depth 1 -type d)"
+cd "$(find "$DIR" -mindepth 1 -maxdepth 1 -type d)"
 zip -q "$DIR/archive.zip" --move --recurse-paths .
 mkdir -p $(dirname "$CACHE")
 mv "$DIR/archive.zip" "$CACHE"
