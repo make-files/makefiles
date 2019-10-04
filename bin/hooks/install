@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-source "$MF_ROOT/lib/core/include/common.bash"
-
-"$MF_ROOT/lib/core/bin/install.d/"*
