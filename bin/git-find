@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$MF_PROJECT_ROOT/.makefiles/lib/core/include/common.bash"
+
+if [[ $# < 1 ]]; then
+    echo "Usage: git-find pattern"
+    echo
+    echo "  Lists files within the Git repository that match the given filename"
+    echo "  pattern. Files ignored by Git are not included in the output."
+    echo
+    exit 1
+fi
+
+find $(cd "$MF_PROJECT_ROOT"; git ls-files) -type f -iname "$1"
+find $(cd "$MF_PROJECT_ROOT"; git ls-files --other --exclude-standard) -type f -iname "$1"
