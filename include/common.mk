@@ -27,7 +27,7 @@ clean-generated::
 # repository. It does not remove any files that are ignored due to rules in
 # global ignore configurations.
 .PHONY: clean-ignored
-.clean-ignored::
+clean-ignored::
 	git-find-ignored '*' | xargs -t rm -f --
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
