@@ -71,12 +71,12 @@ _GO_BUILD_MATRIX_HOST = $(foreach P,$(_GO_BUILD_PLATFORM_MATRIX_HOST),$(addprefi
 
 # _GO_DEBUG_TARGETS_xxx is the path to the binaries to produce for debug builds.
 _GO_DEBUG_TARGETS_ALL    = $(addprefix artifacts/build/debug/,$(_GO_BUILD_MATRIX_NIX) $(_GO_BUILD_MATRIX_WIN))
-_GO_DEBUG_TARGETS_HOST   = $(addprefix artifacts/build/debug/,$(_GO_BUILD_PLATFORM_MATRIX_HOST))
+_GO_DEBUG_TARGETS_HOST   = $(addprefix artifacts/build/debug/,$(_GO_BUILD_MATRIX_HOST))
 .SECONDARY: $(_GO_DEBUG_TARGETS_ALL)
 
 # _GO_DEBUG_TARGETS_xxx is the path to the binaries to produce for release builds.
 _GO_RELEASE_TARGETS_ALL  = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATRIX_NIX) $(_GO_BUILD_MATRIX_WIN))
-_GO_RELEASE_TARGETS_HOST = $(addprefix artifacts/build/release/,$(_GO_BUILD_PLATFORM_MATRIX_HOST))
+_GO_RELEASE_TARGETS_HOST = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATRIX_HOST))
 .SECONDARY: $(_GO_RELEASE_TARGETS_HOST)
 
 # Ensure that Linux release binaries are built before attempting to build a Docker image.
