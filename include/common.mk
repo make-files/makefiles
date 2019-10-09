@@ -16,7 +16,9 @@ GIT_HEAD_COMMITTISH	?= $(shell git describe --exact-match 2>/dev/null || git rev
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
 .PHONY: clean
-clean:: clean-ignored clean-generated
+clean::
+	$(MAKE) clean-generated
+	$(MAKE) clean-ignored
 
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
