@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source "$MF_PROJECT_ROOT/.makefiles/lib/core/include/common.bash"
+source "$(dirname ${BASH_SOURCE[0]})/../include/common.bash"
 
 if [[ $# < 2 ]]; then
     echo "Usage: install-pkg name version"
