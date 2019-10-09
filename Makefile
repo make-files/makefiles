@@ -79,6 +79,9 @@ _GO_RELEASE_TARGETS_ALL  = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATR
 _GO_RELEASE_TARGETS_HOST = $(addprefix artifacts/build/release/,$(_GO_BUILD_PLATFORM_MATRIX_HOST))
 .SECONDARY: $(_GO_RELEASE_TARGETS_HOST)
 
+# Ensure that Linux release binaries are built before attempting to build a Docker image.
+DOCKER_BUILD_REQ += $(addprefix artifacts/build/release/linux/amd64/,$(_GO_BUILD_PLATFORM_MATRIX_NIX))
+
 ################################################################################
 
 # test --- Executes all go tests in this module.
