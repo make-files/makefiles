@@ -18,12 +18,12 @@ DOCKER_BUILD_ARGS +=
 # docker --- Builds a docker image from the Dockerfile in the root of the
 # repository.
 .PHONY: docker
-docker: .makefiles/touch/docker-build-$(DOCKER_TAG)
+docker: artifacts/docker/build-$(DOCKER_TAG).touch
 
 # docker-build --- Builds a docker image from the Dockerfile in the root of the
 # repository and pushes it to the registry.
 .PHONY: docker-push
-docker-push: .makefiles/touch/docker-push-$(DOCKER_TAG)
+docker-push: artifacts/docker/push-$(DOCKER_TAG).touch
 
 ################################################################################
 
@@ -31,7 +31,7 @@ docker-push: .makefiles/touch/docker-push-$(DOCKER_TAG)
 	@echo .makefiles > "$@"
 	@echo .git >> "$@"
 
-.makefiles/touch/docker-build-%: Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
+artifacts/docker/build-%.touch: Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
 	docker build \
 		--pull \
 		--build-arg "VERSION=$(GIT_HASH_COMMITTISH)" \
@@ -43,12 +43,12 @@ docker-push: .makefiles/touch/docker-push-$(DOCKER_TAG)
 	@mkdir -p "$(@D)"
 	@touch "$@"
 
-.PHONY: .makefiles/touch/docker-push-dev
-.makefiles/touch/docker-push-dev:
+.PHONY: artifacts/docker/push-dev
+artifacts/docker/push-dev.touch:
 	@echo "The 'dev' tag can not be pushed to the registry!"
 	@exit 1
 
-.makefiles/touch/docker-push-%: .makefiles/touch/docker-build-%
+artifacts/docker/push-%.touch: artifacts/docker/build-%
 	docker push "$(DOCKER_REPO):$*"
 	@mkdir -p "$(@D)"
 	@touch "$@"
