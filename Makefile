@@ -152,6 +152,6 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval ARCH  := $(word 3,$(PARTS)))
 	$(eval BIN   := $(word 4,$(PARTS)))
 	$(eval PKG   := $(basename $(BIN)))
-	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(DEBUG_ARGS),$(RELEASE_ARGS)))
+	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
 
 	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" go build $(ARGS) -o "$@" "./cmd/$(PKG)"
