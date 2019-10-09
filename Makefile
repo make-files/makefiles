@@ -98,9 +98,10 @@ coverage: artifacts/coverage/index.html
 coverage-open: artifacts/coverage/index.html
 	open "$<"
 
-# prepare --- Executes pre-commit checks.
+# prepare --- Perform tasks that need to be executed before committing. Stacks
+# with the "prepare" target form the common makefile.
 .PHONY: prepare
-prepare: test
+prepare:: test
 	go fmt ./...
 	go mod tidy
 
