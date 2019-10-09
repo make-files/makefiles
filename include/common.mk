@@ -28,7 +28,7 @@ clean-generated::
 # global ignore configurations.
 .PHONY: clean-ignored
 clean-ignored::
-	git-find-ignored '*' | xargs -t rm -f --
+	git-find-ignored '*' | xargs -t -n1 rm -rf --
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate

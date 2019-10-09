@@ -13,4 +13,7 @@ if [[ $# < 1 ]]; then
     exit 1
 fi
 
-find "$MF_PROJECT_ROOT" -type f -iname "$1" | git check-ignore --stdin --verbose | egrep -v '^\/'
+find "$MF_PROJECT_ROOT" -iname "$1" \
+    | git check-ignore --stdin --verbose \
+    | egrep -v '^\/' \
+    | cut -f2-
