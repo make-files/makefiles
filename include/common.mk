@@ -38,7 +38,13 @@ regenerate::
 	$(MAKE) clean-generated
 	$(MAKE) -- $(GENERATED_FILES)
 
-# ci -- Perform tasks that need to be executed within a continuous integration
+# prepare --- Perform tasks that need to be executed before committing.
+# Individual language Makefiles are expected to add additional recipies for this
+# target.
+.PHONY:
+prepare:: $(GENERATED_FILES)
+
+# ci --- Perform tasks that need to be executed within a continuous integration
 # environment. Individual language Makefiles are expected to add additional
 # recipies for this target.
 .PHONY: ci
