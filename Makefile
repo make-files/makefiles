@@ -3,7 +3,7 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
-PROTO_INCLUDE_PATHS += $(MF_PROJECT_ROOT)
+PROTO_INCLUDE_PATHS += .
 
 ################################################################################
 
