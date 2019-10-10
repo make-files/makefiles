@@ -38,17 +38,17 @@ if ! curl \
     --show-error \
     --location \
     --create-dirs \
-    --output "$tmpdir/archive.zip" \
+    --output "$tmpdir/original.zip" \
     "$url?nonce=$(uuidgen)"; then
     2>&1 echo "failed downloading $URL"
     exit 1
 fi
 
-unzip -q "$tmpdir/archive.zip" -d "$tmpdir"
+unzip -q "$tmpdir/original.zip" -d "$tmpdir"
 cd "$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d)"
-zip -q "$tmpdir/archive.zip" --move --recurse-paths .
+zip -q "$tmpdir/content.zip" --move --recurse-paths .
 mkdir -p $(dirname "$cache")
-mv "$tmpdir/archive.zip" "$cache"
+mv "$tmpdir/content.zip" "$cache"
 
 log "added $slug@$branch repository archive to the cache"
 
