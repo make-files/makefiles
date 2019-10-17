@@ -27,6 +27,10 @@ docker-push: artifacts/docker/push-$(DOCKER_TAG).touch
 
 ################################################################################
 
+# Treat any dependencies of the Docker build as secondary build targets so that
+# they are not deleted after a successful build.
+.SECONDARY: $(DOCKER_BUILD_REQ)
+
 .dockerignore:
 	@echo .makefiles > "$@"
 	@echo .git >> "$@"
