@@ -23,7 +23,9 @@ clean::
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated::
+ifneq ($(GENERATED_FILES),)
 	rm -f -- $(GENERATED_FILES)
+endif
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
@@ -35,8 +37,10 @@ clean-ignored::
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
 regenerate::
+ifneq ($(GENERATED_FILES),)
 	$(MAKE) clean-generated
 	$(MAKE) -- $(GENERATED_FILES)
+endif
 
 # prepare --- Perform tasks that need to be executed before committing.
 # Individual language Makefiles are expected to add additional recipies for this
@@ -49,7 +53,9 @@ prepare:: $(GENERATED_FILES)
 # recipies for this target.
 .PHONY: ci
 ci::
+ifneq ($(GENERATED_FILES),)
 	@echo "checking for out-of-date generated files"
 	@$(MAKE) regenerate
 	@git diff -- $(GENERATED_FILES)
 	@!(git status --porcelain -- $(GENERATED_FILES) | grep .)
+endif
