@@ -40,7 +40,7 @@ GO_MATRIX_ARCH ?= $(GOHOSTARCH)
 
 # _GO_COMMAND_PACKAGES is a list of directory names that are expected to contain
 # "main" packages. It forms the basis for the executable filenames.
-_GO_COMMAND_PACKAGES = $(notdir $(wildcard cmd/*))
+_GO_COMMAND_PACKAGES = $(notdir $(shell find cmd -type d -mindepth 1 -maxdepth 1))
 
 # _GO_EXECUTABLES_xxx is a list of executable filenames to produce in a build.
 _GO_EXECUTABLES_NIX = $(_GO_COMMAND_PACKAGES)
