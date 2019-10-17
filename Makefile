@@ -48,7 +48,7 @@ artifacts/docker/push-dev.touch:
 	@echo "The 'dev' tag can not be pushed to the registry!"
 	@exit 1
 
-artifacts/docker/push-%.touch: artifacts/docker/build-%
+artifacts/docker/push-%.touch: artifacts/docker/build-%.touch
 	docker push "$(DOCKER_REPO):$*"
 	@mkdir -p "$(@D)"
 	@touch "$@"
