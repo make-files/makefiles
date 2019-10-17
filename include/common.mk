@@ -17,8 +17,10 @@ GIT_HEAD_COMMITTISH	?= $(shell git describe --exact-match 2>/dev/null || git rev
 # Makefiles should also remove any build artifacts that aren't already ignored.
 .PHONY: clean
 clean::
-	$(MAKE) clean-generated
-	$(MAKE) clean-ignored
+ifneq ($(GENERATED_FILES),)
+	$(MAKE) --no-print-directory clean-generated
+endif
+	$(MAKE) --no-print-directory clean-ignored
 
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
@@ -36,10 +38,9 @@ clean-ignored::
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
-regenerate::
+regenerate:: clean-generated
 ifneq ($(GENERATED_FILES),)
-	$(MAKE) clean-generated
-	$(MAKE) -- $(GENERATED_FILES)
+	$(MAKE) --no-print-directory -- $(GENERATED_FILES)
 endif
 
 # prepare --- Perform tasks that need to be executed before committing.
@@ -54,8 +55,8 @@ prepare:: $(GENERATED_FILES)
 .PHONY: ci
 ci::
 ifneq ($(GENERATED_FILES),)
-	@echo "checking for out-of-date generated files"
-	@$(MAKE) regenerate
+	@echo "--- checking for out-of-date generated files"
+	@$(MAKE) --no-print-directory regenerate
 	@git diff -- $(GENERATED_FILES)
 	@!(git status --porcelain -- $(GENERATED_FILES) | grep .)
 endif
