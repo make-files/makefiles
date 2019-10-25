@@ -11,5 +11,7 @@ if [[ $# < 1 ]]; then
     exit 1
 fi
 
-find $(cd "$MF_PROJECT_ROOT"; git ls-files) -type f -iname "$1" 2>/dev/null
-find $(cd "$MF_PROJECT_ROOT"; git ls-files --other --exclude-standard) -type f -iname "$1" 2>/dev/null
+cd "$MF_PROJECT_ROOT"
+files="$(git ls-files; git ls-files --other --exclude-standard)"
+files="$(find $files 2>/dev/null || true)"
+find $files -type f -iname "$1"
