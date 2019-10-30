@@ -15,7 +15,7 @@ CGO_ENABLED ?= 0
 # GO_APP_VERSION is a human-readable string describing the application version.
 # If the "main" package has a variable named "version" it is set to this value
 # at link time.
-GO_APP_VERSION ?= $(GIT_HASH_COMMITTISH)
+GO_APP_VERSION ?= $(GIT_HEAD_COMMITTISH)
 
 # GO_DEBUG_ARGS and GO_RELEASE_ARGS are arguments passed to "go build" for the
 # "debug" and "release" targets, respectively.
