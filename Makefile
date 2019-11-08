@@ -4,6 +4,10 @@
 # Build Go source files from protocol buffers definitions.
 GENERATED_FILES += $(PROTO_FILES:.proto=.pb.go)
 
+# GO_ARCHIVE_FILES is a space separated list of additional files to include in
+# the release archives. The compiled binaries are included by default.
+GO_ARCHIVE_FILES +=
+
 # GO_SOURCE_FILES is a space separated list of source files that are used by the
 # build process.
 GO_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.go')
@@ -127,6 +131,10 @@ debug: $(_GO_DEBUG_TARGETS_ALL)
 .PHONY: release
 release: $(_GO_RELEASE_TARGETS_ALL)
 
+# archives --- Builds zip archives containing the release executables and an
+# additional files specified in GO_ARCHIVE_FILES.
+archives: $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-,$(addsuffix .zip,$(subst /,-,$(_GO_BUILD_PLATFORM_MATRIX_ALL))))
+
 ################################################################################
 
 artifacts/coverage/index.html: artifacts/coverage/cover.out
@@ -147,3 +155,13 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
 
 	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" go build $(ARGS) -o "$@" "./cmd/$(PKG)"
+
+artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/windows/$$*/,$(_GO_EXECUTABLES_WIN))
+	@mkdir -p "$(@D)"
+	@rm -f "$@"
+	zip --recurse-paths --junk-paths "$@" -- $^
+
+artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/$$(subst -,/,$$*)/,$(_GO_EXECUTABLES_NIX))
+	@mkdir -p "$(@D)"
+	@rm -f "$@"
+	zip --recurse-paths --junk-paths "$@" -- $^
