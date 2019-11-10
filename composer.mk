@@ -1,3 +1,6 @@
+# COMPOSER_INSTALL_ARGS is a set of arguments passed to "composer install"
+COMPOSER_INSTALL_ARGS ?= --no-suggest --optimize-autoloader --prefer-dist
+
 # The type of package as defined in the composer.json "type" property
 COMPOSER_PACKAGE_TYPE := $(shell $(MF_ROOT)/pkg/php/v1/bin/composer-package-type)
 
@@ -28,10 +31,10 @@ prepare:: artifacts/composer/validate.touch
 ################################################################################
 
 vendor: composer.lock
-	composer install
+	composer install $(COMPOSER_INSTALL_ARGS)
 
 composer.lock: | composer.json
-	composer install
+	composer install $(COMPOSER_INSTALL_ARGS)
 
 composer.json:
 	composer init --no-interaction
