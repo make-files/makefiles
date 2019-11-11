@@ -32,6 +32,11 @@ DOCKER_BUILD_REQ += composer.json composer.lock
 .PHONY: prepare
 prepare:: artifacts/composer/validate.touch
 
+# ci --- Validate composer.json and composer.lock. Stacks with the "ci" target
+# from the common makefile.
+.PHONY: ci
+ci:: artifacts/composer/validate.touch
+
 ################################################################################
 
 vendor: composer.lock
