@@ -1,10 +1,12 @@
 # PHP_COMPOSER_INSTALL_ARGS is a set of arguments passed to "composer install"
 PHP_COMPOSER_INSTALL_ARGS ?= --no-suggest --optimize-autoloader --prefer-dist
 
-# The type of package as defined in the composer.json "type" property
+# PHP_COMPOSER_PACKAGE_TYPE is the package type as defined in the composer.json
+# "type" property
 PHP_COMPOSER_PACKAGE_TYPE := $(shell $(MF_ROOT)/pkg/php/v1/bin/composer-package-type)
 
-# Whether this package is intended to be published
+# PHP_COMPOSER_PUBLISH should be non-empty if this package is intended to be
+# published
 ifeq ($(PHP_COMPOSER_PACKAGE_TYPE),library)
 PHP_COMPOSER_PUBLISH ?= true
 else
