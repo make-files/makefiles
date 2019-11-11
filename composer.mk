@@ -1,17 +1,9 @@
 # PHP_COMPOSER_INSTALL_ARGS is a set of arguments passed to "composer install"
 PHP_COMPOSER_INSTALL_ARGS ?= --no-suggest --optimize-autoloader --prefer-dist
 
-# PHP_COMPOSER_PACKAGE_TYPE is the package type as defined in the composer.json
-# "type" property
-PHP_COMPOSER_PACKAGE_TYPE := $(shell $(MF_ROOT)/pkg/php/v1/bin/composer-package-type)
-
 # PHP_COMPOSER_PUBLISH should be non-empty if this package is intended to be
 # published
-ifeq ($(PHP_COMPOSER_PACKAGE_TYPE),library)
-PHP_COMPOSER_PUBLISH ?= true
-else
 PHP_COMPOSER_PUBLISH ?=
-endif
 
 # PHP_COMPOSER_VALIDATE_PUBLISH_ARGS and PHP_COMPOSER_VALIDATE_NO_PUBLISH_ARGS
 # are arguments passed to "composer validate"
@@ -19,6 +11,15 @@ PHP_COMPOSER_VALIDATE_PUBLISH_ARGS    ?= --strict
 PHP_COMPOSER_VALIDATE_NO_PUBLISH_ARGS ?= --no-check-publish
 
 ################################################################################
+
+# _PHP_COMPOSER_PACKAGE_TYPE is the package type as defined in the composer.json
+# "type" property
+_PHP_COMPOSER_PACKAGE_TYPE := $(shell $(MF_ROOT)/pkg/php/v1/bin/composer-package-type)
+
+# Default PHP_COMPOSER_PUBLISH to true for libraries
+ifeq ($(_PHP_COMPOSER_PACKAGE_TYPE),library)
+PHP_COMPOSER_PUBLISH ?= true
+endif
 
 # Ensure that dependencies are installed before attempting to build a Docker
 # image.
