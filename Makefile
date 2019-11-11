@@ -20,10 +20,6 @@ PHP_PHPUNIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-file phpunit.xml phpunit.
 
 ################################################################################
 
-# _PHP_EXECUTABLES is a space separated list of all executable files in the bin
-# directory.
-_PHP_EXECUTABLES := $(shell find bin -type f -perm +111 2> /dev/null)
-
 # _PHP_TEST_ASSETS is a space separated list of all non-PHP files in the test
 # directory.
 _PHP_TEST_ASSETS := $(shell find test -type f -not -iname "*.php" 2> /dev/null)

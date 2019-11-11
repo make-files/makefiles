@@ -1,6 +1,6 @@
 # PHP_PHPUNIT_REQ is a space separated list of prerequisites needed to run the
 # PHPUnit tests.
-PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_EXECUTABLES) $(_PHP_TEST_ASSETS)
+PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
 
 ################################################################################
 
