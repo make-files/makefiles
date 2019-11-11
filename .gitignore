@@ -1,3 +1,4 @@
 /.makefiles/
+/.phpunit.result.cache
 /artifacts/
 /vendor/
