@@ -1,13 +1,19 @@
 # PHP_PHPUNIT_REQ is a space separated list of prerequisites needed to run the
 # PHPUnit tests.
-PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+PHP_PHPUNIT_REQ +=
+
+################################################################################
+
+# _PHP_PHPUNIT_REQ is a space separated list of automatically detected
+# prerequisites needed to run the PHPUnit tests.
+_PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
 
 ################################################################################
 
 # test --- Executes all PHPUnit tests in this package. Stacks with test targets
 # from other test runners.
 .PHONY: test
-test:: $(PHP_PHPUNIT_REQ) | vendor
+test:: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
 	php $(PHP_TEST_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
 
 # coverage --- Produces an HTML coverage report. Stacks with coverage targets
@@ -33,8 +39,8 @@ ci:: artifacts/coverage/phpunit/clover.xml
 
 ################################################################################
 
-artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) | vendor
+artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
 	phpdbg $(PHP_TEST_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-html="$(@D)"
 
-artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) | vendor
+artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
 	phpdbg $(PHP_TEST_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-clover="$@"
