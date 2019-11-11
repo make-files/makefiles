@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname ${BASH_SOURCE[0]})/../include/common.bash"
+
+if [[ $# < 1 ]]; then
+    echo "Usage: find-file pattern [pattern...]"
+    echo
+    echo "  Attempts to find a file that matches the supplied filename pattern."
+    echo "  Multiple patterns can be specified, with earlier patterns having "
+    echo "  higher precedence."
+    echo
+    exit 1
+fi
+
+for ARG in "$@"; do
+    RESULT="$((find "$MF_PROJECT_ROOT" -type f -ipath "$MF_PROJECT_ROOT/$ARG" 2>/dev/null || true) | sort | head -n1)"
+
+    if [[ -n "$RESULT" ]]; then
+        echo "${RESULT#"$MF_PROJECT_ROOT/"}"
+        exit 0
+    fi
+done
