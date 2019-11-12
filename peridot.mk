@@ -73,7 +73,7 @@ artifacts/coverage/peridot/index.html: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | 
 	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter html-code-coverage --code-coverage-path "$(@D)"
 
 artifacts/coverage/peridot/clover.xml: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter clover-code-coverage --code-coverage-path "$@"
+	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter clover-code-coverage --code-coverage-path "$(@D)"
 
 artifacts/test/peridot.touch: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
 	php $(_PHP_PERIDOT_RUNTIME_ARGS) vendor/bin/peridot $(_PHP_PERIDOT_ARGS)
