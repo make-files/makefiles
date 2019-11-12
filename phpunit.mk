@@ -10,21 +10,33 @@ _PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_A
 
 ################################################################################
 
-# test --- Executes all PHPUnit tests in this package. Stacks with test targets
-# from other test runners.
+# test --- Executes all tests in this package. Stacks with test targets from
+# other test runners.
 .PHONY: test
-test:: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	php $(PHP_TEST_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
+test:: test-phpunit
 
 # coverage --- Produces an HTML coverage report. Stacks with coverage targets
 # from other test runners.
 .PHONY: coverage
-coverage:: artifacts/coverage/phpunit/index.html
+coverage:: coverage-phpunit
 
-# coverage-open --- Opens the HTML coverage report in a browser. Stacks with
+# coverage-open --- Opens all HTML coverage reports in a browser. Stacks with
 # coverage-open targets from other test runners.
 .PHONY: coverage-open
-coverage-open:: artifacts/coverage/phpunit/index.html
+coverage-open:: coverage-phpunit-open
+
+# test-phpunit --- Executes all PHPUnit tests in this package.
+.PHONY: test-phpunit
+test-phpunit: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
+	php $(PHP_TEST_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
+
+# coverage-phpunit --- Produces a PHPUnit HTML coverage report.
+.PHONY: coverage-phpunit
+coverage-phpunit: artifacts/coverage/phpunit/index.html
+
+# coverage-phpunit-open --- Opens the PHPUnit HTML coverage report in a browser.
+.PHONY: coverage-phpunit-open
+coverage-phpunit-open: artifacts/coverage/phpunit/index.html
 	open "$<"
 
 # prepare --- Perform tasks that need to be executed before committing. Stacks
