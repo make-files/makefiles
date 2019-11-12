@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s nullglob
 source "$(dirname ${BASH_SOURCE[0]})/../include/common.bash"
 
 if [[ $# < 1 ]]; then
@@ -12,11 +13,13 @@ if [[ $# < 1 ]]; then
     exit 1
 fi
 
-for ARG in "$@"; do
-    RESULT="$((find "$MF_PROJECT_ROOT" -type f -ipath "$MF_PROJECT_ROOT/$ARG" 2>/dev/null || true) | sort | head -n1)"
+cd "$MF_PROJECT_ROOT"
 
-    if [[ -n "$RESULT" ]]; then
-        echo "${RESULT#"$MF_PROJECT_ROOT/"}"
-        exit 0
-    fi
+for PATTERN in "$@"; do
+    for FILE in $PATTERN; do
+        if [[ -f "$FILE" ]]; then
+            echo $FILE
+            exit 0
+        fi
+    done
 done
