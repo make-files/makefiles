@@ -4,6 +4,10 @@
 # PHP_SOURCE_FILES is a space separated list of source files in the repo.
 PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
 
+# PHP_CS_FIXER_CONFIG_FILE is the path to any existing PHP CS Fixer
+# configuration.
+PHP_CS_FIXER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .php_cs .php_cs.dist)
+
 # PHP_PERIDOT_CONFIG_FILE is the path to any existing Peridot configuration.
 PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file peridot.php)
 
@@ -23,6 +27,10 @@ DOCKER_BUILD_REQ += vendor
 ################################################################################
 
 -include .makefiles/pkg/php/v1/composer.mk
+
+ifneq ($(PHP_CS_FIXER_CONFIG_FILE),)
+-include .makefiles/pkg/php/v1/php-cs-fixer.mk
+endif
 
 ifneq ($(PHP_PERIDOT_CONFIG_FILE),)
 -include .makefiles/pkg/php/v1/peridot.mk
