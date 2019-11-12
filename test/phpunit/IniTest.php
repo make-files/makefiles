@@ -8,6 +8,6 @@ class IniTest extends TestCase
 {
     public function testIni ()
     {
-        $this->assertSame('1', get_cfg_var('makefiles.dev'));
+        $this->assertSame('1', get_cfg_var('makefiles.dev.phpunit'));
     }
 }
