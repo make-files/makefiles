@@ -4,7 +4,10 @@
 # PHP_SOURCE_FILES is a space separated list of source files in the repo.
 PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
 
-# PHP_PHPUNIT_CONFIG_FILE is the path to any existing PHPUnit XML configuration.
+# PHP_PERIDOT_CONFIG_FILE is the path to any existing Peridot configuration.
+PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-file peridot.php)
+
+# PHP_PHPUNIT_CONFIG_FILE is the path to any existing PHPUnit configuration.
 PHP_PHPUNIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-file phpunit.xml phpunit.xml.dist)
 
 ################################################################################
@@ -20,6 +23,10 @@ DOCKER_BUILD_REQ += vendor
 ################################################################################
 
 -include .makefiles/pkg/php/v1/composer.mk
+
+ifneq ($(PHP_PERIDOT_CONFIG_FILE),)
+-include .makefiles/pkg/php/v1/peridot.mk
+endif
 
 ifneq ($(PHP_PHPUNIT_CONFIG_FILE),)
 -include .makefiles/pkg/php/v1/phpunit.mk
