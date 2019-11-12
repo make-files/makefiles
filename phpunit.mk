@@ -4,9 +4,21 @@ PHP_PHPUNIT_REQ +=
 
 ################################################################################
 
+# _PHP_PHPUNIT_INI_FILE is the path to a PHP INI file that should be used when
+# running PHPUnit tests.
+_PHP_PHPUNIT_INI_FILE ?= $(shell PATH="$(PATH)" find-file php.phpunit.ini)
+
 # _PHP_PHPUNIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the PHPUnit tests.
-_PHP_PHPUNIT_REQ += $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+_PHP_PHPUNIT_REQ += $(_PHP_PHPUNIT_INI_FILE) $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+
+# _PHP_PHPUNIT_RUNTIME_ARGS is a set of arguments to pass to the PHP runtime
+# when running PHPUnit tests.
+ifeq ($(_PHP_PHPUNIT_INI_FILE),)
+_PHP_PHPUNIT_RUNTIME_ARGS +=
+else
+_PHP_PHPUNIT_RUNTIME_ARGS += -c "$(_PHP_PHPUNIT_INI_FILE)"
+endif
 
 ################################################################################
 
@@ -28,7 +40,7 @@ coverage-open:: coverage-phpunit-open
 # test-phpunit --- Executes all PHPUnit tests in this package.
 .PHONY: test-phpunit
 test-phpunit: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	php $(PHP_TEST_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
+	php $(_PHP_PHPUNIT_RUNTIME_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
 
 # coverage-phpunit --- Produces a PHPUnit HTML coverage report.
 .PHONY: coverage-phpunit
@@ -52,7 +64,7 @@ ci:: artifacts/coverage/phpunit/clover.xml
 ################################################################################
 
 artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	phpdbg $(PHP_TEST_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-html="$(@D)"
+	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-html="$(@D)"
 
 artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	phpdbg $(PHP_TEST_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-clover="$@"
+	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-clover="$@"
