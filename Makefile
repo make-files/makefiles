@@ -5,10 +5,10 @@
 PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
 
 # PHP_PERIDOT_CONFIG_FILE is the path to any existing Peridot configuration.
-PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-file peridot.php)
+PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file peridot.php)
 
 # PHP_PHPUNIT_CONFIG_FILE is the path to any existing PHPUnit configuration.
-PHP_PHPUNIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-file phpunit.xml phpunit.xml.dist)
+PHP_PHPUNIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file phpunit.xml phpunit.xml.dist)
 
 ################################################################################
 

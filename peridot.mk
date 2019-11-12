@@ -10,7 +10,7 @@ PHP_PERIDOT_PRIMARY_REPORTER ?= spec
 
 # _PHP_PERIDOT_INI_FILE is the path to a PHP INI file that should be used when
 # running Peridot tests.
-_PHP_PERIDOT_INI_FILE ?= $(shell PATH="$(PATH)" find-file php.peridot.ini)
+_PHP_PERIDOT_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.peridot.ini)
 
 # _PHP_PERIDOT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Peridot tests.

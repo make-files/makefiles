@@ -6,7 +6,7 @@ PHP_PHPUNIT_REQ +=
 
 # _PHP_PHPUNIT_INI_FILE is the path to a PHP INI file that should be used when
 # running PHPUnit tests.
-_PHP_PHPUNIT_INI_FILE ?= $(shell PATH="$(PATH)" find-file php.phpunit.ini)
+_PHP_PHPUNIT_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.phpunit.ini)
 
 # _PHP_PHPUNIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the PHPUnit tests.
