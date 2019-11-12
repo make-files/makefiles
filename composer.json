@@ -9,7 +9,8 @@
         "peridot-php/peridot": "^1.19",
         "peridot-php/peridot-code-coverage-reporters": "^3.0",
         "peridot-php/leo": "^1.6",
-        "peridot-php/peridot-dot-reporter": "^1.0"
+        "peridot-php/peridot-dot-reporter": "^1.0",
+        "friendsofphp/php-cs-fixer": "^2.16"
     },
     "autoload": {
         "psr-4": {

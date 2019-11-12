@@ -4,12 +4,12 @@ namespace Makefiles\Test;
 
 class ClassB
 {
-    public static function methodA ()
+    public static function methodA()
     {
         return 'a';
     }
 
-    public static function methodB ()
+    public static function methodB()
     {
         return 'b';
     }
