@@ -40,7 +40,7 @@ coverage-open:: coverage-phpunit-open
 # test-phpunit --- Executes all PHPUnit tests in this package.
 .PHONY: test-phpunit
 test-phpunit: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	php $(_PHP_PHPUNIT_RUNTIME_ARGS) vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --no-coverage
+	php $(_PHP_PHPUNIT_RUNTIME_ARGS) vendor/bin/phpunit -c "$(PHP_PHPUNIT_CONFIG_FILE)" --no-coverage
 
 # coverage-phpunit --- Produces a PHPUnit HTML coverage report.
 .PHONY: coverage-phpunit
@@ -64,7 +64,7 @@ ci:: artifacts/coverage/phpunit/clover.xml
 ################################################################################
 
 artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-html="$(@D)"
+	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c "$(PHP_PHPUNIT_CONFIG_FILE)" --coverage-html="$(@D)"
 
 artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ) | vendor
-	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c $(PHP_PHPUNIT_CONFIG_FILE) --coverage-clover="$@"
+	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit -c "$(PHP_PHPUNIT_CONFIG_FILE)" --coverage-clover="$@"

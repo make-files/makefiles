@@ -44,7 +44,7 @@ coverage-open:: coverage-peridot-open
 # test-peridot --- Executes all Peridot tests in this package.
 .PHONY: test-peridot
 test-peridot: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	php $(_PHP_PERIDOT_RUNTIME_ARGS) vendor/bin/peridot -c $(PHP_PERIDOT_CONFIG_FILE) --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)"
+	php $(_PHP_PERIDOT_RUNTIME_ARGS) vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)"
 
 # coverage-peridot --- Produces a Peridot HTML coverage report.
 .PHONY: coverage-peridot
@@ -68,7 +68,7 @@ ci:: artifacts/coverage/peridot/clover.xml
 ################################################################################
 
 artifacts/coverage/peridot/index.html: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c $(PHP_PERIDOT_CONFIG_FILE) --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter html-code-coverage --code-coverage-path "$(@D)"
+	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter html-code-coverage --code-coverage-path "$(@D)"
 
 artifacts/coverage/peridot/clover.xml: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c $(PHP_PERIDOT_CONFIG_FILE) --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter clover-code-coverage --code-coverage-path "$@"
+	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter clover-code-coverage --code-coverage-path "$@"
