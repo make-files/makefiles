@@ -24,6 +24,9 @@ else
 _PHP_PERIDOT_RUNTIME_ARGS += -c "$(_PHP_PERIDOT_INI_FILE)"
 endif
 
+# _PHP_PERIDOT_ARGS is a set of arguments to use for every execution of Peridot.
+_PHP_PERIDOT_ARGS := -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)"
+
 ################################################################################
 
 # test --- Executes all tests in this package. Stacks with test targets from
@@ -44,7 +47,7 @@ coverage-open:: coverage-peridot-open
 # test-peridot --- Executes all Peridot tests in this package.
 .PHONY: test-peridot
 test-peridot: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	php $(_PHP_PERIDOT_RUNTIME_ARGS) vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)"
+	php $(_PHP_PERIDOT_RUNTIME_ARGS) vendor/bin/peridot $(_PHP_PERIDOT_ARGS)
 
 # coverage-peridot --- Produces a Peridot HTML coverage report.
 .PHONY: coverage-peridot
@@ -68,7 +71,7 @@ ci:: artifacts/coverage/peridot/clover.xml
 ################################################################################
 
 artifacts/coverage/peridot/index.html: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter html-code-coverage --code-coverage-path "$(@D)"
+	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter html-code-coverage --code-coverage-path "$(@D)"
 
 artifacts/coverage/peridot/clover.xml: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ) | vendor
-	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)" --reporter clover-code-coverage --code-coverage-path "$@"
+	phpdbg $(_PHP_PERIDOT_RUNTIME_ARGS) -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter clover-code-coverage --code-coverage-path "$@"
