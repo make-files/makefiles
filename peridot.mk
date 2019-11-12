@@ -56,7 +56,7 @@ coverage-peridot-open: artifacts/coverage/peridot/index.html
 	open "$<"
 
 # prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target form the common makefile.
+# with the "prepare" target from the common makefile.
 .PHONY: prepare
 prepare:: test
 

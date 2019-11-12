@@ -28,7 +28,7 @@ DOCKER_BUILD_REQ += composer.json composer.lock
 ################################################################################
 
 # prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target form the common makefile.
+# with the "prepare" target from the common makefile.
 .PHONY: prepare
 prepare:: artifacts/composer/validate.touch
 
