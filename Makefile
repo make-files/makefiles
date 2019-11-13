@@ -11,6 +11,9 @@ PHP_CS_FIXER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .php
 # PHP_PERIDOT_CONFIG_FILE is the path to any existing Peridot configuration.
 PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file peridot.php)
 
+# PHP_PHPSTAN_CONFIG_FILE is the path to any existing PHPStan configuration.
+PHP_PHPSTAN_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file phpstan.neon phpstan.neon.dist)
+
 # PHP_PHPUNIT_CONFIG_FILE is the path to any existing PHPUnit configuration.
 PHP_PHPUNIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file phpunit.xml phpunit.xml.dist)
 
@@ -28,9 +31,7 @@ DOCKER_BUILD_REQ += vendor
 
 -include .makefiles/pkg/php/v1/composer.mk
 
-ifneq ($(PHP_CS_FIXER_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/php-cs-fixer.mk
-endif
+# Test runners
 
 ifneq ($(PHP_PERIDOT_CONFIG_FILE),)
 -include .makefiles/pkg/php/v1/peridot.mk
@@ -38,4 +39,14 @@ endif
 
 ifneq ($(PHP_PHPUNIT_CONFIG_FILE),)
 -include .makefiles/pkg/php/v1/phpunit.mk
+endif
+
+# Lint tools
+
+ifneq ($(PHP_PHPSTAN_CONFIG_FILE),)
+-include .makefiles/pkg/php/v1/phpstan.mk
+endif
+
+ifneq ($(PHP_CS_FIXER_CONFIG_FILE),)
+-include .makefiles/pkg/php/v1/php-cs-fixer.mk
 endif
