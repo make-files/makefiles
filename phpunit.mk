@@ -2,6 +2,11 @@
 # PHPUnit tests.
 PHP_PHPUNIT_REQ +=
 
+# PHP_PHPUNIT_RESULT_CACHE_FILE is the path to use for the PHPUnit result cache
+# file. Can be set to an empty value for older versions of PHPUnit that do not
+# supprt the --cache-result-file option.
+PHP_PHPUNIT_RESULT_CACHE_FILE ?= artifacts/test/phpunit.result.cache
+
 ################################################################################
 
 # _PHP_PHPUNIT_INI_FILE is the path to a PHP INI file that should be used when
@@ -22,6 +27,10 @@ endif
 
 # _PHP_PHPUNIT_ARGS is a set of arguments to use for every execution of PHPUnit.
 _PHP_PHPUNIT_ARGS := -c "$(PHP_PHPUNIT_CONFIG_FILE)"
+
+ifneq ($(PHP_PHPUNIT_RESULT_CACHE_FILE),)
+	_PHP_PHPUNIT_ARGS += --cache-result-file "$(PHP_PHPUNIT_RESULT_CACHE_FILE)"
+endif
 
 ################################################################################
 
