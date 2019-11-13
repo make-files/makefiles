@@ -62,7 +62,9 @@ else
 endif
 
 composer.json:
+ifeq ($(wildcard composer.json),)
 	composer init --no-interaction
+endif
 
 artifacts/lint/composer-validate.touch: composer.json
 	composer validate $(_PHP_COMPOSER_VALIDATE_ARGS)
