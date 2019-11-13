@@ -34,20 +34,27 @@ endif
 
 ################################################################################
 
-# test --- Executes all tests in this package. Stacks with test targets from
-# other test runners.
+# test --- Executes all tests.
 .PHONY: test
 test:: test-phpunit
 
-# coverage --- Produces an HTML coverage report. Stacks with coverage targets
-# from other test runners.
+# coverage --- Produce all HTML coverage reports.
 .PHONY: coverage
 coverage:: coverage-phpunit
 
-# coverage-open --- Opens all HTML coverage reports in a browser. Stacks with
-# coverage-open targets from other test runners.
+# coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
 coverage-open:: coverage-phpunit-open
+
+# prepare --- Perform tasks that need to be executed before committing.
+.PHONY: prepare
+prepare:: test-phpunit
+
+# ci --- Perform tasks that should be run as part of continuous integration.
+.PHONY: ci
+ci:: ci-phpunit
+
+################################################################################
 
 # test-phpunit --- Executes all PHPUnit tests in this package.
 .PHONY: test-phpunit
@@ -62,15 +69,10 @@ coverage-phpunit: artifacts/coverage/phpunit/index.html
 coverage-phpunit-open: artifacts/coverage/phpunit/index.html
 	open "$<"
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target from the common makefile.
-.PHONY: prepare
-prepare:: test-phpunit
-
-# ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
-# from the common makefile.
-.PHONY: ci
-ci:: artifacts/coverage/phpunit/clover.xml
+# ci-phpunit --- Executes all PHPUnit tests in this package, and produces a
+#                machine-readable coverage report.
+.PHONY: ci-phpunit
+ci-phpunit: artifacts/coverage/phpunit/clover.xml
 
 ################################################################################
 

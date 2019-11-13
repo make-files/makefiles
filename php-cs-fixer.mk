@@ -18,25 +18,29 @@ _PHP_CS_FIXER_ARGS := fix --config "$(PHP_CS_FIXER_CONFIG_FILE)" --cache-file "$
 
 ################################################################################
 
-# lint --- Check for code style and formatting issues, fixing automatically
-# where possible. Stacks with the "lint" target from other makefiles.
+# lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
 lint:: lint-php-cs-fixer
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target from the common makefile.
+# prepare --- Perform tasks that need to be executed before committing.
 .PHONY: prepare
 prepare:: lint-php-cs-fixer
 
-# ci --- Enforce code style and formatting rules. Stacks with the "ci" target
-# from the common makefile.
+# ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: artifacts/lint/php-cs-fixer-ci.touch
+ci:: ci-php-cs-fixer
+
+################################################################################
 
 # lint-php-cs-fixer --- Check for PHP code style and formatting issues, fixing
-# automatically where possible.
+#                       automatically where possible.
 .PHONY: lint-php-cs-fixer
-lint-php-cs-fixer: artifacts/lint/php-cs-fixer-fix.touch
+lint-php-cs-fixer: artifacts/lint/php-cs-fixer-fix.touch#
+
+# lint-php-cs-fixer --- Check for PHP code style and formatting issues, and fail
+#                       if any issues are detected.
+.PHONY: ci-php-cs-fixer
+ci-php-cs-fixer: artifacts/lint/php-cs-fixer-ci.touch
 
 ################################################################################
 

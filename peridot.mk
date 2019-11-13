@@ -29,20 +29,27 @@ _PHP_PERIDOT_ARGS := -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_P
 
 ################################################################################
 
-# test --- Executes all tests in this package. Stacks with test targets from
-# other test runners.
+# test --- Executes all tests.
 .PHONY: test
 test:: test-peridot
 
-# coverage --- Produces an HTML coverage report. Stacks with coverage targets
-# from other test runners.
+# coverage --- Produce all HTML coverage reports.
 .PHONY: coverage
 coverage:: coverage-peridot
 
-# coverage-open --- Opens all HTML coverage reports in a browser. Stacks with
-# coverage-open targets from other test runners.
+# coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
 coverage-open:: coverage-peridot-open
+
+# prepare --- Perform tasks that need to be executed before committing.
+.PHONY: prepare
+prepare:: test-peridot
+
+# ci --- Perform tasks that should be run as part of continuous integration.
+.PHONY: ci
+ci:: ci-peridot
+
+################################################################################
 
 # test-peridot --- Executes all Peridot tests in this package.
 .PHONY: test-peridot
@@ -57,15 +64,10 @@ coverage-peridot: artifacts/coverage/peridot/index.html
 coverage-peridot-open: artifacts/coverage/peridot/index.html
 	open "$<"
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target from the common makefile.
-.PHONY: prepare
-prepare:: test-peridot
-
-# ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
-# from the common makefile.
-.PHONY: ci
-ci:: artifacts/coverage/peridot/clover.xml
+# ci-peridot --- Executes all Peridot tests in this package, and produces a
+#                machine-readable coverage report.
+.PHONY: ci-peridot
+ci-peridot: artifacts/coverage/peridot/clover.xml
 
 ################################################################################
 

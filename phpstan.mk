@@ -13,17 +13,19 @@ _PHP_PHPSTAN_ARGS := analyze -c "$(PHP_PHPSTAN_CONFIG_FILE)"
 
 ################################################################################
 
-# lint --- Check for code style and formatting issues. Stacks with the "lint" target from other makefiles.
+# lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
 lint:: lint-phpstan
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks with the "prepare" target from the common makefile.
+# prepare --- Perform tasks that need to be executed before committing.
 .PHONY: prepare
 prepare:: lint-phpstan
 
-# ci --- Enforce code style and formatting rules. Stacks with the "ci" target from the common makefile.
+# ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: artifacts/lint/phpstan.touch
+ci:: lint-phpstan
+
+################################################################################
 
 # lint-phpstan --- Check for PHP code style and formatting issues.
 .PHONY: lint-phpstan

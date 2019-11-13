@@ -31,20 +31,19 @@ DOCKER_BUILD_REQ += composer.json composer.lock
 
 ################################################################################
 
-# lint --- Validate composer.json and composer.lock. Stacks with the "lint"
-# target from other makefiles.
+# lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
 lint:: lint-composer-validate
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target from the common makefile.
+# prepare --- Perform tasks that need to be executed before committing.
 .PHONY: prepare
 prepare:: lint-composer-validate
 
-# ci --- Validate composer.json and composer.lock. Stacks with the "ci" target
-# from the common makefile.
+# ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: lint-composer-validate
+
+################################################################################
 
 # lint-composer-validate --- Validate composer.json and composer.lock.
 .PHONY: lint-composer-validate
