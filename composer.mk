@@ -31,15 +31,24 @@ DOCKER_BUILD_REQ += composer.json composer.lock
 
 ################################################################################
 
+# lint --- Validate composer.json and composer.lock. Stacks with the "lint"
+# target from other makefiles.
+.PHONY: lint
+lint:: lint-composer-validate
+
 # prepare --- Perform tasks that need to be executed before committing. Stacks
 # with the "prepare" target from the common makefile.
 .PHONY: prepare
-prepare:: artifacts/composer/validate.touch
+prepare:: lint-composer-validate
 
 # ci --- Validate composer.json and composer.lock. Stacks with the "ci" target
 # from the common makefile.
 .PHONY: ci
-ci:: artifacts/composer/validate.touch
+ci:: lint-composer-validate
+
+# lint-composer-validate --- Validate composer.json and composer.lock.
+.PHONY: lint-composer-validate
+lint-composer-validate: artifacts/lint/composer-validate.touch
 
 ################################################################################
 
@@ -56,7 +65,7 @@ endif
 composer.json:
 	composer init --no-interaction
 
-artifacts/composer/validate.touch: composer.json
+artifacts/lint/composer-validate.touch: composer.json
 	composer validate $(_PHP_COMPOSER_VALIDATE_ARGS)
 
 	@mkdir -p "$(@D)"
