@@ -65,7 +65,7 @@ coverage-phpunit-open: artifacts/coverage/phpunit/index.html
 # prepare --- Perform tasks that need to be executed before committing. Stacks
 # with the "prepare" target from the common makefile.
 .PHONY: prepare
-prepare:: test
+prepare:: test-phpunit
 
 # ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
 # from the common makefile.
