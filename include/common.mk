@@ -49,11 +49,17 @@ ifneq ($(GENERATED_FILES),)
 	$(MAKE) --no-print-directory -- $(GENERATED_FILES)
 endif
 
+# test --- Executes all tests.
+# Individual language Makefiles are expected to add additional recipies for this
+# target.
+.PHONY: test
+test::
+
 # prepare --- Perform tasks that need to be executed before committing.
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
 .PHONY:
-prepare:: $(GENERATED_FILES)
+prepare:: $(GENERATED_FILES) test
 
 # ci --- Perform tasks that need to be executed within a continuous integration
 # environment. Individual language Makefiles are expected to add additional
