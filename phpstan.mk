@@ -17,10 +17,6 @@ _PHP_PHPSTAN_ARGS := analyze -c "$(PHP_PHPSTAN_CONFIG_FILE)"
 .PHONY: lint
 lint:: lint-phpstan
 
-# prepare --- Perform tasks that need to be executed before committing.
-.PHONY: prepare
-prepare:: lint-phpstan
-
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: lint-phpstan
