@@ -8,6 +8,9 @@ PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
 # configuration.
 PHP_CS_FIXER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .php_cs .php_cs.dist)
 
+# PHP_KAHLAN_CONFIG_FILE is the path to any existing Kahlan configuration.
+PHP_KAHLAN_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file kahlan-config.php)
+
 # PHP_PERIDOT_CONFIG_FILE is the path to any existing Peridot configuration.
 PHP_PERIDOT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file peridot.php)
 
@@ -32,6 +35,10 @@ DOCKER_BUILD_REQ += vendor
 -include .makefiles/pkg/php/v1/composer.mk
 
 # Test runners
+
+ifneq ($(PHP_KAHLAN_CONFIG_FILE),)
+-include .makefiles/pkg/php/v1/kahlan.mk
+endif
 
 ifneq ($(PHP_PERIDOT_CONFIG_FILE),)
 -include .makefiles/pkg/php/v1/peridot.mk
