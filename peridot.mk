@@ -33,7 +33,7 @@ _PHP_PERIDOT_ARGS := -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_P
 .PHONY: test
 test:: test-peridot
 
-# coverage --- Produce all HTML coverage reports.
+# coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
 coverage:: coverage-peridot
 

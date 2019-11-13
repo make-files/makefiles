@@ -38,7 +38,7 @@ endif
 .PHONY: test
 test:: test-phpunit
 
-# coverage --- Produce all HTML coverage reports.
+# coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
 coverage:: coverage-phpunit
 
