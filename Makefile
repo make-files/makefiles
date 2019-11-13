@@ -1,5 +1,4 @@
 DOCKER_REPO := makefiles/test
-PHP_PERIDOT_PRIMARY_REPORTER := dot
 
 -include .makefiles/Makefile
 -include .makefiles/pkg/php/v1/Makefile
