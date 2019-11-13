@@ -85,16 +85,16 @@ DOCKER_BUILD_REQ += $(addprefix artifacts/build/release/linux/amd64/,$(_GO_EXECU
 
 # test --- Executes all go tests in this module.
 .PHONY: test
-test: $(GENERATED_FILES)
+test:: $(GENERATED_FILES)
 	go test ./...
 
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
-coverage: artifacts/coverage/index.html
+coverage:: artifacts/coverage/index.html
 
 # coverage-open --- Opens the HTML coverage report in a browser.
 .PHONY: coverage-open
-coverage-open: artifacts/coverage/index.html
+coverage-open:: artifacts/coverage/index.html
 	open "$<"
 
 # prepare --- Perform tasks that need to be executed before committing. Stacks
