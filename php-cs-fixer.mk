@@ -33,8 +33,8 @@ ci:: ci-php-cs-fixer
 .PHONY: lint-php-cs-fixer
 lint-php-cs-fixer: artifacts/lint/php-cs-fixer/fix.touch
 
-# lint-php-cs-fixer --- Check for PHP code style and formatting issues, and fail
-#                       if any issues are detected.
+# ci-php-cs-fixer --- Check for PHP code style and formatting issues, and fail
+#                     if any issues are detected.
 .PHONY: ci-php-cs-fixer
 ci-php-cs-fixer: artifacts/lint/php-cs-fixer/ci.touch
 
