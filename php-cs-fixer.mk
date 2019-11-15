@@ -44,7 +44,7 @@ artifacts/lint/php-cs-fixer:
 	@mkdir -p "$@"
 
 artifacts/lint/php-cs-fixer-ci.touch: artifacts/lint/php-cs-fixer $(PHP_CS_FIXER_REQ) $(_PHP_CS_FIXER_REQ)
-	vendor/bin/php-cs-fixer $(_PHP_CS_FIXER_ARGS) --dry-run
+	vendor/bin/php-cs-fixer $(_PHP_CS_FIXER_ARGS) --dry-run --diff
 
 	@touch "$@"
 
