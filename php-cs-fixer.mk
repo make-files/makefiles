@@ -31,24 +31,24 @@ ci:: ci-php-cs-fixer
 # lint-php-cs-fixer --- Check for PHP code style and formatting issues, fixing
 #                       automatically where possible.
 .PHONY: lint-php-cs-fixer
-lint-php-cs-fixer: artifacts/lint/php-cs-fixer-fix.touch#
+lint-php-cs-fixer: artifacts/lint/php-cs-fixer/fix.touch
 
 # lint-php-cs-fixer --- Check for PHP code style and formatting issues, and fail
 #                       if any issues are detected.
 .PHONY: ci-php-cs-fixer
-ci-php-cs-fixer: artifacts/lint/php-cs-fixer-ci.touch
+ci-php-cs-fixer: artifacts/lint/php-cs-fixer/ci.touch
 
 ################################################################################
 
 artifacts/lint/php-cs-fixer:
 	@mkdir -p "$@"
 
-artifacts/lint/php-cs-fixer-ci.touch: artifacts/lint/php-cs-fixer $(PHP_CS_FIXER_REQ) $(_PHP_CS_FIXER_REQ)
-	vendor/bin/php-cs-fixer $(_PHP_CS_FIXER_ARGS) --dry-run --diff
+artifacts/lint/php-cs-fixer/ci.touch: artifacts/lint/php-cs-fixer $(PHP_CS_FIXER_REQ) $(_PHP_CS_FIXER_REQ)
+	vendor/bin/php-cs-fixer $(_PHP_CS_FIXER_ARGS) --dry-run
 
 	@touch "$@"
 
-artifacts/lint/php-cs-fixer-fix.touch: artifacts/lint/php-cs-fixer $(PHP_CS_FIXER_REQ) $(_PHP_CS_FIXER_REQ)
+artifacts/lint/php-cs-fixer/fix.touch: artifacts/lint/php-cs-fixer $(PHP_CS_FIXER_REQ) $(_PHP_CS_FIXER_REQ)
 	vendor/bin/php-cs-fixer $(_PHP_CS_FIXER_ARGS)
 
 	@touch "$@"
