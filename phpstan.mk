@@ -19,18 +19,29 @@ lint:: lint-phpstan
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: lint-phpstan
+ci:: ci-phpstan
 
 ################################################################################
 
-# lint-phpstan --- Check for PHP code style and formatting issues.
+# lint-phpstan --- Statically analyze code and report potential issues.
 .PHONY: lint-phpstan
-lint-phpstan: artifacts/lint/phpstan.touch
+lint-phpstan: artifacts/lint/phpstan/analyze.touch
+
+# ci-phpstan --- Statically analyze code and report potential issues under CI.
+.PHONY: ci-phpstan
+ci-phpstan: artifacts/lint/phpstan/ci.touch
 
 ################################################################################
 
-artifacts/lint/phpstan.touch: $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
+artifacts/lint/phpstan:
+	@mkdir -p "$@"
+
+artifacts/lint/phpstan/analyze.touch: artifacts/lint/phpstan $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
 	vendor/bin/phpstan $(_PHP_PHPSTAN_ARGS)
 
-	@mkdir -p "$(@D)"
+	@touch "$@"
+
+artifacts/lint/phpstan/ci.touch: artifacts/lint/phpstan $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
+	vendor/bin/phpstan $(_PHP_PHPSTAN_ARGS) --no-progress
+
 	@touch "$@"
