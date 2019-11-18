@@ -25,8 +25,7 @@ _PHP_KAHLAN_RUNTIME_ARGS += -c "$(_PHP_KAHLAN_INI_FILE)"
 endif
 
 # _PHP_KAHLAN_ARGS is a set of arguments to use for every execution of Kahlan.
-# The config file cannot be passed explicitly because of https://github.com/kahlan/kahlan/issues/335
-_PHP_KAHLAN_ARGS := # --config "$(PHP_KAHLAN_CONFIG_FILE)"
+_PHP_KAHLAN_ARGS := --config="$(PHP_KAHLAN_CONFIG_FILE)"
 
 # _PHP_KAHLAN_COVERAGE_ARGS is a set of arguments to use for every execution of
 # Kahlan that produces coverage reports.
