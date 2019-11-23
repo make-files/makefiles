@@ -149,12 +149,13 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
 	$(eval BUILD := $(word 1,$(PARTS)))
 	$(eval OS    := $(word 2,$(PARTS)))
-	$(eval ARCH  := $(word 3,$(PARTS)))
+	$(eval ARCH  := $(patsubst arm%,arm,$(word 3,$(PARTS))))
+	$(eval GOARM := $(patsubst arm%,%,$(filter arm%,$(word 3,$(PARTS)))))
 	$(eval BIN   := $(word 4,$(PARTS)))
 	$(eval PKG   := $(basename $(BIN)))
 	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
 
-	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" go build $(ARGS) -o "$@" "./cmd/$(PKG)"
+	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build $(ARGS) -o "$@" "./cmd/$(PKG)"
 
 artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/windows/$$*/,$(_GO_EXECUTABLES_WIN))
 	@mkdir -p "$(@D)"
