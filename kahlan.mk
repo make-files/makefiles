@@ -14,7 +14,7 @@ _PHP_KAHLAN_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.kahl
 
 # _PHP_KAHLAN_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Kahlan tests.
-_PHP_KAHLAN_REQ += vendor $(_PHP_KAHLAN_INI_FILE) $(PHP_KAHLAN_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+_PHP_KAHLAN_REQ += vendor $(_PHP_KAHLAN_INI_FILE) $(PHP_KAHLAN_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
 
 # _PHP_KAHLAN_RUNTIME_ARGS is a set of arguments to pass to the PHP runtime
 # when running Kahlan tests.

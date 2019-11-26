@@ -15,7 +15,7 @@ _PHP_PHPUNIT_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.php
 
 # _PHP_PHPUNIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the PHPUnit tests.
-_PHP_PHPUNIT_REQ += vendor $(_PHP_PHPUNIT_INI_FILE) $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+_PHP_PHPUNIT_REQ += vendor $(_PHP_PHPUNIT_INI_FILE) $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
 
 # _PHP_PHPUNIT_RUNTIME_ARGS is a set of arguments to pass to the PHP runtime
 # when running PHPUnit tests.

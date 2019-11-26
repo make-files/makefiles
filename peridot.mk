@@ -14,7 +14,7 @@ _PHP_PERIDOT_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.per
 
 # _PHP_PERIDOT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Peridot tests.
-_PHP_PERIDOT_REQ += vendor $(_PHP_PERIDOT_INI_FILE) $(PHP_PERIDOT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS)
+_PHP_PERIDOT_REQ += vendor $(_PHP_PERIDOT_INI_FILE) $(PHP_PERIDOT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
 
 # _PHP_PERIDOT_RUNTIME_ARGS is a set of arguments to pass to the PHP runtime
 # when running Peridot tests.

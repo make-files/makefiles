@@ -6,7 +6,7 @@ PHP_PHPSTAN_REQ +=
 
 # _PHP_PHPSTAN_REQ is a space separated list of automatically detected
 # prerequisites needed to run PHPStan.
-_PHP_PHPSTAN_REQ += vendor $(PHP_PHPSTAN_CONFIG_FILE) $(PHP_SOURCE_FILES)
+_PHP_PHPSTAN_REQ += vendor $(PHP_PHPSTAN_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_REQ)
 
 # _PHP_PHPSTAN_ARGS is a space separated list of arguments to pass to PHPStan.
 _PHP_PHPSTAN_ARGS := analyze -c "$(PHP_PHPSTAN_CONFIG_FILE)"
