@@ -12,6 +12,10 @@ PROJECT_NAME ?= $(notdir $(MF_PROJECT_ROOT))
 # the Makefile and are intended to be committed to the repository.
 GENERATED_FILES +=
 
+# CI_VERIFY_GENERATED_FILES, if non-empty, causes the "ci" target to check that
+# the files in GENERATED_FILES are up-to-date.
+CI_VERIFY_GENERATED_FILES ?= true
+
 # GET_HEAD_xxx variables containing information about the commit at the head of
 # the working tree.
 GIT_HEAD_HASH		?= $(shell git rev-parse --short --verify HEAD)
@@ -72,9 +76,11 @@ prepare:: $(GENERATED_FILES) test lint
 # recipies for this target.
 .PHONY: ci
 ci::
+ifneq ($(CI_VERIFY_GENERATED_FILES),)
 ifneq ($(GENERATED_FILES),)
 	@echo "--- checking for out-of-date generated files"
 	@$(MAKE) --no-print-directory regenerate
 	@git diff -- $(GENERATED_FILES)
 	@!(git status --porcelain -- $(GENERATED_FILES) | grep .)
+endif
 endif
