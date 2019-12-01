@@ -19,6 +19,10 @@ _PHP_KAHLAN_ARGS := --config="$(PHP_KAHLAN_CONFIG_FILE)"
 # Kahlan that produces coverage reports.
 _PHP_KAHLAN_COVERAGE_ARGS := $(_PHP_KAHLAN_ARGS) --coverage="$(PHP_KAHLAN_COVERAGE_LEVEL)"
 
+# _PHP_KAHLAN_COVERAGE_DRIVER is the extension or SAPI that will be used for
+# Kahlan code coverage generation.
+_PHP_KAHLAN_COVERAGE_DRIVER := $(shell $(MF_ROOT)/pkg/php/v1/bin/coverage-driver xdebug phpdbg)
+
 ################################################################################
 
 # test --- Executes all tests.
@@ -63,13 +67,21 @@ artifacts/coverage/kahlan:
 	@mkdir -p "$@"
 
 artifacts/coverage/kahlan/clover.xml: artifacts/coverage/kahlan $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
-	phpdbg -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --clover="$@"
+ifeq ($(_PHP_KAHLAN_COVERAGE_DRIVER),phpdbg)
+	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --clover="$@"
+else
+	vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --clover="$@"
+endif
 
 artifacts/coverage/kahlan/index.html: artifacts/coverage/kahlan/lcov.info
 	@genhtml -t "$(PROJECT_NAME)" -o "$(@D)" "$<" > /dev/null
 
 artifacts/coverage/kahlan/lcov.info: artifacts/coverage/kahlan $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
-	phpdbg -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --lcov="$@"
+ifeq ($(_PHP_KAHLAN_COVERAGE_DRIVER),phpdbg)
+	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --lcov="$@"
+else
+	vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --lcov="$@"
+endif
 
 artifacts/test/kahlan.touch: $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
 	vendor/bin/kahlan $(_PHP_KAHLAN_ARGS)
