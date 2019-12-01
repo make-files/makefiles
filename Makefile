@@ -1,5 +1,6 @@
 DOCKER_REPO := makefiles/test
 PHP_PERIDOT_PRIMARY_REPORTER := dot
+PHP_PHPUNIT_RESULT_CACHE_FILE :=
 
 -include .makefiles/Makefile
 -include .makefiles/pkg/php/v1/Makefile
