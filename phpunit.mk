@@ -20,6 +20,10 @@ ifneq ($(PHP_PHPUNIT_RESULT_CACHE_FILE),)
 	_PHP_PHPUNIT_ARGS += --cache-result-file "$(PHP_PHPUNIT_RESULT_CACHE_FILE)"
 endif
 
+# _PHP_PHPUNIT_COVERAGE_DRIVER is the extension or SAPI that will be used for
+# PHPUnit code coverage generation.
+_PHP_PHPUNIT_COVERAGE_DRIVER := $(shell $(MF_ROOT)/pkg/php/v1/bin/coverage-driver pcov xdebug phpdbg)
+
 ################################################################################
 
 # test --- Executes all tests.
@@ -61,10 +65,24 @@ ci-phpunit: artifacts/coverage/phpunit/clover.xml
 ################################################################################
 
 artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
+ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+else ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),pcov)
+	@[[ ! -x vendor/bin/pcov ]] || vendor/bin/pcov clobber
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+else
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+endif
 
 artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
+ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
+else ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),pcov)
+	@[[ ! -x vendor/bin/pcov ]] || vendor/bin/pcov clobber
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+else
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
+endif
 
 artifacts/test/phpunit.touch: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
 	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --no-coverage
