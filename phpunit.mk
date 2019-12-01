@@ -9,21 +9,9 @@ PHP_PHPUNIT_RESULT_CACHE_FILE ?= artifacts/test/phpunit.result.cache
 
 ################################################################################
 
-# _PHP_PHPUNIT_INI_FILE is the path to a PHP INI file that should be used when
-# running PHPUnit tests.
-_PHP_PHPUNIT_INI_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file php.phpunit.ini)
-
 # _PHP_PHPUNIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the PHPUnit tests.
-_PHP_PHPUNIT_REQ += vendor $(_PHP_PHPUNIT_INI_FILE) $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
-
-# _PHP_PHPUNIT_RUNTIME_ARGS is a set of arguments to pass to the PHP runtime
-# when running PHPUnit tests.
-ifeq ($(_PHP_PHPUNIT_INI_FILE),)
-_PHP_PHPUNIT_RUNTIME_ARGS +=
-else
-_PHP_PHPUNIT_RUNTIME_ARGS += -c "$(_PHP_PHPUNIT_INI_FILE)"
-endif
+_PHP_PHPUNIT_REQ += vendor $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
 
 # _PHP_PHPUNIT_ARGS is a set of arguments to use for every execution of PHPUnit.
 _PHP_PHPUNIT_ARGS := -c "$(PHP_PHPUNIT_CONFIG_FILE)"
@@ -73,13 +61,13 @@ ci-phpunit: artifacts/coverage/phpunit/clover.xml
 ################################################################################
 
 artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
-	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
 
 artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
-	phpdbg $(_PHP_PHPUNIT_RUNTIME_ARGS) -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
+	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
 
 artifacts/test/phpunit.touch: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
-	php $(_PHP_PHPUNIT_RUNTIME_ARGS) vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --no-coverage
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --no-coverage
 
 	@mkdir -p "$(@D)"
 	@touch "$@"
