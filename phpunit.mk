@@ -79,7 +79,7 @@ ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
 else ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),pcov)
 	@[ ! -x vendor/bin/pcov ] || vendor/bin/pcov clobber
-	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
 else
 	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
 endif
