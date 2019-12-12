@@ -100,7 +100,7 @@ coverage-open:: artifacts/coverage/index.html
 # prepare --- Perform tasks that need to be executed before committing. Stacks
 # with the "prepare" target form the common makefile.
 .PHONY: prepare
-prepare:: test
+prepare::
 	go fmt ./...
 	go mod tidy
 
