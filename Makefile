@@ -97,10 +97,10 @@ coverage:: artifacts/coverage/index.html
 coverage-open:: artifacts/coverage/index.html
 	open "$<"
 
-# prepare --- Perform tasks that need to be executed before committing. Stacks
-# with the "prepare" target form the common makefile.
-.PHONY: prepare
-prepare::
+# precommit --- Perform tasks that need to be executed before committing. Stacks
+# with the "precommit" target form the common makefile.
+.PHONY: precommit
+precommit::
 	go fmt ./...
 	go mod tidy
 
