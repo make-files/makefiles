@@ -2,6 +2,12 @@ export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
 export PATH := $(MF_ROOT)/lib/core/bin:$(PATH)
 
+# Run tests by default unless the project's main Makefile has already defined a
+# default goal.
+ifeq ($(.DEFAULT_GOAL),)
+.DEFAULT_GOAL := test
+endif
+
 .SECONDEXPANSION:
 
 # PROJECT_NAME is a short name for the project. It defaults to the name of the
