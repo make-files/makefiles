@@ -100,7 +100,7 @@ coverage-open:: artifacts/coverage/index.html
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
-precommit::
+precommit:: test
 	go fmt ./...
 	go mod tidy
 
