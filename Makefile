@@ -4,6 +4,9 @@
 # JS_SOURCE_FILES is a space separated list of source files in the repo.
 JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.js')
 
+# JS_ESLINT_CONFIG_FILE is the path to any existing Jest configuration.
+JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslintrc.js .eslintrc.cjs .eslintrc.yaml .eslintrc.yml .eslintrc.json .eslintrc)
+
 # JS_JEST_CONFIG_FILE is the path to any existing Jest configuration.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.js jest.config.cjs jest.config.json)
 
@@ -23,6 +26,14 @@ DOCKER_BUILD_REQ += node_modules
 
 ################################################################################
 
+# Test runners
+
 ifneq ($(JS_JEST_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/jest.mk
+endif
+
+# Lint tools
+
+ifneq ($(JS_ESLINT_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/eslint.mk
 endif
