@@ -33,6 +33,10 @@ coverage:: coverage-peridot
 .PHONY: coverage-open
 coverage-open:: coverage-peridot-open
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: test-peridot
+
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: ci-peridot

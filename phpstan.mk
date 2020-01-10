@@ -27,6 +27,10 @@ ci:: ci-phpstan
 .PHONY: lint-phpstan
 lint-phpstan: artifacts/lint/phpstan/analyze.touch
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: lint-phpstan
+
 # ci-phpstan --- Statically analyze code and report potential issues under CI.
 .PHONY: ci-phpstan
 ci-phpstan: artifacts/lint/phpstan/ci.touch

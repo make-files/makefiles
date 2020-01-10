@@ -38,6 +38,10 @@ coverage:: coverage-phpunit
 .PHONY: coverage-open
 coverage-open:: coverage-phpunit-open
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: test-phpunit
+
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: ci-phpunit

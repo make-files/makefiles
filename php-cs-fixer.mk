@@ -22,6 +22,10 @@ _PHP_CS_FIXER_ARGS := fix --config "$(PHP_CS_FIXER_CONFIG_FILE)" --cache-file "$
 .PHONY: lint
 lint:: lint-php-cs-fixer
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: lint-php-cs-fixer
+
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: ci-php-cs-fixer
