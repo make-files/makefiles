@@ -74,7 +74,7 @@ lint::
 # precommit --- Perform tasks that need to be executed before committing.
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
-.PHONY:
+.PHONY: precommit
 precommit:: $(GENERATED_FILES) test lint
 
 # ci --- Perform tasks that need to be executed within a continuous integration
