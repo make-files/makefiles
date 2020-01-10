@@ -25,6 +25,10 @@ coverage:: coverage-jest
 .PHONY: coverage-open
 coverage-open:: coverage-jest-open
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: test-jest
+
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: ci-jest
