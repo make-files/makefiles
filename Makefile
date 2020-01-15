@@ -10,6 +10,9 @@ JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslint
 # JS_JEST_CONFIG_FILE is the path to any existing Jest configuration.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.*)
 
+# JS_WEBPACK_CONFIG_FILE is the path to any existing Webpack configuration.
+JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpack.config.*)
+
 ################################################################################
 
 # _JS_REQ is a space separated list of automatically detected prerequisites
@@ -25,6 +28,12 @@ _JS_TEST_ASSETS := $(shell find test -type f -not -iname "*.js" 2> /dev/null)
 DOCKER_BUILD_REQ += node_modules
 
 ################################################################################
+
+# Build systems
+
+ifneq ($(JS_WEBPACK_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/with-webpack.mk
+endif
 
 # Test runners
 
