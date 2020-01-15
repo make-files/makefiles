@@ -33,21 +33,21 @@ DOCKER_BUILD_REQ += composer.json composer.lock
 
 # lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
-lint:: lint-composer-validate
+lint:: composer-validate
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: lint-composer-validate
+precommit:: composer-validate
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: lint-composer-validate
+ci:: composer-validate
 
 ################################################################################
 
-# lint-composer-validate --- Validate composer.json and composer.lock.
-.PHONY: lint-composer-validate
-lint-composer-validate: artifacts/lint/composer-validate.touch
+# composer-validate --- Validate composer.json and composer.lock.
+.PHONY: composer-validate
+composer-validate: artifacts/lint/composer-validate.touch
 
 ################################################################################
 

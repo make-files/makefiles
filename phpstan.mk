@@ -15,25 +15,21 @@ _PHP_PHPSTAN_ARGS := analyze -c "$(PHP_PHPSTAN_CONFIG_FILE)"
 
 # lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
-lint:: lint-phpstan
+lint:: phpstan
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-phpstan
+ci:: artifacts/lint/phpstan/ci.touch
 
 ################################################################################
 
-# lint-phpstan --- Statically analyze code and report potential issues.
-.PHONY: lint-phpstan
-lint-phpstan: artifacts/lint/phpstan/analyze.touch
+# phpstan --- Statically analyze code and report potential issues.
+.PHONY: phpstan
+phpstan: artifacts/lint/phpstan/analyze.touch
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: lint-phpstan
-
-# ci-phpstan --- Statically analyze code and report potential issues under CI.
-.PHONY: ci-phpstan
-ci-phpstan: artifacts/lint/phpstan/ci.touch
+precommit:: phpstan
 
 ################################################################################
 

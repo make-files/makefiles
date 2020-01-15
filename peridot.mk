@@ -23,43 +23,38 @@ _PHP_PERIDOT_COVERAGE_DRIVER := $(shell $(MF_ROOT)/pkg/php/v1/bin/coverage-drive
 
 # test --- Executes all tests.
 .PHONY: test
-test:: test-peridot
+test:: peridot
 
 # coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
-coverage:: coverage-peridot
+coverage:: peridot-coverage
 
 # coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
-coverage-open:: coverage-peridot-open
+coverage-open:: peridot-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: test-peridot
+precommit:: peridot
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-peridot
+ci:: artifacts/coverage/peridot/clover.xml
 
 ################################################################################
 
-# test-peridot --- Executes all Peridot tests in this package.
-.PHONY: test-peridot
-test-peridot: artifacts/test/peridot.touch
+# peridot --- Executes all Peridot tests in this package.
+.PHONY: peridot
+peridot: artifacts/test/peridot.touch
 
-# coverage-peridot --- Produces a Peridot HTML coverage report.
-.PHONY: coverage-peridot
-coverage-peridot: artifacts/coverage/peridot/index.html
+# peridot-coverage --- Produces a Peridot HTML coverage report.
+.PHONY: peridot-coverage
+peridot-coverage: artifacts/coverage/peridot/index.html
 
-# coverage-peridot-open --- Opens the Peridot HTML coverage report in a browser.
-.PHONY: coverage-peridot-open
-coverage-peridot-open: artifacts/coverage/peridot/index.html
+# peridot-coverage-open --- Opens the Peridot HTML coverage report in a browser.
+.PHONY: peridot-coverage-open
+peridot-coverage-open: artifacts/coverage/peridot/index.html
 	open "$<"
-
-# ci-peridot --- Executes all Peridot tests in this package, and produces a
-#                machine-readable coverage report.
-.PHONY: ci-peridot
-ci-peridot: artifacts/coverage/peridot/clover.xml
 
 ################################################################################
 

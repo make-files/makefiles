@@ -28,43 +28,38 @@ _PHP_PHPUNIT_COVERAGE_DRIVER := $(shell $(MF_ROOT)/pkg/php/v1/bin/coverage-drive
 
 # test --- Executes all tests.
 .PHONY: test
-test:: test-phpunit
+test:: phpunit
 
 # coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
-coverage:: coverage-phpunit
+coverage:: phpunit-coverage
 
 # coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
-coverage-open:: coverage-phpunit-open
+coverage-open:: phpunit-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: test-phpunit
+precommit:: phpunit
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-phpunit
+ci:: artifacts/coverage/phpunit/clover.xml
 
 ################################################################################
 
-# test-phpunit --- Executes all PHPUnit tests in this package.
-.PHONY: test-phpunit
-test-phpunit: artifacts/test/phpunit.touch
+# phpunit --- Executes all PHPUnit tests in this package.
+.PHONY: phpunit
+phpunit: artifacts/test/phpunit.touch
 
-# coverage-phpunit --- Produces a PHPUnit HTML coverage report.
-.PHONY: coverage-phpunit
-coverage-phpunit: artifacts/coverage/phpunit/index.html
+# phpunit-coverage --- Produces a PHPUnit HTML coverage report.
+.PHONY: phpunit-coverage
+phpunit-coverage: artifacts/coverage/phpunit/index.html
 
-# coverage-phpunit-open --- Opens the PHPUnit HTML coverage report in a browser.
-.PHONY: coverage-phpunit-open
-coverage-phpunit-open: artifacts/coverage/phpunit/index.html
+# phpunit-coverage-open --- Opens the PHPUnit HTML coverage report in a browser.
+.PHONY: phpunit-coverage-open
+phpunit-coverage-open: artifacts/coverage/phpunit/index.html
 	open "$<"
-
-# ci-phpunit --- Executes all PHPUnit tests in this package, and produces a
-#                machine-readable coverage report.
-.PHONY: ci-phpunit
-ci-phpunit: artifacts/coverage/phpunit/clover.xml
 
 ################################################################################
 

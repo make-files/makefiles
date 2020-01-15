@@ -20,27 +20,22 @@ _PHP_CS_FIXER_ARGS := fix --config "$(PHP_CS_FIXER_CONFIG_FILE)" --cache-file "$
 
 # lint --- Check for syntax, configuration, code style and/or formatting issues.
 .PHONY: lint
-lint:: lint-php-cs-fixer
+lint:: php-cs-fixer
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: lint-php-cs-fixer
+precommit:: php-cs-fixer
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-php-cs-fixer
+ci:: artifacts/lint/php-cs-fixer/ci.touch
 
 ################################################################################
 
-# lint-php-cs-fixer --- Check for PHP code style and formatting issues, fixing
-#                       automatically where possible.
-.PHONY: lint-php-cs-fixer
-lint-php-cs-fixer: artifacts/lint/php-cs-fixer/fix.touch
-
-# ci-php-cs-fixer --- Check for PHP code style and formatting issues, and fail
-#                     if any issues are detected.
-.PHONY: ci-php-cs-fixer
-ci-php-cs-fixer: artifacts/lint/php-cs-fixer/ci.touch
+# php-cs-fixer --- Check for PHP code style and formatting issues, fixing
+#                  automatically where possible.
+.PHONY: php-cs-fixer
+php-cs-fixer: artifacts/lint/php-cs-fixer/fix.touch
 
 ################################################################################
 

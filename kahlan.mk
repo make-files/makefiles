@@ -27,43 +27,38 @@ _PHP_KAHLAN_COVERAGE_DRIVER := $(shell $(MF_ROOT)/pkg/php/v1/bin/coverage-driver
 
 # test --- Executes all tests.
 .PHONY: test
-test:: test-kahlan
+test:: kahlan
 
 # coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
-coverage:: coverage-kahlan
+coverage:: kahlan-coverage
 
 # coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
-coverage-open:: coverage-kahlan-open
+coverage-open:: kahlan-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: test-kahlan
+precommit:: kahlan
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-kahlan
+ci:: artifacts/coverage/kahlan/clover.xml
 
 ################################################################################
 
-# test-kahlan --- Executes all Kahlan tests in this package.
-.PHONY: test-kahlan
-test-kahlan: artifacts/test/kahlan.touch
+# kahlan --- Executes all Kahlan tests in this package.
+.PHONY: kahlan
+kahlan: artifacts/test/kahlan.touch
 
-# coverage-kahlan --- Produces a Kahlan HTML coverage report.
-.PHONY: coverage-kahlan
-coverage-kahlan: artifacts/coverage/kahlan/index.html
+# kahlan-coverage --- Produces a Kahlan HTML coverage report.
+.PHONY: kahlan-coverage
+kahlan-coverage: artifacts/coverage/kahlan/index.html
 
-# coverage-kahlan-open --- Opens the Kahlan HTML coverage report in a browser.
-.PHONY: coverage-kahlan-open
-coverage-kahlan-open: artifacts/coverage/kahlan/index.html
+# kahlan-coverage-open --- Opens the Kahlan HTML coverage report in a browser.
+.PHONY: kahlan-coverage-open
+kahlan-coverage-open: artifacts/coverage/kahlan/index.html
 	open "$<"
-
-# ci-kahlan --- Executes all Kahlan tests in this package, and produces a
-#               machine-readable coverage report.
-.PHONY: ci-kahlan
-ci-kahlan: artifacts/coverage/kahlan/clover.xml
 
 ################################################################################
 
