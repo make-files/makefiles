@@ -15,43 +15,38 @@ _JS_JEST_ARGS := --config "$(JS_JEST_CONFIG_FILE)"
 
 # test --- Executes all tests.
 .PHONY: test
-test:: test-jest
+test:: jest
 
 # coverage --- Executes all tests, producing coverage reports.
 .PHONY: coverage
-coverage:: coverage-jest
+coverage:: jest-coverage
 
 # coverage-open --- Opens all HTML coverage reports in a browser.
 .PHONY: coverage-open
-coverage-open:: coverage-jest-open
+coverage-open:: jest-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: test-jest
+precommit:: jest
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: ci-jest
+ci:: artifacts/coverage/jest/lcov.info
 
 ################################################################################
 
-# test-jest --- Executes all Jest tests in this package.
-.PHONY: test-jest
-test-jest: artifacts/test/jest.touch
+# jest --- Executes all Jest tests in this package.
+.PHONY: jest
+jest: artifacts/test/jest.touch
 
-# coverage-jest --- Produces a Jest HTML coverage report.
-.PHONY: coverage-jest
-coverage-jest: artifacts/coverage/jest/index.html
+# jest-coverage --- Produces a Jest HTML coverage report.
+.PHONY: jest-coverage
+jest-coverage: artifacts/coverage/jest/index.html
 
-# coverage-jest-open --- Opens the Jest HTML coverage report in a browser.
-.PHONY: coverage-jest-open
-coverage-jest-open: artifacts/coverage/jest/index.html
+# jest-coverage-open --- Opens the Jest HTML coverage report in a browser.
+.PHONY: jest-coverage-open
+jest-coverage-open: artifacts/coverage/jest/index.html
 	open "$<"
-
-# ci-jest --- Executes all Jest tests in this package, and produces a
-#             machine-readable coverage report.
-.PHONY: ci-jest
-ci-jest: artifacts/coverage/jest/lcov.info
 
 ################################################################################
 
