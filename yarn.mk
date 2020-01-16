@@ -13,7 +13,9 @@ node_modules: package.json
 	yarn install $(JS_YARN_INSTALL_ARGS)
 
 yarn.lock: package.json
-	yarn install $(JS_YARN_INSTALL_ARGS) && touch "$@"
+	yarn install $(JS_YARN_INSTALL_ARGS)
+
+	@touch "$@"
 
 package.json:
 ifeq ($(wildcard package.json),)
