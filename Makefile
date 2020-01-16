@@ -15,10 +15,6 @@ JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpac
 
 ################################################################################
 
-# _JS_REQ is a space separated list of automatically detected prerequisites
-# needed to run JavaScript targets.
-_JS_REQ += $(GENERATED_FILES)
-
 # _JS_TEST_ASSETS is a space separated list of all non-JS files in the test
 # directory.
 _JS_TEST_ASSETS := $(shell find test -type f -not -iname "*.js" 2> /dev/null)

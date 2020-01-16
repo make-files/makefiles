@@ -6,7 +6,7 @@ JS_WEBPACK_REQ +=
 
 # _JS_WEBPACK_REQ is a space separated list of automatically detected
 # prerequisites needed to run Webpack.
-_JS_WEBPACK_REQ += node_modules $(JS_WEBPACK_CONFIG_FILE) $(JS_SOURCE_FILES) $(_JS_REQ)
+_JS_WEBPACK_REQ += node_modules $(JS_WEBPACK_CONFIG_FILE) $(JS_SOURCE_FILES) $(GENERATED_FILES)
 
 ################################################################################
 

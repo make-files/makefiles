@@ -6,7 +6,7 @@ JS_JEST_REQ +=
 
 # _JS_JEST_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Jest tests.
-_JS_JEST_REQ += node_modules $(JS_JEST_CONFIG_FILE) $(JS_SOURCE_FILES) $(_JS_TEST_ASSETS) $(_JS_REQ)
+_JS_JEST_REQ += node_modules $(JS_JEST_CONFIG_FILE) $(JS_SOURCE_FILES) $(_JS_TEST_ASSETS) $(GENERATED_FILES)
 
 # _JS_JEST_ARGS is a set of arguments to use for every execution of Jest.
 _JS_JEST_ARGS := --config "$(JS_JEST_CONFIG_FILE)"
