@@ -32,7 +32,7 @@ _PHP_TEST_ASSETS := $(shell find test -type f -not -iname "*.php" 2> /dev/null)
 
 # Ensure that dependencies are installed before attempting to build a Docker
 # image.
-DOCKER_BUILD_REQ += vendor
+DOCKER_BUILD_REQ += vendor $(PHP_SOURCE_FILES)
 
 ################################################################################
 
