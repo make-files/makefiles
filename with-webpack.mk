@@ -31,16 +31,16 @@ webpack-analyze-open: artifacts/webpack/analyze/production.html
 ################################################################################
 
 artifacts/webpack/build/development: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
-	rm -rf "$@"
+	@rm -rf "$@"
 	node_modules/.bin/webpack --mode development
 
 artifacts/webpack/build/production: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
-	rm -rf "$@"
+	@rm -rf "$@"
 	NODE_ENV=production node_modules/.bin/webpack --mode production
 
 artifacts/webpack/build/production/.stats.json: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@mkdir -p "$(@D)"
-	rm -f "$@"
+	@rm -f "$@"
 	NODE_ENV=production node_modules/.bin/webpack --mode production --json > "$@"
 
 artifacts/webpack/analyze/production.html: artifacts/webpack/build/production/.stats.json
