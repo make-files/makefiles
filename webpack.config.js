@@ -5,6 +5,7 @@ module.exports = (_, {mode = 'development'} = {}) => {
   const isProduction = mode === 'production'
 
   return {
+    mode,
     output: {
       path: join(__dirname, 'artifacts/webpack/build', mode),
     },
