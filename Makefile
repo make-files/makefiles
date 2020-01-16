@@ -25,7 +25,7 @@ _JS_TEST_ASSETS := $(shell find test -type f -not -iname "*.js" 2> /dev/null)
 
 # Ensure that dependencies are installed before attempting to build a Docker
 # image.
-DOCKER_BUILD_REQ += node_modules
+DOCKER_BUILD_REQ += node_modules $(JS_SOURCE_FILES)
 
 ################################################################################
 
