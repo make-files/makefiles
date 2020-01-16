@@ -40,7 +40,7 @@ if ! curl \
     --create-dirs \
     --output "$tmpdir/original.zip" \
     "$url?nonce=$(uuidgen)"; then
-    2>&1 echo "failed downloading $URL"
+    2>&1 echo "failed downloading $url"
     exit 1
 fi
 
