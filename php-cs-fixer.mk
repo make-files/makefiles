@@ -6,7 +6,7 @@ PHP_CS_FIXER_REQ +=
 
 # _PHP_CS_FIXER_REQ is a space separated list of automatically detected
 # prerequisites needed to run PHP CS Fixer.
-_PHP_CS_FIXER_REQ += vendor $(PHP_CS_FIXER_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_REQ)
+_PHP_CS_FIXER_REQ += vendor $(PHP_CS_FIXER_CONFIG_FILE) $(PHP_SOURCE_FILES) $(GENERATED_FILES)
 
 # _PHP_CS_FIXER_CACHE_FILE is a path to the cache file to use when running PHP
 # CS Fixer.

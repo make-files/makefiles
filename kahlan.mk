@@ -10,7 +10,7 @@ PHP_KAHLAN_COVERAGE_LEVEL ?= 1
 
 # _PHP_KAHLAN_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Kahlan tests.
-_PHP_KAHLAN_REQ += vendor $(PHP_KAHLAN_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
+_PHP_KAHLAN_REQ += vendor $(PHP_KAHLAN_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(GENERATED_FILES)
 
 # _PHP_KAHLAN_ARGS is a set of arguments to use for every execution of Kahlan.
 _PHP_KAHLAN_ARGS := --config="$(PHP_KAHLAN_CONFIG_FILE)"

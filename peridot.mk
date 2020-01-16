@@ -10,7 +10,7 @@ PHP_PERIDOT_PRIMARY_REPORTER ?= spec
 
 # _PHP_PERIDOT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Peridot tests.
-_PHP_PERIDOT_REQ += vendor $(PHP_PERIDOT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
+_PHP_PERIDOT_REQ += vendor $(PHP_PERIDOT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(GENERATED_FILES)
 
 # _PHP_PERIDOT_ARGS is a set of arguments to use for every execution of Peridot.
 _PHP_PERIDOT_ARGS := -c "$(PHP_PERIDOT_CONFIG_FILE)" --reporter "$(PHP_PERIDOT_PRIMARY_REPORTER)"

@@ -11,7 +11,7 @@ PHP_PHPUNIT_RESULT_CACHE_FILE ?= artifacts/test/phpunit.result.cache
 
 # _PHP_PHPUNIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run the PHPUnit tests.
-_PHP_PHPUNIT_REQ += vendor $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(_PHP_REQ)
+_PHP_PHPUNIT_REQ += vendor $(PHP_PHPUNIT_CONFIG_FILE) $(PHP_SOURCE_FILES) $(_PHP_TEST_ASSETS) $(GENERATED_FILES)
 
 # _PHP_PHPUNIT_ARGS is a set of arguments to use for every execution of PHPUnit.
 _PHP_PHPUNIT_ARGS := -c "$(PHP_PHPUNIT_CONFIG_FILE)"
