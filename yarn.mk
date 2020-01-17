@@ -9,7 +9,7 @@ DOCKER_BUILD_REQ += package.json yarn.lock
 
 ################################################################################
 
-node_modules: package.json
+node_modules: yarn.lock
 	yarn install $(JS_YARN_INSTALL_ARGS)
 
 yarn.lock: package.json
