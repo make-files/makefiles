@@ -66,6 +66,9 @@ ifeq ($(wildcard composer.json),)
 	composer init --no-interaction
 endif
 
+artifacts/composer/production/vendor: composer.lock
+	COMPOSER_VENDOR_DIR="$@" composer install $(PHP_COMPOSER_INSTALL_ARGS) --no-dev
+
 artifacts/lint/composer-validate.touch: composer.json
 	composer validate $(_PHP_COMPOSER_VALIDATE_ARGS)
 
