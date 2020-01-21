@@ -36,10 +36,19 @@ CI_VERIFY_GENERATED_FILES ?= true
 
 # GET_HEAD_xxx variables containing information about the commit at the head of
 # the working tree.
-GIT_HEAD_HASH		?= $(shell git rev-parse --short --verify HEAD)
-GIT_HEAD_HASH_FULL	?= $(shell git rev-parse --verify HEAD)
-GIT_HEAD_TAG 		?= $(shell git describe --exact-match 2>/dev/null)
-GIT_HEAD_COMMITTISH	?= $(shell git describe --exact-match 2>/dev/null || git rev-parse --short --verify HEAD)
+GIT_HEAD_HASH_FULL	= $(shell git rev-parse --verify HEAD)
+GIT_HEAD_HASH		= $(shell git rev-parse --short --verify HEAD)
+GIT_HEAD_BRANCH		= $(shell git symbolic-ref --short HEAD 2>/dev/null)
+GIT_HEAD_COMMITTISH	= $(GIT_HEAD_HASH)
+
+ifneq ($(GIT_HEAD_BRANCH),)
+GIT_HEAD_COMMITTISH = $(GIT_HEAD_BRANCH)
+else
+GIT_HEAD_TAG		= $(shell git describe --exact-match HEAD 2>/dev/null)
+ifneq ($(GIT_HEAD_TAG),)
+GIT_HEAD_COMMITTISH = $(GIT_HEAD_TAG)
+endif
+endif
 
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
