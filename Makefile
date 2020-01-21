@@ -28,17 +28,17 @@ DOCKER_BUILD_REQ += node_modules $(JS_SOURCE_FILES)
 # Build systems
 
 ifneq ($(JS_WEBPACK_CONFIG_FILE),)
--include .makefiles/pkg/js/v1/with-webpack.mk
+-include .makefiles/pkg/js/v1/include/webpack.mk
 endif
 
 # Test runners
 
 ifneq ($(JS_JEST_CONFIG_FILE),)
--include .makefiles/pkg/js/v1/jest.mk
+-include .makefiles/pkg/js/v1/include/jest.mk
 endif
 
 # Lint tools
 
 ifneq ($(JS_ESLINT_CONFIG_FILE),)
--include .makefiles/pkg/js/v1/eslint.mk
+-include .makefiles/pkg/js/v1/include/eslint.mk
 endif
