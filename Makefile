@@ -32,28 +32,28 @@ DOCKER_BUILD_REQ += vendor $(PHP_SOURCE_FILES)
 
 ################################################################################
 
--include .makefiles/pkg/php/v1/composer.mk
+-include .makefiles/pkg/php/v1/include/composer.mk
 
 # Test runners
 
 ifneq ($(PHP_KAHLAN_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/kahlan.mk
+-include .makefiles/pkg/php/v1/include/kahlan.mk
 endif
 
 ifneq ($(PHP_PERIDOT_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/peridot.mk
+-include .makefiles/pkg/php/v1/include/peridot.mk
 endif
 
 ifneq ($(PHP_PHPUNIT_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/phpunit.mk
+-include .makefiles/pkg/php/v1/include/phpunit.mk
 endif
 
 # Lint tools
 
 ifneq ($(PHP_PHPSTAN_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/phpstan.mk
+-include .makefiles/pkg/php/v1/include/phpstan.mk
 endif
 
 ifneq ($(PHP_CS_FIXER_CONFIG_FILE),)
--include .makefiles/pkg/php/v1/php-cs-fixer.mk
+-include .makefiles/pkg/php/v1/include/php-cs-fixer.mk
 endif
