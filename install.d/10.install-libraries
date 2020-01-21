@@ -2,10 +2,12 @@
 set -euo pipefail
 source "$MF_PROJECT_ROOT/.makefiles/lib/core/include/common.bash"
 
-if [[ -n "${TRAVIS:-}" ]]; then
+CI_SYSTEM="$(ci-system-name)"
+
+if [[ "$CI_SYSTEM" == travisci ]]; then
     install-lib travisci
 fi
 
-if [[ -n "${GITHUB_ACTION:-}" ]]; then
+if [[ "$CI_SYSTEM" == gha ]]; then
     install-lib gha
 fi
