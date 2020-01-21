@@ -2,6 +2,18 @@ export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
 export PATH := $(MF_ROOT)/lib/core/bin:$(PATH)
 
+# MF_CI is the name of any detected continuous integration system. If no CI
+# system is detected, MF_CI will be empty.
+export MF_CI ?= $(shell PATH="$(PATH)" ci-system-name)
+
+# MF_NON_INTERACTIVE will be non-empty when make is not running under an
+# interactive shell.
+ifeq ($(MF_CI),)
+export MF_NON_INTERACTIVE ?= $(shell [ -t 0 ] || echo true)
+else
+export MF_NON_INTERACTIVE ?= true
+endif
+
 # Run tests by default unless the project's main Makefile has already defined a
 # default goal.
 ifeq ($(.DEFAULT_GOAL),)
