@@ -34,12 +34,25 @@ GENERATED_FILES +=
 # the files in GENERATED_FILES are up-to-date.
 CI_VERIFY_GENERATED_FILES ?= true
 
-# GET_HEAD_xxx variables containing information about the commit at the head of
-# the working tree.
-GIT_HEAD_HASH		?= $(shell git rev-parse --short --verify HEAD)
-GIT_HEAD_HASH_FULL	?= $(shell git rev-parse --verify HEAD)
-GIT_HEAD_TAG 		?= $(shell git describe --exact-match 2>/dev/null)
-GIT_HEAD_COMMITTISH	?= $(shell git describe --exact-match 2>/dev/null || git rev-parse --short --verify HEAD)
+# GIT_HEAD_HASH_FULL is the full-length hash of the HEAD commit.
+GIT_HEAD_HASH_FULL ?= $(shell git rev-parse --verify HEAD)
+
+# GIT_HEAD_HASH is the abbreviated (7-character) hash of the HEAD commit.
+GIT_HEAD_HASH ?= $(shell git rev-parse --short --verify HEAD)
+
+# GIT_HEAD_BRANCH is the name of the current branch. It is empty if the HEAD is
+# detached (that is, no specific branch is checked out).
+GIT_HEAD_BRANCH ?= $(shell git symbolic-ref --short HEAD 2>/dev/null)
+
+# GIT_HEAD_TAG is the name of the current tag. It is empty if the HEAD is not a
+# tag (either annotated, or un-annotated). If the HEAD commit is referred to by
+# multiple tags there is no guarantee which tag name will be used.
+GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --tags --exact-match HEAD 2>/dev/null))
+
+# GIT_HEAD_COMMITTISH is the "best" representation of the HEAD commit. If HEAD
+# is a branch or tag, this will be the branch or tag name. Otherwise it will be
+# the commit hash.
+GIT_HEAD_COMMITTISH ?= $(or $(GIT_HEAD_BRANCH),$(GIT_HEAD_TAG),$(GIT_HEAD_HASH))
 
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
