@@ -44,9 +44,10 @@ GIT_HEAD_HASH ?= $(shell git rev-parse --short --verify HEAD)
 # detached (that is, no specific branch is checked out).
 GIT_HEAD_BRANCH ?= $(shell git symbolic-ref --short HEAD 2>/dev/null)
 
-# GIT_HEAD_BRANCH is the name of the current tag. It is empty if the HEAD is
-# not pointed to by a tag.
-GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --exact-match HEAD 2>/dev/null))
+# GIT_HEAD_TAG is the name of the current tag. It is empty if the HEAD is not a
+# tag (either annotated, or un-annotated). If the HEAD commit is referred to by
+# multiple tags there is no guarantee which tag name will be used.
+GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --tags --exact-match HEAD 2>/dev/null))
 
 # GIT_HEAD_COMMITTISH is the "best" representation of the HEAD commit. If HEAD
 # is a branch or tag, this will be the branch or tag name. Otherwise it will be
