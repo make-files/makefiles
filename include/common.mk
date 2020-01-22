@@ -51,7 +51,7 @@ GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --exact-match HEAD
 # GIT_HEAD_COMMITTISH is the "best" representation of the HEAD commit. If HEAD
 # is a branch or tag, this will be the branch or tag name. Otherwise it will be
 # the commit hash.
-GIT_HEAD_COMMITTISH	?= $(or $(GIT_HEAD_BRANCH),$(GIT_HEAD_TAG),$(GIT_HEAD_HASH))
+GIT_HEAD_COMMITTISH ?= $(or $(GIT_HEAD_BRANCH),$(GIT_HEAD_TAG),$(GIT_HEAD_HASH))
 
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
