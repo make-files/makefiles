@@ -1,6 +1,10 @@
 # PHP_COMPOSER_INSTALL_ARGS is a set of arguments passed to "composer install"
 PHP_COMPOSER_INSTALL_ARGS ?= --no-suggest --optimize-autoloader --prefer-dist
 
+ifneq ($(MF_NON_INTERACTIVE),)
+	PHP_COMPOSER_INSTALL_ARGS += --no-interaction --no-progress
+endif
+
 # PHP_COMPOSER_PUBLISH should be non-empty if this package is intended to be
 # published
 PHP_COMPOSER_PUBLISH ?=
