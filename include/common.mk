@@ -54,6 +54,13 @@ GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --tags --exact-mat
 # the commit hash.
 GIT_HEAD_COMMITTISH ?= $(or $(GIT_HEAD_BRANCH),$(GIT_HEAD_TAG),$(GIT_HEAD_HASH))
 
+# GIT_HEAD_SEMVER is a semver representation of the HEAD commit. If GIT_HEAD_TAG
+# is a valid semver version (with an optional leading 'v') then GIT_HEAD_SEMVER
+# is that semver version (with the leading 'v' stripped, if present). Otherwise,
+# GIT_HEAD_SEMVER is a pre-release version formed from the commit hash, such as
+# "0.0.0-167aea9".
+GIT_HEAD_SEMVER ?= $(shell PATH="$(PATH)" git-head-semver)
+
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
 .PHONY: clean
