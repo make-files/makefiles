@@ -1,6 +1,10 @@
 # JS_YARN_INSTALL_ARGS is a set of arguments passed to "yarn install"
 JS_YARN_INSTALL_ARGS ?= --pure-lockfile
 
+ifneq ($(MF_NON_INTERACTIVE),)
+	JS_YARN_INSTALL_ARGS += --non-interactive --no-progress
+endif
+
 ################################################################################
 
 # Ensure that dependencies are installed before attempting to build a Docker
