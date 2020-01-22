@@ -34,10 +34,10 @@ GENERATED_FILES +=
 # the files in GENERATED_FILES are up-to-date.
 CI_VERIFY_GENERATED_FILES ?= true
 
-# GIT_HEAD_HASH is the full-length hash of the HEAD commit.
+# GIT_HEAD_HASH_FULL is the full-length hash of the HEAD commit.
 GIT_HEAD_HASH_FULL ?= $(shell git rev-parse --verify HEAD)
 
-# GIT_HEAD_HASH is the abbreviated (7-digit) hash of the HEAD commit.
+# GIT_HEAD_HASH is the abbreviated (7-character) hash of the HEAD commit.
 GIT_HEAD_HASH ?= $(shell git rev-parse --short --verify HEAD)
 
 # GIT_HEAD_BRANCH is the name of the current branch. It is empty if the HEAD is
