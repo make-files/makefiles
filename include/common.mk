@@ -35,31 +35,34 @@ GENERATED_FILES +=
 CI_VERIFY_GENERATED_FILES ?= true
 
 # GIT_HEAD_HASH_FULL is the full-length hash of the HEAD commit.
-GIT_HEAD_HASH_FULL ?= $(shell git rev-parse --verify HEAD)
-
+#
 # GIT_HEAD_HASH is the abbreviated (7-character) hash of the HEAD commit.
-GIT_HEAD_HASH ?= $(shell git rev-parse --short --verify HEAD)
-
+#
 # GIT_HEAD_BRANCH is the name of the current branch. It is empty if the HEAD is
 # detached (that is, no specific branch is checked out).
-GIT_HEAD_BRANCH ?= $(shell git symbolic-ref --short HEAD 2>/dev/null)
-
+#
 # GIT_HEAD_TAG is the name of the current tag. It is empty if the HEAD is not a
 # tag (either annotated, or un-annotated). If the HEAD commit is referred to by
 # multiple tags there is no guarantee which tag name will be used.
-GIT_HEAD_TAG ?= $(if $(GIT_HEAD_BRANCH),,$(shell git describe --tags --exact-match HEAD 2>/dev/null))
-
+#
 # GIT_HEAD_COMMITTISH is the "best" representation of the HEAD commit. If HEAD
 # is a branch or tag, this will be the branch or tag name. Otherwise it will be
 # the commit hash.
-GIT_HEAD_COMMITTISH ?= $(or $(GIT_HEAD_BRANCH),$(GIT_HEAD_TAG),$(GIT_HEAD_HASH))
-
+#
 # GIT_HEAD_SEMVER is a semver representation of the HEAD commit. If GIT_HEAD_TAG
 # is a valid semver version (with an optional leading 'v') then GIT_HEAD_SEMVER
 # is that semver version (with the leading 'v' stripped, if present). Otherwise,
 # GIT_HEAD_SEMVER is a pre-release version formed from the commit hash, such as
 # "0.0.0-167aea9".
-GIT_HEAD_SEMVER ?= $(shell PATH="$(PATH)" git-head-semver)
+#
+# GIT_HEAD_SEMVER_MAJOR is the major version component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_MINOR is the minor version component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_PATCH is the patch version component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_PRERELEASE is the pre-release component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_METADATA is the build meta-data component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_IS_STABLE is "true" if GIT_HEAD_SEMVER is a stable version.
+$(shell PATH="$(PATH)" generate-git-include > "$(MF_ROOT)/lib/core/include/git.mk")
+include $(MF_ROOT)/lib/core/include/git.mk
 
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
