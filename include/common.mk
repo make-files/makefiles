@@ -61,7 +61,6 @@ CI_VERIFY_GENERATED_FILES ?= true
 # GIT_HEAD_SEMVER_PRERELEASE is the pre-release component of GIT_HEAD_SEMVER.
 # GIT_HEAD_SEMVER_METADATA is the build meta-data component of GIT_HEAD_SEMVER.
 # GIT_HEAD_SEMVER_IS_STABLE is "true" if GIT_HEAD_SEMVER is a stable version.
-# X := $(shell mktemp)
 $(shell PATH="$(PATH)" generate-git-include > "$(MF_ROOT)/lib/core/include/git.mk")
 include $(MF_ROOT)/lib/core/include/git.mk
 
