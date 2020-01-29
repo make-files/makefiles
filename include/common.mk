@@ -34,6 +34,10 @@ GENERATED_FILES +=
 # the files in GENERATED_FILES are up-to-date.
 CI_VERIFY_GENERATED_FILES ?= true
 
+# CLEAN_EXCLUSIONS is a space separated list of gitignore patterns to exclude
+# from being removed by "make clean".
+CLEAN_EXCLUSIONS +=
+
 # GIT_HEAD_HASH_FULL is the full-length hash of the HEAD commit.
 #
 # GIT_HEAD_HASH is the abbreviated (7-character) hash of the HEAD commit.
@@ -85,7 +89,8 @@ endif
 # global ignore configurations.
 .PHONY: clean-ignored
 clean-ignored::
-	git-find-ignored '*' | xargs -t -n1 rm -rf --
+	$(eval _EXCLUSION_ARGS := $(foreach EXCLUSION,$(CLEAN_EXCLUSIONS),--exclude "!$(EXCLUSION)"))
+	git -c core.excludesfile= clean -dX --force $(_EXCLUSION_ARGS)
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
