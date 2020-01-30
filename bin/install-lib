@@ -27,3 +27,5 @@ if [ -d "$target/install.d" ]; then
         "$file"
     done
 fi
+
+"$MF_ROOT/bin/generate-lib-include" > "$MF_ROOT/lib/core/include/lib.mk")

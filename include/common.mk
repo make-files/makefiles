@@ -64,6 +64,9 @@ CI_VERIFY_GENERATED_FILES ?= true
 $(shell PATH="$(PATH)" generate-git-include > "$(MF_ROOT)/lib/core/include/git.mk")
 include $(MF_ROOT)/lib/core/include/git.mk
 
+# Include any Makefiles that are provided by the currently installed libraries.
+include $(MF_ROOT)/lib/core/include/lib.mk
+
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
 .PHONY: clean
