@@ -3,12 +3,8 @@ set -euo pipefail
 
 if [[ -n "${GITHUB_ACTION:-}" ]]; then
     echo gha
-fi
-
-if [[ -n "${TRAVIS:-}" ]]; then
+elif [[ -n "${TRAVIS:-}" ]]; then
     echo travisci
-fi
-
-if [[ -n "${CI:-}" ]]; then
+elif [[ -n "${CI:-}" ]]; then
     echo generic
 fi
