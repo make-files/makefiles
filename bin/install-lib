@@ -28,4 +28,4 @@ if [ -d "$target/install.d" ]; then
     done
 fi
 
-"$MF_ROOT/bin/generate-lib-include" > "$MF_ROOT/lib/core/include/lib.mk"
+"$MF_ROOT/lib/core/bin/generate-lib-include" > "$MF_ROOT/lib/core/include/lib.mk"
