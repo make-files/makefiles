@@ -1,0 +1,14 @@
+_GITHUB_REF_ATOMS := $(subst /, ,$(GITHUB_REF))
+_GITHUB_REF_TYPE := $(word 2,$(_GITHUB_REF_ATOMS))
+_GITHUB_REF_SUBJECT := $(word 3,$(_GITHUB_REF_ATOMS))
+
+ifeq ($(_GITHUB_REF_TYPE),tags)
+CI_TRIGGER := tag
+CI_TAG := $(_GITHUB_REF_SUBJECT)
+else ifeq ($(_GITHUB_REF_TYPE),pull)
+CI_TRIGGER := pr
+CI_PR := $(_GITHUB_REF_SUBJECT)
+else
+CI_TRIGGER := branch
+CI_BRANCH := $(_GITHUB_REF_SUBJECT)
+endif
