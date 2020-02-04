@@ -124,7 +124,7 @@ lint::
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
 .PHONY: precommit
-precommit:: $(GENERATED_FILES)
+precommit:: $$(GENERATED_FILES)
 
 # ci --- Perform tasks that need to be executed within a continuous integration
 # environment. Individual language Makefiles are expected to add additional
