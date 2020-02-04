@@ -100,7 +100,7 @@ clean-ignored::
 
 # generate --- Builds any out-of-date files in the GENERATED_FILES list.
 .PHONY: generate
-generate: $(GENERATED_FILES)
+generate:: $$(GENERATED_FILES)
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
