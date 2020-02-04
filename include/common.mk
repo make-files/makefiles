@@ -108,6 +108,16 @@ regenerate::
 	$(MAKE) --no-print-directory clean-generated
 	$(MAKE) --no-print-directory generate
 
+# verify-generated --- Removes and regenerates all files in the GENERATED_FILES
+# list and checks for differences to the committed files. The target fails if
+# differences are detected.
+.PHONY: verify-generated _verify-generated
+verify-generated: $$(if $$(GENERATED_FILES),_verify-generated,)
+_verify-generated:
+	@echo "--- checking for out-of-date generated files"
+	@$(MAKE) --no-print-directory regenerate
+	@git diff --exit-code -- $(GENERATED_FILES)
+
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
@@ -132,10 +142,5 @@ precommit:: $$(GENERATED_FILES)
 .PHONY: ci
 ci::
 ifneq ($(CI_VERIFY_GENERATED_FILES),)
-ifneq ($$(GENERATED_FILES),)
-	@echo "--- checking for out-of-date generated files"
-	@$(MAKE) --no-print-directory regenerate
-	@git diff -- $(GENERATED_FILES)
-	@!(git status --porcelain -- $(GENERATED_FILES) | grep .)
-endif
+ci:: verify-generated
 endif
