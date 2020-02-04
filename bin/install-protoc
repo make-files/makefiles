@@ -9,3 +9,6 @@ pushd /usr/local
 sudo curl --location --silent --output "${ARCHIVE}" "${URL}"
 sudo unzip ${ARCHIVE}
 popd
+
+ls -la /usr/local/bin/protoc
+stat  /usr/local/bin/protoc
