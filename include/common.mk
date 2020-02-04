@@ -75,7 +75,7 @@ include $(MF_ROOT)/lib/core/include/lib.mk
 # Makefiles should also remove any build artifacts that aren't already ignored.
 .PHONY: clean
 clean::
-ifneq ($(GENERATED_FILES),)
+ifneq ($$(GENERATED_FILES),)
 	$(MAKE) --no-print-directory clean-generated
 endif
 	$(MAKE) --no-print-directory clean-ignored
@@ -83,7 +83,7 @@ endif
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated::
-ifneq ($(GENERATED_FILES),)
+ifneq ($$(GENERATED_FILES),)
 	rm -f -- $(GENERATED_FILES)
 endif
 
@@ -98,7 +98,7 @@ clean-ignored::
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
 regenerate:: clean-generated
-ifneq ($(GENERATED_FILES),)
+ifneq ($$(GENERATED_FILES),)
 	$(MAKE) --no-print-directory -- $(GENERATED_FILES)
 endif
 
@@ -126,7 +126,7 @@ precommit:: $(GENERATED_FILES)
 .PHONY: ci
 ci::
 ifneq ($(CI_VERIFY_GENERATED_FILES),)
-ifneq ($(GENERATED_FILES),)
+ifneq ($$(GENERATED_FILES),)
 	@echo "--- checking for out-of-date generated files"
 	@$(MAKE) --no-print-directory regenerate
 	@git diff -- $(GENERATED_FILES)
