@@ -73,19 +73,22 @@ include $(MF_ROOT)/lib/core/include/lib.mk
 
 # clean --- Removes all generated and ignored files. Individual language
 # Makefiles should also remove any build artifacts that aren't already ignored.
+#
+# The use of recursive make ensures that clean-ignored is done after everything
+# else, as this will remove the makefiles themselves.
+#
+# See https://github.com/make-files/issues/issues/36. This issue is probably
+# due to the fact that clean is a "double-colon" target and some other clean
+# target is executing after the makefiles have been removed.
 .PHONY: clean
 clean::
-ifneq ($$(GENERATED_FILES),)
 	$(MAKE) --no-print-directory clean-generated
-endif
 	$(MAKE) --no-print-directory clean-ignored
 
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated::
-ifneq ($$(GENERATED_FILES),)
 	rm -f -- $(GENERATED_FILES)
-endif
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
@@ -95,12 +98,25 @@ clean-ignored::
 	$(eval _EXCLUSION_ARGS := $(foreach EXCLUSION,$(CLEAN_EXCLUSIONS),--exclude "!$(EXCLUSION)"))
 	git -c core.excludesfile= clean -dX --force $(_EXCLUSION_ARGS)
 
+# generate --- Builds any out-of-date files in the GENERATED_FILES list.
+.PHONY: generate
+generate:: $$(GENERATED_FILES)
+
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
-regenerate:: clean-generated
-ifneq ($$(GENERATED_FILES),)
-	$(MAKE) --no-print-directory -- $(GENERATED_FILES)
-endif
+regenerate::
+	$(MAKE) --no-print-directory clean-generated
+	$(MAKE) --no-print-directory generate
+
+# verify-generated --- Removes and regenerates all files in the GENERATED_FILES
+# list and checks for differences to the committed files. The target fails if
+# differences are detected.
+.PHONY: verify-generated _verify-generated
+verify-generated: $$(if $$(GENERATED_FILES),_verify-generated,)
+_verify-generated:
+	@echo "--- checking for out-of-date generated files"
+	@$(MAKE) --no-print-directory regenerate
+	@git diff --exit-code -- $(GENERATED_FILES)
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipies for this
@@ -118,7 +134,7 @@ lint::
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
 .PHONY: precommit
-precommit:: $(GENERATED_FILES)
+precommit:: $$(GENERATED_FILES)
 
 # ci --- Perform tasks that need to be executed within a continuous integration
 # environment. Individual language Makefiles are expected to add additional
@@ -126,10 +142,5 @@ precommit:: $(GENERATED_FILES)
 .PHONY: ci
 ci::
 ifneq ($(CI_VERIFY_GENERATED_FILES),)
-ifneq ($$(GENERATED_FILES),)
-	@echo "--- checking for out-of-date generated files"
-	@$(MAKE) --no-print-directory regenerate
-	@git diff -- $(GENERATED_FILES)
-	@!(git status --porcelain -- $(GENERATED_FILES) | grep .)
-endif
+ci:: verify-generated
 endif
