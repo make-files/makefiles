@@ -7,5 +7,5 @@ URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/$
 
 pushd /usr/local
 sudo curl --location --silent --output "${ARCHIVE}" "${URL}"
-sudo unzip ${ARCHIVE}
+sudo unzip -o ${ARCHIVE}
 popd
