@@ -11,8 +11,6 @@ packages=(
     'github.com/golang/protobuf github.com/golang/protobuf/protoc-gen-go'
 )
 
-echo "installing protoc-gen-go"
-
 # look in go.mod for each of the desired packages
 for entry in "${packages[@]}"; do
     pair=($entry)
@@ -20,7 +18,7 @@ for entry in "${packages[@]}"; do
     package="${pair[1]}"
 
     if version="$(go list -f '{{.Version}}' -m "$module" 2> /dev/null)"; then
-        echo "installing $package@version"
+        echo "installing $package@$version as per go.mod"
         GOBIN="$1" go get "$package@$version"
         exit
     fi
@@ -32,7 +30,7 @@ for entry in ${packages[@]}; do
     module="${pair[0]}"
     package="${pair[1]}"
 
-    echo "installing $package@version"
+    echo "installing $package@$version by default"
     GOBIN="$1" go get "$package@$version"
     exit
 done
