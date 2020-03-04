@@ -19,8 +19,7 @@ for entry in "${packages[@]}"; do
     module="${pair[0]}"
     package="${pair[1]}"
 
-    version="$(go list -f '{{.Version}}' -m "$module" 2> /dev/null)"
-    if [[ -n "$version" ]]; then
+    if version="$(go list -f '{{.Version}}' -m "$module" 2> /dev/null)"; then
         echo "installing $package@version"
         GOBIN="$1" go get "$package@$version"
         exit
