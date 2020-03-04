@@ -7,7 +7,7 @@ set -euo pipefail
 # Each entry is a pair of module path to look for in go.mod, and the
 # "protoc-gen-go" package to install if that module is found.
 packages=(
-    'google.golang.org/protobuf google.golang.org/protobuf/cmd/protoc-gen-go'
+    # 'google.golang.org/protobuf google.golang.org/protobuf/cmd/protoc-gen-go'
     'github.com/golang/protobuf github.com/golang/protobuf/protoc-gen-go'
 )
 
