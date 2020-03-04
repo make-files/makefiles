@@ -20,4 +20,4 @@ PROTO_INCLUDE_PATHS += .
 		$(@D)/*.proto
 
 artifacts/protobuf/bin/protoc-gen-go: go.mod
-	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(@D)"
+	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
