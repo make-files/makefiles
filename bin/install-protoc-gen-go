@@ -25,10 +25,12 @@ for entry in "${packages[@]}"; do
 done
 
 # we couldn't find anything in go.mod, so install our top preference
-for entry in ${packages[@]}; do
+for entry in "${packages[@]}"; do
     pair=($entry)
     module="${pair[0]}"
     package="${pair[1]}"
+    # default to the latest version of the package
+    version="latest"
 
     echo "installing $package@$version by default"
     GOBIN="$1" go get "$package@$version"
