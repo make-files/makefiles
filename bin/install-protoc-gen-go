@@ -25,7 +25,7 @@ for entry in "${packages[@]}"; do
 done
 
 # we couldn't find anything in go.mod, so install our top preference
-for entry in ${packages[@]}; do
+for entry in "${packages[@]}"; do
     pair=($entry)
     module="${pair[0]}"
     package="${pair[1]}"
