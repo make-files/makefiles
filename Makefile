@@ -50,6 +50,11 @@ GO_MATRIX_ARCH ?= $(GOHOSTARCH)
 # "main" packages. It forms the basis for the executable filenames.
 _GO_COMMAND_PACKAGES = $(notdir $(shell find cmd -type d -mindepth 1 -maxdepth 1 2> /dev/null))
 
+# _GO_BUILDMODE_PLUGIN_PATTERNS is a list of patterns that are matched against
+# the binary name to determine if it should be built as a plugin instead of a
+# regular executable.
+_GO_BUILDMODE_PLUGIN_PATTERNS = %.so %.dll
+
 # _GO_EXECUTABLES_xxx is a list of executable filenames to produce in a build.
 _GO_EXECUTABLES_NIX = $(_GO_COMMAND_PACKAGES)
 _GO_EXECUTABLES_WIN = $(addsuffix .exe,$(_GO_COMMAND_PACKAGES))
@@ -157,9 +162,10 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval GOARM := $(patsubst arm%,%,$(filter arm%,$(word 3,$(PARTS)))))
 	$(eval BIN   := $(word 4,$(PARTS)))
 	$(eval PKG   := $(basename $(BIN)))
+	$(eval MODE  := $(if $(filter $(_GO_BUILDMODE_PLUGIN_PATTERNS),$(BIN)),plugin,default))
 	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
 
-	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build $(ARGS) -o "$@" "./cmd/$(PKG)"
+	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build -buildmode=$(MODE) $(ARGS) -o "$@" "./cmd/$(PKG)"
 
 artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/windows/$$*/,$(_GO_EXECUTABLES_WIN))
 	@mkdir -p "$(@D)"
