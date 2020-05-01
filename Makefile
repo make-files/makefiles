@@ -44,6 +44,16 @@ GOHOSTARCH := $(shell go env GOHOSTARCH)
 GO_MATRIX_OS   ?= $(GOHOSTOS)
 GO_MATRIX_ARCH ?= $(GOHOSTARCH)
 
+# GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
+GO_TEST_REQ +=
+
+# GO_BUILD_BEFORE_TEST indicates whether debug binaries should be built before
+# running the tests.
+#
+# If it non-empty, all debug binaries for the current host are added to
+# GO_TEST_REQ.
+GO_BUILD_BEFORE_TEST ?=
+
 ################################################################################
 
 # _GO_COMMAND_DIR and _GO_PLUGIN_DIR are the names of directories in the root of
@@ -99,11 +109,19 @@ _GO_RELEASE_TARGETS_HOST = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATR
 # Ensure that Linux release binaries are built before attempting to build a Docker image.
 DOCKER_BUILD_REQ += $(addprefix artifacts/build/release/linux/amd64/,$(_GO_BINARIES_NIX))
 
+ifneq ($(GO_BUILD_BEFORE_TEST),)
+GO_TEST_REQ += $(_GO_DEBUG_TARGETS_HOST)
+endif
+
 ################################################################################
+
+# Treat any dependencies of the tests as secondary build targets so that they
+# are not deleted after a successful test.
+.SECONDARY: $(GO_TEST_REQ)
 
 # test --- Executes all go tests in this module.
 .PHONY: test
-test:: $(GENERATED_FILES)
+test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 	go test ./...
 
 # coverage --- Produces an HTML coverage report.
@@ -159,7 +177,7 @@ artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"
 
 .PHONY: artifacts/coverage/cover.out # always rebuild
-artifacts/coverage/cover.out: $(GENERATED_FILES)
+artifacts/coverage/cover.out: $(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
 	go test -covermode=count -coverprofile=$@ ./...
 
