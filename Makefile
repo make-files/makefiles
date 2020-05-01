@@ -65,7 +65,7 @@ artifacts/docker/tag/%.touch: artifacts/docker/image-id
 
 .PHONY: artifacts/docker/push/dev.touch
 artifacts/docker/push/dev.touch:
-	@echo "The 'dev' tag can not be pushed to the registry!"
+	@echo "The 'dev' tag can not be pushed to the registry, did you forget to set the DOCKER_TAGS environment variable?"
 	@exit 1
 
 artifacts/docker/push/%.touch: artifacts/docker/tag/%.touch
