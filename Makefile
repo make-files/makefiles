@@ -192,7 +192,7 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval PKG   := $(if $(findstring plugin,$(MODE)),$(_GO_PLUGIN_DIR),$(_GO_COMMAND_DIR))/$(basename $(BIN)))
 	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
 
-	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build -buildmode=$(MODE) $(ARGS) -o "$@" "./$(PKG)"
+	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build -tags=$(BUILD) -buildmode=$(MODE) $(ARGS) -o "$@" "./$(PKG)"
 
 artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/windows/$$*/,$(_GO_BINARIES_WIN))
 	@mkdir -p "$(@D)"
