@@ -32,7 +32,7 @@ GENERATED_FILES +=
 
 # CI_VERIFY_GENERATED_FILES, if non-empty, causes the "ci" target to check that
 # the files in GENERATED_FILES are up-to-date.
-CI_VERIFY_GENERATED_FILES ?= true
+CI_VERIFY_GENERATED_FILES ?=
 
 # CLEAN_EXCLUSIONS is a space separated list of gitignore patterns to exclude
 # from being removed by "make clean".
