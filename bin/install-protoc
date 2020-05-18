@@ -7,9 +7,8 @@ URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/$
 
 pushd /usr/local
 curl --location --silent --output "${ARCHIVE}" "${URL}"
-umask 022
-echo -n 'umask is: '
-umask
 unzip "${ARCHIVE}"
 chmod +x bin/protoc
+find include/google -type d -exec chmod 755 {} \;
+find include/google -type f -exec chmod 644 {} \;
 popd
