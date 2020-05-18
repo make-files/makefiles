@@ -7,7 +7,9 @@ URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/$
 
 pushd /usr/local
 curl --location --silent --output "${ARCHIVE}" "${URL}"
-umask 002
+umask 022
+echo -n 'umask is: '
+umask
 unzip "${ARCHIVE}"
 chmod +x bin/protoc
 popd
