@@ -6,6 +6,9 @@ ARCHIVE="protoc-${VERSION}-linux-x86_64.zip"
 URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/${ARCHIVE}"
 
 pushd /usr/local
-sudo curl --location --silent --output "${ARCHIVE}" "${URL}"
-sudo unzip -o ${ARCHIVE}
+curl --location --silent --output "${ARCHIVE}" "${URL}"
+unzip -o ${ARCHIVE}
+chmod +x bin/protoc
+find include/google -type d -exec chmod 755 {} \;
+find include/google -type f -exec chmod 644 {} \;
 popd
