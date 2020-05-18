@@ -6,9 +6,8 @@ ARCHIVE="protoc-${VERSION}-linux-x86_64.zip"
 URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/${ARCHIVE}"
 
 pushd /usr/local
-sudo curl --location --silent --output "${ARCHIVE}" "${URL}"
+curl --location --silent --output "${ARCHIVE}" "${URL}"
 umask 002
-sudo umask
-sudo unzip ${ARCHIVE}
-sudo chmod +x bin/protoc
+unzip "${ARCHIVE}"
+chmod +x bin/protoc
 popd
