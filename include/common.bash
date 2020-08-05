@@ -21,6 +21,6 @@ fi
 
 MF_VERSION="1"
 
-if [[ "$(which build-resource)" != "$MF_ROOT/lib/core/bin/build-resource" ]]; then
+if [[ "$(which build-resource 2>/dev/null)" != "$MF_ROOT/lib/core/bin/build-resource" ]]; then
     PATH="$MF_ROOT/lib/core/bin:$PATH"
 fi
