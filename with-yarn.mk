@@ -24,6 +24,8 @@ set-package-version:
 node_modules: yarn.lock
 	yarn install $(JS_YARN_INSTALL_ARGS)
 
+	@touch "$@"
+
 yarn.lock: package.json
 	yarn install $(JS_YARN_INSTALL_ARGS)
 
