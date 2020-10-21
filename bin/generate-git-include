@@ -7,6 +7,7 @@ source "$(dirname ${BASH_SOURCE[0]})/../include/common.bash"
 GIT_HEAD_HASH_FULL="$(git rev-parse --verify HEAD)"
 GIT_HEAD_HASH="$(git rev-parse --short --verify HEAD)"
 GIT_HEAD_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
+GIT_HEAD_TAG=
 GIT_HEAD_COMMITTISH="$GIT_HEAD_HASH"
 
 GIT_HEAD_SEMVER="0.0.0-$GIT_HEAD_HASH"
@@ -48,6 +49,7 @@ echo
 echo "GIT_HEAD_HASH_FULL ?= $GIT_HEAD_HASH_FULL"
 echo "GIT_HEAD_HASH ?= $GIT_HEAD_HASH"
 echo "GIT_HEAD_BRANCH ?= $GIT_HEAD_BRANCH"
+echo "GIT_HEAD_TAG ?= $GIT_HEAD_TAG"
 echo "GIT_HEAD_COMMITTISH ?= $GIT_HEAD_COMMITTISH"
 echo "GIT_HEAD_SEMVER ?= $GIT_HEAD_SEMVER"
 echo "GIT_HEAD_SEMVER_MAJOR ?= $GIT_HEAD_SEMVER_MAJOR"
