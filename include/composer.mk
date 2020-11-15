@@ -1,5 +1,5 @@
 # PHP_COMPOSER_INSTALL_ARGS is a set of arguments passed to "composer install"
-PHP_COMPOSER_INSTALL_ARGS ?= --no-suggest --optimize-autoloader --prefer-dist
+PHP_COMPOSER_INSTALL_ARGS ?= --optimize-autoloader --prefer-dist
 
 ifneq ($(MF_NON_INTERACTIVE),)
 	PHP_COMPOSER_INSTALL_ARGS += --no-interaction --no-progress
