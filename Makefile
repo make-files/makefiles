@@ -21,14 +21,17 @@ PROTO_INCLUDE_PATHS += .
 # 'github.com/foo/bar' and the proto file 'dir/file.proto' in that module, the
 # import statement becomes `import "github.com/foo/bar/dir/file.proto";` in the
 # target .proto file.
-%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go
-	go mod download -x all
-
+%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
 		--go_out=paths=source_relative,plugins=grpc:. \
-		$(addprefix --proto_path=,$(shell go list -f "{{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all | tr '\n' ' ')) \
+		$$(< artifacts/protobuf/go.proto_paths) \
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
 		$(@D)/*.proto
 
 artifacts/protobuf/bin/protoc-gen-go: go.mod
 	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
+
+artifacts/protobuf/go.proto_paths: go.mod
+	go mod download all
+	mkdir -p $(@D)
+	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > $@
