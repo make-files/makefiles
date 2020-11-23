@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 shopt -s nullglob
-source "$(dirname ${BASH_SOURCE[0]})/../include/common.bash"
+source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 
 if [[ $# < 1 ]]; then
     echo "Usage: find-first-matching-file pattern [pattern...]"
