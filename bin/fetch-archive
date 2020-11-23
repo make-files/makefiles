@@ -47,7 +47,7 @@ fi
 unzip -q "$tmpdir/original.zip" -d "$tmpdir"
 cd "$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d)"
 zip -q "$tmpdir/content.zip" --move --recurse-paths .
-mkdir -p $(dirname "$cache")
+mkdir -p "$(dirname "$cache")"
 mv "$tmpdir/content.zip" "$cache"
 
 log "added $slug@$branch repository archive to the cache"
