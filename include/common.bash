@@ -12,7 +12,7 @@ if [ -n "${MF_DEBUG:-}" ]; then
 fi
 
 if [ -z "${MF_PROJECT_ROOT:-}" ]; then
-    MF_PROJECT_ROOT="$(cd "$(dirname ${BASH_SOURCE[0]})/../../../../"; pwd)"
+    MF_PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../"; pwd)"
 fi
 
 if [ -z "${MF_ROOT:-}" ]; then
