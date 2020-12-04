@@ -34,10 +34,4 @@ artifacts/protobuf/bin/protoc-gen-go: go.mod
 artifacts/protobuf/go.proto_paths: go.mod
 	go mod download all
 	mkdir -p $(@D)
-
-# 1. list the --proto_path parameters prefixed with the length of the module path
-# 3. sort by that length, descending
-# 3. cut the line length from the start of each line
-	go list -f "{{if .Dir}}{{ len .Path }} --proto_path={{ .Path }}={{ .Dir }}{{ end }}" -m all \
-		| sort -rg \
-		| cut -d' ' -f2- > "$@"
+	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > $@
