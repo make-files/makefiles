@@ -3,7 +3,12 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
-PROTO_INCLUDE_PATHS += .
+#
+# NOTE: Please avoid adding the current directory (.) in this variable as it may
+# cause a "type redefinition" error from the protobuf compiler. The absolute
+# path to the current repository is already added to the list of include paths
+# via the 'artifacts/protobuf/go.proto_paths' file.
+PROTO_INCLUDE_PATHS ?=
 
 ################################################################################
 
@@ -22,14 +27,37 @@ PROTO_INCLUDE_PATHS += .
 # import statement becomes `import "github.com/foo/bar/dir/file.proto";` in the
 # target .proto file.
 #
+# Please note that relative import paths are strongly discouraged as they
+# require adding the current directory (.) to protoc's include path via a
+# --proto_path parameter. This may cause "type redefinition" errors during
+# protobuf file compilation because the same file is reachable via different
+# paths.
+#
+# The absolute path to the current repository is already added to the list of
+# include paths via the 'artifacts/protobuf/go.proto_paths' file.
+#
+#
+# It is also critical to supply absolute paths to the .proto files when running
+# the recipe below so that protoc can detect those files as part of this module
+# (it uses a simple string prefix comparison). This works because the path to
+# this module in the 'artifacts/protobuf/go.proto_paths' file is absolute.
+#
+# The --go_opt=module=... parameter strips the absolute module path prefix off
+# the name of the generated files, ensuring they are placed relative to the root
+# of the repository.
+#
+# For more information follow this link:
+# https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
+#
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
 %.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
-		--go_out=paths=source_relative,plugins=grpc:. \
+		--go_out=plugins=grpc:. \
+		--go_opt=module=$$(go list -m) \
 		$$(cat artifacts/protobuf/go.proto_paths) \
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
-		$(@D)/*.proto
+		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto
 
 artifacts/protobuf/bin/protoc-gen-go: go.mod
 	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
