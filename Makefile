@@ -54,7 +54,7 @@ PROTO_INCLUDE_PATHS ?=
 %.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
 		--go_out=plugins=grpc:. \
-		--go_opt=module=$$(go list) \
+		--go_opt=module=$$(go list -m) \
 		$$(cat artifacts/protobuf/go.proto_paths) \
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
 		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto
