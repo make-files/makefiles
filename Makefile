@@ -4,11 +4,11 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
 #
-# NOTE: Plese avoid adding dot import (.) in this variable as it may result in
-# type redifinion error returned by the protobuf compiler. This occurs because
-# the current repository is already added through its absolute path in the
-# 'artifacts/protobuf/go.proto_paths' file.
-PROTO_INCLUDE_PATHS +=
+# NOTE: Please avoid adding the current directory (.) in this variable as it may
+# cause a "type redefinition" error from the protobuf compiler. The absolute
+# path to the current repository is already added to the list of include paths
+# via the 'artifacts/protobuf/go.proto_paths' file.
+PROTO_INCLUDE_PATHS ?=
 
 ################################################################################
 
@@ -27,21 +27,27 @@ PROTO_INCLUDE_PATHS +=
 # import statement becomes `import "github.com/foo/bar/dir/file.proto";` in the
 # target .proto file.
 #
-# Please note that relative import paths are strongly discouraged as they would
-# require specifying a dot import (.) via --proto_path/-I parameter to the
-# protobuf compiler. The dot import may cause type redifinion errors during
-# protobuf file compilation. See the comment for the PROTO_INCLUDE_PATHS
-# variable above.
+# Please note that relative import paths are strongly discouraged as they
+# require adding the current directory (.) to protoc's include path via a
+# --proto_path parameter. This may cause "type redefinition" errors during
+# protobuf file compilation because the same file is reachable via different
+# paths.
 #
-# The current package import path is supplied as 'module' option to remove the
-# package path as a directory prefix from the output filename.
+# The absolute path to the current repository is already added to the list of
+# include paths via the 'artifacts/protobuf/go.proto_paths' file.
+#
+#
+# It is also critical to supply absolute paths to the .proto files when running
+# the recipe below so that protoc can detect those files as part of this module
+# (it uses a simple string prefix comparison). This works because the path to
+# this module in the 'artifacts/protobuf/go.proto_paths' file is absolute.
+#
+# The --go_opt=module=... parameter strips the absolute module path prefix off
+# the name of the generated files, ensuring they are placed relative to the root
+# of the repository.
 #
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
-#
-# It is also critical to supply absolute paths to the *.proto files when running
-# the recipe below as the current package is mapped through its absolute path in
-# the 'artifacts/protobuf/go.proto_paths' file.
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
