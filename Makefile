@@ -176,10 +176,13 @@ archives: $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-,$(ad
 artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"
 
-.PHONY: artifacts/coverage/cover.out # always rebuild
-artifacts/coverage/cover.out: $(GENERATED_FILES) $(GO_TEST_REQ)
+.PHONY: artifacts/coverage/cover.tmp # always rebuild
+artifacts/coverage/cover.tmp: $(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
 	go test -covermode=count -coverprofile=$@ ./...
+
+artifacts/coverage/cover.out: artifacts/coverage/cover.tmp
+	grep --fixed-strings --invert-match $(foreach F,$(GENERATED_FILES),-e "$F") "$<" > "$@"
 
 artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
