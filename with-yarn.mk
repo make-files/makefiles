@@ -17,7 +17,7 @@ DOCKER_BUILD_REQ += package.json yarn.lock
 # representation of the HEAD commit.
 .PHONY: set-package-version
 set-package-version:
-	yarn version --no-git-tag-version --new-version "$(GIT_HEAD_SEMVER)"
+	yarn version --no-git-tag-version --new-version "$(SEMVER)"
 
 ################################################################################
 
