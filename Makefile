@@ -53,7 +53,7 @@ artifacts/docker/image-id: Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
 
 	docker build \
 		--pull \
-		--build-arg "VERSION=$(GIT_HEAD_SEMVER)" \
+		--build-arg "VERSION=$(SEMVER)" \
 		--iidfile "$@" \
 		$(DOCKER_BUILD_ARGS) \
 		.
