@@ -65,9 +65,21 @@ CLEAN_EXCLUSIONS +=
 # GIT_HEAD_SEMVER_PATCH is the patch version component of GIT_HEAD_SEMVER.
 # GIT_HEAD_SEMVER_PRERELEASE is the pre-release component of GIT_HEAD_SEMVER.
 # GIT_HEAD_SEMVER_METADATA is the build meta-data component of GIT_HEAD_SEMVER.
+# GIT_HEAD_SEMVER_IS_FROM_TAG is "true" if GIT_HEAD_SEMVER is identical to GIT_HEAD_TAG.
 # GIT_HEAD_SEMVER_IS_STABLE is "true" if GIT_HEAD_SEMVER is a stable version.
 $(shell PATH="$(PATH)" generate-git-include > "$(MF_ROOT)/lib/core/include/git.mk")
 include $(MF_ROOT)/lib/core/include/git.mk
+
+# SEMVER_DEV_BUILD is the semantic version "build" component to use in dev
+# versions.
+SEMVER_DEV_BUILD ?= $(GIT_HEAD_HASH)
+
+# SEMVER is the semantic version as defined by https://semver.org/.
+ifeq ($(GIT_HEAD_SEMVER_IS_FROM_TAG),true)
+SEMVER ?= $(GIT_HEAD_SEMVER)
+else
+SEMVER ?= 0.0.0+$(SEMVER_DEV_BUILD)
+endif
 
 # Include any Makefiles that are provided by the currently installed libraries.
 include $(MF_ROOT)/lib/core/include/lib.mk
