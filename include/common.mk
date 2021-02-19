@@ -40,7 +40,8 @@ CLEAN_EXCLUSIONS +=
 
 # GIT_HEAD_HASH_FULL is the full-length hash of the HEAD commit.
 #
-# GIT_HEAD_HASH is the abbreviated (7-character) hash of the HEAD commit.
+# GIT_HEAD_HASH is the abbreviated hash of the HEAD commit. The exact length may
+# vary based on Git configuration and repo size.
 #
 # GIT_HEAD_BRANCH is the name of the current branch. It is empty if the HEAD is
 # detached (that is, no specific branch is checked out).
