@@ -194,7 +194,7 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
 	$(eval BIN   := $(word 4,$(PARTS)))
 	$(eval MODE  := $(if $(filter $(_GO_BUILDMODE_PLUGIN_PATTERNS),$(BIN)),plugin,default))
 	$(eval PKG   := $(if $(findstring plugin,$(MODE)),$(_GO_PLUGIN_DIR),$(_GO_COMMAND_DIR))/$(basename $(BIN)))
-	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),$(GO_RELEASE_ARGS)))
+	$(eval ARGS  := $(if $(findstring debug,$(BUILD)),$(GO_DEBUG_ARGS),-trimpath $(GO_RELEASE_ARGS)))
 
 	CGO_ENABLED=$(CGO_ENABLED) GOOS="$(OS)" GOARCH="$(ARCH)" GOARM="$(GOARM)" go build -tags=$(BUILD) -buildmode=$(MODE) $(ARGS) -o "$@" "./$(PKG)"
 
