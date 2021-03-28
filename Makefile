@@ -1,13 +1,17 @@
 # PROTO_FILES is a space separated list of Protocol Buffers files.
 PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 
+# PROTO_GRPC_FILES is the subset of PROTO_FILES that contain gRPC service
+# definitions.
+PROTO_GRPC_FILES = $(shell $(MF_ROOT)/pkg/protobuf/v1/bin/filter-grpc $(PROTO_FILES))
+
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
 #
 # NOTE: Please avoid adding the current directory (.) in this variable as it may
 # cause a "type redefinition" error from the protobuf compiler. The absolute
 # path to the current repository is already added to the list of include paths
-# via the 'artifacts/protobuf/go.proto_paths' file.
+# via the 'artifacts/protobuf/args/proto_paths' file.
 PROTO_INCLUDE_PATHS ?=
 
 ################################################################################
@@ -17,6 +21,10 @@ PROTO_INCLUDE_PATHS ?=
 # the GENERATED_FILES list. This is the responsibility of each language-specific
 # Makefile; otherwise any project that included the protobuf Makefile would
 # attempt to build source files for every supported language.
+
+artifacts/protobuf/args/common:
+	@mkdir -p "$(@D)"
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > $@
 
 # This recipe below includes each Golang module available through `go list -m
 # all` command as an import path for the protoc compiler.
@@ -34,13 +42,12 @@ PROTO_INCLUDE_PATHS ?=
 # paths.
 #
 # The absolute path to the current repository is already added to the list of
-# include paths via the 'artifacts/protobuf/go.proto_paths' file.
-#
+# include paths via the 'artifacts/protobuf/args/go' file.
 #
 # It is also critical to supply absolute paths to the .proto files when running
 # the recipe below so that protoc can detect those files as part of this module
 # (it uses a simple string prefix comparison). This works because the path to
-# this module in the 'artifacts/protobuf/go.proto_paths' file is absolute.
+# this module in the 'artifacts/protobuf/args/paths' file is absolute.
 #
 # The --go_opt=module=... parameter strips the absolute module path prefix off
 # the name of the generated files, ensuring they are placed relative to the root
@@ -51,18 +58,10 @@ PROTO_INCLUDE_PATHS ?=
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
-		--go_out=plugins=grpc:. \
-		--go_opt=module=$$(go list -m) \
-		$$(cat artifacts/protobuf/go.proto_paths) \
-		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
-		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto
+%_grpc.pb.go %.pb.go: %.proto artifacts/protobuf/args/go
+	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc $$(cat artifacts/protobuf/args/go) $(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-artifacts/protobuf/bin/protoc-gen-go: go.mod
-	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
-
-artifacts/protobuf/go.proto_paths: go.mod
-	go mod download all
-	mkdir -p $(@D)
-	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > $@
+artifacts/protobuf/args/go: go.mod artifacts/protobuf/args/common
+	@mkdir -p "$(@D)"
+	cp artifacts/protobuf/args/common $@
+	$(MF_ROOT)/pkg/protobuf/v1/bin/prepare-go $(PROTO_FILES) >> $@

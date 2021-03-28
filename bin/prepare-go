@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Add options for protoc-gen-go.
+module=$(go list -m)
+echo "--go_opt=module=$module"
+echo "--go_out=."
+
+use_google=true
+version=
+packages=
+
+# Check go.mod for google.golang.org/protobuf, the newer protocol buffers
+# implementation. If it is present we can use the related version of
+# protoc-gen-go and the latest version of protoc-gen-go-grpc.
+if version="$(go list -f '{{.Version}}' -m "google.golang.org/protobuf" 2> /dev/null)"; then
+    1>&2 echo "found 'google.golang.org/protobuf' in go.mod, using GOOGLE protocol buffers implementation"
+
+# Otherwise, check go.mod for github.com/golang/protobuf, an olrder protocol
+# buffers implementation. If this is all that is present we can use its version
+# of protoc-gen-go, which includes support for gRPC.
+elif version="$(go list -f '{{.Version}}' -m "github.com/golang/protobuf" 2> /dev/null)"; then
+    1>&2 echo "found 'github.com/golang/protobuf' in go.mod, using NON-GOOGLE protocol buffers implementation, consider using 'google.golang.org/protobuf' instead"
+    use_google=
+
+# Finally, if neither of the protocol buffers implementations are in go.mod, we
+# assume this is a new project so use the latest version of the new
+# implementation by default.
+else
+    1>&2 echo "did not find any protocol buffers modules in go.mod, defaulting to GOOGLE implementation 'google.golang.org/protobuf'"
+fi
+
+packages=
+if [[ -n "$use_google" ]]; then
+    packages="$packages google.golang.org/protobuf/cmd/protoc-gen-go@$version"
+
+    # Only install protoc-gen-go-grpc if the .proto files contain gRPC service
+    # definitions.
+    if egrep '\bservice \w+\b' "$@" > /dev/null; then
+        packages="$packages google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
+
+        # Add options for protoc-gen-go-grpc.
+        echo "--go-grpc_opt=module=$module"
+        echo "--go-grpc_out=."
+        echo "--go-grpc_opt=require_unimplemented_servers=false"
+    fi
+else
+    packages="$packages github.com/golang/protobuf/protoc-gen-go@$version"
+fi
+
+# Map fully-qualified module names to their directories so that protobuf import
+# statements accept the fully-qualified name of the .proto files.
+go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all
+
+1>&2 echo "installing:$packages"
+export GOBIN="$MF_PROJECT_ROOT/artifacts/protobuf/bin"
+1>&2 mkdir -p "$GOBIN"
+1>&2 go get $packages
