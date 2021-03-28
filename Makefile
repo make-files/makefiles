@@ -7,6 +7,7 @@
 # convention of using underscores to exclude files and directories from the
 # build.
 GENERATED_FILES += $(foreach f,$(PROTO_FILES:.proto=.pb.go),$(if $(findstring /_,/$f),,$f))
+GENERATED_FILES += $(foreach f,$(PROTO_GRPC_FILES:.proto=_grpc.pb.go),$(if $(findstring /_,/$f),,$f))
 
 # GO_ARCHIVE_FILES is a space separated list of additional files to include in
 # the release archives. The compiled binaries are included by default.
