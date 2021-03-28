@@ -47,7 +47,7 @@ artifacts/protobuf/args/common:
 # It is also critical to supply absolute paths to the .proto files when running
 # the recipe below so that protoc can detect those files as part of this module
 # (it uses a simple string prefix comparison). This works because the path to
-# this module in the 'artifacts/protobuf/args/paths' file is absolute.
+# this module in the 'artifacts/protobuf/args/go' file is absolute.
 #
 # The --go_opt=module=... parameter strips the absolute module path prefix off
 # the name of the generated files, ensuring they are placed relative to the root
