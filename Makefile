@@ -3,7 +3,7 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 
 # PROTO_GRPC_FILES is the subset of PROTO_FILES that contain gRPC service
 # definitions.
-PROTO_GRPC_FILES = $(shell $(MF_ROOT)/pkg/protobuf/v1/bin/filter-grpc $(PROTO_FILES))
+PROTO_GRPC_FILES = $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_FILES))
 
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
@@ -64,4 +64,4 @@ artifacts/protobuf/args/common:
 artifacts/protobuf/args/go: go.mod artifacts/protobuf/args/common
 	@mkdir -p "$(@D)"
 	cp artifacts/protobuf/args/common $@
-	$(MF_ROOT)/pkg/protobuf/v1/bin/prepare-go $(PROTO_FILES) >> $@
+	$(MF_ROOT)/pkg/protobuf/v2/bin/prepare-go $(PROTO_FILES) >> $@
