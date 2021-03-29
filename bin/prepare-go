@@ -28,7 +28,15 @@ else
 fi
 
 export GOBIN="$MF_PROJECT_ROOT/artifacts/protobuf/bin"
+
 1>&2 mkdir -p "$GOBIN"
-1>&2 go install \
+1>&2 cd "$GOBIN"
+
+# Create a go mod just for this binaries, to avoid messing with the project's
+# own go.mod.
+1>&1 go mod init bin || true
+
+# Install the code generators into this "bin" module.
+1>&2 go get \
     "google.golang.org/protobuf/cmd/protoc-gen-go@$version" \
     "google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
