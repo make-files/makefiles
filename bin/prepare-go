@@ -34,7 +34,7 @@ export GOBIN="$MF_PROJECT_ROOT/artifacts/protobuf/bin"
 
 # Create a go mod just for this binaries, to avoid messing with the project's
 # own go.mod.
-1>&1 go mod init bin || true
+1>&2 go mod init bin || true
 
 # Install the code generators into this "bin" module.
 1>&2 go get \
