@@ -21,11 +21,7 @@ PROTO_INCLUDE_PATHS ?=
 # the GENERATED_FILES list. This is the responsibility of each language-specific
 # Makefile; otherwise any project that included the protobuf Makefile would
 # attempt to build source files for every supported language.
-
-artifacts/protobuf/args/common:
-	@mkdir -p "$(@D)"
-	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > $@
-
+#
 # This recipe below includes each Golang module available through `go list -m
 # all` command as an import path for the protoc compiler.
 #
@@ -58,10 +54,23 @@ artifacts/protobuf/args/common:
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go %_grpc.pb.go: %.proto artifacts/protobuf/args/go
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc $$(cat artifacts/protobuf/args/go) $(MF_PROJECT_ROOT)/$(@D)/*.proto
+%.pb.go %_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
+	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
+		--go_opt=module=$$(go list -m) \
+		--go_out=:. \
+		--go-grpc_opt=module=$$(go list -m) \
+		--go-grpc_out=. \
+		--go-grpc_opt=require_unimplemented_servers=false \
+		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
+		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-artifacts/protobuf/args/go: go.mod artifacts/protobuf/args/common
+artifacts/protobuf/bin/go.mod: go.mod
+	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
+
+artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
-	cp artifacts/protobuf/args/common $@
-	$(MF_ROOT)/pkg/protobuf/v2/bin/prepare-go $(PROTO_FILES) >> $@
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > $@
+
+artifacts/protobuf/args/go: go.mod
+	@mkdir -p "$(@D)"
+	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > "$@"
