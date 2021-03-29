@@ -11,7 +11,7 @@ packages=
 if version="$(go list -f '{{.Version}}' -m "google.golang.org/protobuf" 2> /dev/null)"; then
     1>&2 echo "found 'google.golang.org/protobuf' in go.mod, using GOOGLE protocol buffers implementation"
 
-# Otherwise, check go.mod for github.com/golang/protobuf, an olrder protocol
+# Otherwise, check go.mod for github.com/golang/protobuf, an older protocol
 # buffers implementation. If this is all that is present we can use its version
 # of protoc-gen-go, which includes support for gRPC.
 elif version="$(go list -f '{{.Version}}' -m "github.com/golang/protobuf" 2> /dev/null)"; then
