@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Add options for protoc-gen-go.
-module=$(go list -m)
-echo "--go_opt=module=$module"
-echo "--go_out=."
-
 use_google=true
 version=
 packages=
@@ -30,9 +25,14 @@ else
     1>&2 echo "did not find any protocol buffers modules in go.mod, defaulting to GOOGLE implementation 'google.golang.org/protobuf'"
 fi
 
+module=$(go list -m)
 packages=
+
 if [[ -n "$use_google" ]]; then
     packages="$packages google.golang.org/protobuf/cmd/protoc-gen-go@$version"
+
+    echo "--go_opt=module=$module"
+    echo "--go_out=."
 
     # Only install protoc-gen-go-grpc if the .proto files contain gRPC service
     # definitions.
@@ -46,6 +46,9 @@ if [[ -n "$use_google" ]]; then
     fi
 else
     packages="$packages github.com/golang/protobuf/protoc-gen-go@$version"
+
+    echo "--go_opt=module=$module"
+    echo "--go_out=plugins=grpc:."
 fi
 
 # Map fully-qualified module names to their directories so that protobuf import

@@ -58,7 +58,7 @@ artifacts/protobuf/args/common:
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%_grpc.pb.go %.pb.go: %.proto artifacts/protobuf/args/go
+%.pb.go %_grpc.pb.go: %.proto artifacts/protobuf/args/go
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc $$(cat artifacts/protobuf/args/go) $(MF_PROJECT_ROOT)/$(@D)/*.proto
 
 artifacts/protobuf/args/go: go.mod artifacts/protobuf/args/common
