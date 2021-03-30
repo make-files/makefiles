@@ -72,5 +72,6 @@ artifacts/protobuf/args/common:
 	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > $@
 
 artifacts/protobuf/args/go: go.mod
+	go mod download all
 	@mkdir -p "$(@D)"
 	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > "$@"
