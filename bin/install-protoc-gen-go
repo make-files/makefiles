@@ -26,3 +26,7 @@ fi
 go get \
     "google.golang.org/protobuf/cmd/protoc-gen-go@$version" \
     "google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
+
+# Touch the go.mod file so that it is no longer considered out of date by make,
+# even if nothing actually changed.
+touch go.mod
