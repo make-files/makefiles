@@ -3,8 +3,9 @@ set -euo pipefail
 
 case "$(uname -s)" in
     "Darwin")
+        [[ -f "/usr/local/bin/protoc" ]] && exit 0
         OS="osx";;
-    "Linux"
+    "Linux")
         OS="linux";;
     *)
         OS="linux";;
