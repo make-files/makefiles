@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+case "$(uname -s)" in
+    "Darwin")
+        OS="osx";;
+    "Linux"
+        OS="linux";;
+    *)
+        OS="linux";;
+esac
+
 VERSION="$(curl --head --silent https://github.com/protocolbuffers/protobuf/releases/latest | grep -i '^Location:' | egrep -o '[0-9]+.[0-9]+.[0-9]+')"
-ARCHIVE="protoc-${VERSION}-linux-x86_64.zip"
+ARCHIVE="protoc-${VERSION}-${OS}-$(uname -m).zip"
 URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/${ARCHIVE}"
 
 pushd /usr/local
