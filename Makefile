@@ -14,6 +14,10 @@ PROTO_GRPC_FILES = $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_FI
 # via the 'artifacts/protobuf/args/proto_paths' file.
 PROTO_INCLUDE_PATHS ?=
 
+# PROTOC_COMMAND is the path to the protoc command, if this is not specified
+# the latest version of protoc is installed for the host operating system.
+PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protoc/bin/protoc
+
 ################################################################################
 
 # This Makefile provides the recipes used to build each language's source files
@@ -54,8 +58,9 @@ PROTO_INCLUDE_PATHS ?=
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go %_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
+%.pb.go %_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
+	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
+		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_opt=module=$$(go list -m) \
 		--go_out=:. \
 		--go-grpc_opt=module=$$(go list -m) \
@@ -63,6 +68,9 @@ PROTO_INCLUDE_PATHS ?=
 		--go-grpc_opt=require_unimplemented_servers=false \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+
+$(MF_PROJECT_ROOT)/artifacts/protoc/bin/protoc:
+	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protoc"
 
 artifacts/protobuf/bin/go.mod: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
