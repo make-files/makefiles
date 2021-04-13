@@ -10,6 +10,10 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
 # via the 'artifacts/protobuf/go.proto_paths' file.
 PROTO_INCLUDE_PATHS ?=
 
+# PROTOC_COMMAND is the path to the protoc command, if this is not specified
+# the latest version of protoc is installed for the host operating system.
+PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
+
 ################################################################################
 
 # This Makefile provides the recipes used to build each language's source files
@@ -51,13 +55,17 @@ PROTO_INCLUDE_PATHS ?=
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" protoc \
+%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/go.proto_paths
+	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
+		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_out=plugins=grpc:. \
 		--go_opt=module=$$(go list -m) \
 		$$(cat artifacts/protobuf/go.proto_paths) \
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
 		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto
+
+artifacts/protobuf/bin/protoc:
+	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
 
 artifacts/protobuf/bin/protoc-gen-go: go.mod
 	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
