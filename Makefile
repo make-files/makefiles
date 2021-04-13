@@ -16,7 +16,7 @@ PROTO_INCLUDE_PATHS ?=
 
 # PROTOC_COMMAND is the path to the protoc command, if this is not specified
 # the latest version of protoc is installed for the host operating system.
-PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protoc/bin/protoc
+PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 
 ################################################################################
 
@@ -69,8 +69,8 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protoc/bin/protoc
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-$(MF_PROJECT_ROOT)/artifacts/protoc/bin/protoc:
-	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protoc"
+$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
+	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
 
 artifacts/protobuf/bin/go.mod: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
