@@ -92,16 +92,15 @@ makefiles:
 	@echo Powered by https://makefiles.dev/
 
 # clean --- Removes all generated and ignored files. Individual language
-# Makefiles should also remove any build artifacts that aren't already ignored.
+# Makefiles should also remove any build artifacts that aren't already ignored
+# by defining a _clean target.
 #
 # The use of recursive make ensures that clean-ignored is done after everything
 # else, as this will remove the makefiles themselves.
-#
-# See https://github.com/make-files/issues/issues/36. This issue is probably
-# due to the fact that clean is a "double-colon" target and some other clean
-# target is executing after the makefiles have been removed.
-.PHONY: clean
-clean::
+.PHONY: clean _clean
+_clean::
+clean:
+	$(MAKE) --no-print-directory _clean
 	$(MAKE) --no-print-directory clean-generated
 	$(MAKE) --no-print-directory clean-ignored
 
