@@ -149,7 +149,7 @@ ci:: artifacts/coverage/cover.out
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
 .PHONY: _clean
-_clean:
+_clean::
 	go clean -testcache
 
 # build --- Builds debug binaries suitable for execution on this machine. It
