@@ -146,10 +146,10 @@ precommit:: test
 .PHONY: ci
 ci:: artifacts/coverage/cover.out
 
-# clean --- Clears the Go test cache. Stacks with the "clean" target from the
-# common makefile.
-.PHONY: clean
-clean::
+# _clean --- Clears the Go test cache. Invoked by the "clean" target from the
+# common makefile before the makefiles themselves are removed.
+.PHONY: _clean
+_clean:
 	go clean -testcache
 
 # build --- Builds debug binaries suitable for execution on this machine. It
