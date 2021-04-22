@@ -64,7 +64,7 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
 		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto
 
-artifacts/protobuf/bin/protoc:
+$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
 	$(MF_ROOT)/pkg/protobuf/v1/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
 
 artifacts/protobuf/bin/protoc-gen-go: go.mod
