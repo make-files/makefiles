@@ -211,7 +211,6 @@ artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip: $(GO_ARCHIVE_FILES) 
 	@rm -f "$@"
 	zip --recurse-paths --junk-paths "$@" -- $^
 
-
 artifacts/go/bin/go.mod:
 	$(MF_ROOT)/pkg/go/v1/bin/install-golangci-lint "$(MF_PROJECT_ROOT)/$(@D)"
 	cp -f $(MF_ROOT)/pkg/go/v1/bin/.golangci.yml "$(MF_PROJECT_ROOT)/$(@D)"
