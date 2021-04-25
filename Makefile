@@ -145,7 +145,7 @@ precommit:: test artifacts/go/bin/go.mod
 # ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
 # from the common makefile.
 .PHONY: ci
-ci:: artifacts/coverage/cover.out
+ci:: artifacts/coverage/cover.out artifacts/go/bin/go.mod
 	artifacts/go/bin/golangci-lint run --config artifacts/go/bin/.golangci.yml ./...
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
