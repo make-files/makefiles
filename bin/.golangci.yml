@@ -1,7 +1,5 @@
 linters:
   enable:
-    - megacheck
-    - govet
     - sqlclosecheck
     - rowserrcheck
   disable-all: false
