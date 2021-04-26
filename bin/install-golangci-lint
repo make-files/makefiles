@@ -6,7 +6,7 @@ mkdir -p "$GOBIN"
 cd "$GOBIN"
 
 # Create a go mod just for this binary, to avoid messing with the project's
-# own go.mod. We ignore
+# own go.mod.
 if [ ! -f go.mod ]; then
     go mod init bin
 fi
