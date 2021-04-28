@@ -1,19 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export GOBIN="$1"
-mkdir -p "$GOBIN"
-cd "$GOBIN"
-
-# Create a go mod just for this binary, to avoid messing with the project's
-# own go.mod.
-if [ ! -f go.mod ]; then
-    go mod init bin
-fi
-
-# Install the latest version of the linter into this "bin" module.
-go get "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-
-# Touch the go.mod file so that it is no longer considered out of date by make,
-# even if nothing actually changed.
-touch go.mod
+# Get the latest version of the golangci-lint linter.
+VERSION="$(curl --head --silent https://github.com/golangci/golangci-lint/releases/latest | grep -i '^Location:' | egrep -o '[0-9]+.[0-9]+.[0-9]+')"
+# Install it in the directory specified in the first argument of this script.
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$1" "v${VERSION}"
