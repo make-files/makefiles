@@ -20,11 +20,11 @@ DOCKER_BUILD_ARGS +=
 
 # _DOCKER_TAG_TOUCH_FILES is a list of touch files for tagging Docker builds.
 # The list is automatically generated from DOCKER_TAGS.
-_DOCKER_TAG_TOUCH_FILES := $(foreach TAG,$(DOCKER_TAGS),artifacts/docker/tag/$(TAG).touch)
+_DOCKER_TAG_TOUCH_FILES := $(foreach TAG,$(DOCKER_TAGS),artifacts/docker/tag/$(DOCKER_REPO)/$(TAG).touch)
 
 # _DOCKER_PUSH_TOUCH_FILES is a list of touch files for pushing Docker tags. The
 # list is automatically generated from DOCKER_TAGS.
-_DOCKER_PUSH_TOUCH_FILES := $(foreach TAG,$(DOCKER_TAGS),artifacts/docker/push/$(TAG).touch)
+_DOCKER_PUSH_TOUCH_FILES := $(foreach TAG,$(DOCKER_TAGS),artifacts/docker/push/$(DOCKER_REPO)/$(TAG).touch)
 
 ################################################################################
 
@@ -48,7 +48,7 @@ docker-push: $(_DOCKER_PUSH_TOUCH_FILES)
 	@echo .makefiles > "$@"
 	@echo .git >> "$@"
 
-artifacts/docker/image-id: Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
+artifacts/docker/image-id/$(DOCKER_REPO): Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
 	@mkdir -p "$(@D)"
 
 	docker build \
@@ -58,17 +58,17 @@ artifacts/docker/image-id: Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
 		$(DOCKER_BUILD_ARGS) \
 		.
 
-artifacts/docker/tag/%.touch: artifacts/docker/image-id
+artifacts/docker/tag/$(DOCKER_REPO)/%.touch: artifacts/docker/image-id/$(DOCKER_REPO)
 	docker tag "$(shell cat "$<")" "$(DOCKER_REPO):$*"
 	@mkdir -p "$(@D)"
 	@touch "$@"
 
-.PHONY: artifacts/docker/push/dev.touch
-artifacts/docker/push/dev.touch:
+.PHONY: artifacts/docker/push/$(DOCKER_REPO)/dev.touch
+artifacts/docker/push/$(DOCKER_REPO)/dev.touch:
 	@echo "The 'dev' tag can not be pushed to the registry, did you forget to set the DOCKER_TAGS environment variable?"
 	@exit 1
 
-artifacts/docker/push/%.touch: artifacts/docker/tag/%.touch
+artifacts/docker/push/$(DOCKER_REPO)/%.touch: artifacts/docker/tag/$(DOCKER_REPO)/%.touch
 	docker push "$(DOCKER_REPO):$*"
 	@mkdir -p "$(@D)"
 	@touch "$@"
