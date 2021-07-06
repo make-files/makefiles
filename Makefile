@@ -17,6 +17,10 @@ GO_ARCHIVE_FILES +=
 # build process.
 GO_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.go')
 
+# GO_EMBEDDED_FILES is a space separated list of files that are embedded into
+# the Go binary using the standard "embed" package.
+GO_EMBEDDED_FILES +=
+
 # Disable CGO by default.
 # See https://golang.org/cmd/cgo
 CGO_ENABLED ?= 0
@@ -186,7 +190,7 @@ ifneq ($(strip $(GENERATED_FILES)),)
 	mv "$@.tmp" "$@"
 endif
 
-artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES)
+artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES) $(GO_EMBEDDED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
 	$(eval BUILD := $(word 1,$(PARTS)))
 	$(eval OS    := $(word 2,$(PARTS)))
