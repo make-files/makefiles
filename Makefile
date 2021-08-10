@@ -49,6 +49,10 @@ GOHOSTARCH := $(shell go env GOHOSTARCH)
 GO_MATRIX_OS   ?= $(GOHOSTOS)
 GO_MATRIX_ARCH ?= $(GOHOSTARCH)
 
+# GO_DEBUG_DIR is the relative path to the debug build directory for the current
+# OS & architecture.
+GO_DEBUG_DIR=artifacts/build/debug/$(GOHOSTOS)/$(GOHOSTARCH)
+
 # GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
 GO_TEST_REQ +=
 
@@ -58,6 +62,7 @@ GO_TEST_REQ +=
 # If it non-empty, all debug binaries for the current host are added to
 # GO_TEST_REQ.
 GO_BUILD_BEFORE_TEST ?=
+
 
 ################################################################################
 
@@ -194,8 +199,8 @@ artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES) $(GO_EMBEDDED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
 	$(eval BUILD := $(word 1,$(PARTS)))
 	$(eval OS    := $(word 2,$(PARTS)))
-	$(eval ARCH  := $(patsubst arm%,arm,$(word 3,$(PARTS))))
-	$(eval GOARM := $(patsubst arm%,%,$(filter arm%,$(word 3,$(PARTS)))))
+	$(eval ARCH  := $(patsubst arm_v%,arm,$(word 3,$(PARTS))))
+	$(eval GOARM := $(patsubst arm_v%,%,$(filter arm_v%,$(word 3,$(PARTS)))))
 	$(eval BIN   := $(word 4,$(PARTS)))
 	$(eval MODE  := $(if $(filter $(_GO_BUILDMODE_PLUGIN_PATTERNS),$(BIN)),plugin,default))
 	$(eval PKG   := $(if $(findstring plugin,$(MODE)),$(_GO_PLUGIN_DIR),$(_GO_COMMAND_DIR))/$(basename $(BIN)))
