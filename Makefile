@@ -35,19 +35,13 @@ GO_APP_VERSION ?= $(SEMVER)
 GO_DEBUG_ARGS   ?= -v -ldflags "-X main.version=$(GO_APP_VERSION)"
 GO_RELEASE_ARGS ?= -v -ldflags "-X main.version=$(GO_APP_VERSION) -s -w"
 
+
 # Build matrix configuration.
 #
-# GO_MATRIX_OS is a whitespace separated set of operating systems.
-# GO_MATRIX_ARCH is a whitespace separated set of CPU architectures.
-#
-# The build-matrix is constructed from all permutations of GO_MATRIX_OS and
-# GO_MATRIX_ARCH. The default is to build only for the OS and architecture
-# specified by the GOHOSTOS and GOHOSTARCH environment variables, that is the OS
-# and architecture of current system.
+# GO_MATRIX is a whitespace separated set of operating systems and architectures.
 GOHOSTOS   := $(shell go env GOHOSTOS)
 GOHOSTARCH := $(shell go env GOHOSTARCH)
-GO_MATRIX_OS   ?= $(GOHOSTOS)
-GO_MATRIX_ARCH ?= $(GOHOSTARCH)
+GO_MATRIX  ?= $(GOHOSTOS)/$(GOHOSTARCH)
 
 # GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
 GO_TEST_REQ +=
@@ -88,9 +82,9 @@ else
 _GO_BINARIES_HOST = $(_GO_BINARIES_NIX)
 endif
 
-# _GO_BUILD_PLATFORM_MATRIX_xxx is the cartesian product of all operating
-# systems and architectures specified in GO_MATRIX_OS and GO_MATRIX_ARCH.
-_GO_BUILD_PLATFORM_MATRIX_ALL  = $(foreach OS,$(GO_MATRIX_OS),$(foreach ARCH,$(GO_MATRIX_ARCH),$(OS)/$(ARCH)))
+# _GO_BUILD_PLATFORM_MATRIX_xxx is the cartesian product of GO_MATRIX (containing os/arch)
+# and all operating systems and architectures specified in GO_MATRIX_OS and GO_MATRIX_ARCH.
+_GO_BUILD_PLATFORM_MATRIX_ALL  = $(sort $(foreach OS,$(GO_MATRIX_OS),$(foreach ARCH,$(GO_MATRIX_ARCH),$(OS)/$(ARCH))) $(GO_MATRIX))
 _GO_BUILD_PLATFORM_MATRIX_NIX  = $(filter-out windows/%,$(_GO_BUILD_PLATFORM_MATRIX_ALL))
 _GO_BUILD_PLATFORM_MATRIX_WIN  = $(filter windows/%,$(_GO_BUILD_PLATFORM_MATRIX_ALL))
 _GO_BUILD_PLATFORM_MATRIX_HOST = $(GOHOSTOS)/$(GOHOSTARCH)
