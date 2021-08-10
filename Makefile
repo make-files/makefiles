@@ -41,7 +41,11 @@ GO_RELEASE_ARGS ?= -v -ldflags "-X main.version=$(GO_APP_VERSION) -s -w"
 # GO_MATRIX is a whitespace separated set of operating systems and architectures.
 GOHOSTOS   := $(shell go env GOHOSTOS)
 GOHOSTARCH := $(shell go env GOHOSTARCH)
+ifneq ($(GO_MATRIX_ARCH)$(GO_MATRIX_OS),)
+GO_MATRIX  ?=
+else
 GO_MATRIX  ?= $(GOHOSTOS)/$(GOHOSTARCH)
+endif
 
 # GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
 GO_TEST_REQ +=
