@@ -89,6 +89,11 @@ _GO_BUILD_PLATFORM_MATRIX_NIX  = $(filter-out windows/%,$(_GO_BUILD_PLATFORM_MAT
 _GO_BUILD_PLATFORM_MATRIX_WIN  = $(filter windows/%,$(_GO_BUILD_PLATFORM_MATRIX_ALL))
 _GO_BUILD_PLATFORM_MATRIX_HOST = $(GOHOSTOS)/$(GOHOSTARCH)
 
+# Print deprecation warnings if GO_MATRIX_ARCH or GO_MATRIX_OS is used.
+ifneq ($(GO_MATRIX_ARCH)$(GO_MATRIX_OS),)
+$(warning GO_MATRIX_ARCH/GO_MATRIX_OS is deprecated, change to GO_MATRIX = $(_GO_BUILD_PLATFORM_MATRIX_ALL))
+endif
+
 # _GO_BUILD_MATRIX_xxx is the cartesian product of the platform matrix and the
 # filenames of the binaries.
 _GO_BUILD_MATRIX_NIX  = $(foreach P,$(_GO_BUILD_PLATFORM_MATRIX_NIX),$(addprefix $(P)/,$(_GO_BINARIES_NIX)))
