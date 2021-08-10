@@ -82,9 +82,9 @@ else
 _GO_BINARIES_HOST = $(_GO_BINARIES_NIX)
 endif
 
-# _GO_BUILD_PLATFORM_MATRIX_xxx is the cartesian product of GO_MATRIX (containing os/arch)
-# and backwards compatible to the deprecated combination of all operating systems and 
-# architectures specified in GO_MATRIX_OS and GO_MATRIX_ARCH.
+# _GO_BUILD_PLATFORM_MATRIX_ALL is the union of GO_MATRIX (containing os/arch) and the
+# cartesian product of all operating systems and architectures specified in
+# GO_MATRIX_OS and GO_MATRIX_ARCH (which are now deprecated).
 _GO_BUILD_PLATFORM_MATRIX_ALL  = $(sort $(foreach OS,$(GO_MATRIX_OS),$(foreach ARCH,$(GO_MATRIX_ARCH),$(OS)/$(ARCH))) $(GO_MATRIX))
 _GO_BUILD_PLATFORM_MATRIX_NIX  = $(filter-out windows/%,$(_GO_BUILD_PLATFORM_MATRIX_ALL))
 _GO_BUILD_PLATFORM_MATRIX_WIN  = $(filter windows/%,$(_GO_BUILD_PLATFORM_MATRIX_ALL))
