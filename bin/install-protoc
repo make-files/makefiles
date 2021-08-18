@@ -13,6 +13,17 @@ case "$(uname -s)" in
         OS="linux";;
 esac
 
+ARCH="$(uname -m)"
+
+# Use x86_64 on Apple Silicon, as there is no official arm64 support.
+#
+# See https://github.com/protocolbuffers/protobuf/issues/8062.
+# See https://github.com/protocolbuffers/protobuf/issues/8428.
+if [[ "$OS" == "osx" && "$ARCH" == "arm64" ]]; then
+    softwareupdate --install-rosetta --agree-to-license
+    ARCH="x86_64"
+fi
+
 VERSION="$(curl --head --silent https://github.com/protocolbuffers/protobuf/releases/latest | grep -i '^Location:' | egrep -o '[0-9]+.[0-9]+.[0-9]+')"
 
 if [[ -f "${PROTOC_ROOT}/bin/protoc" ]]; then
@@ -20,12 +31,12 @@ if [[ -f "${PROTOC_ROOT}/bin/protoc" ]]; then
     [[ "${VERSION}" == "${LOCAL_VERSION}" ]] && exit 0
 fi
 
-ARCHIVE="protoc-${VERSION}-${OS}-$(uname -m).zip"
+ARCHIVE="protoc-${VERSION}-${OS}-${ARCH}.zip"
 URL="https://github.com/protocolbuffers/protobuf/releases/download/v${VERSION}/${ARCHIVE}"
 
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
-curl --location --silent --output "${ARCHIVE}" "${URL}"
+curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
 unzip -o "${ARCHIVE}"
 chmod +x bin/protoc
 find include/google -type d -exec chmod 755 {} \;
