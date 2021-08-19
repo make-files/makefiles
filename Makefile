@@ -61,7 +61,6 @@ GO_TEST_REQ +=
 # GO_TEST_REQ.
 GO_BUILD_BEFORE_TEST ?=
 
-
 ################################################################################
 
 # _GO_COMMAND_DIR and _GO_PLUGIN_DIR are the names of directories in the root of
@@ -127,6 +126,10 @@ ifneq ($(GO_BUILD_BEFORE_TEST),)
 GO_TEST_REQ += $(_GO_DEBUG_TARGETS_HOST)
 endif
 
+# GO_ARCHIVES is the list of archive files to be build, based on the build
+# matrix.
+GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-,$(addsuffix .zip,$(subst /,-,$(_GO_BUILD_PLATFORM_MATRIX_ALL))))
+
 ################################################################################
 
 # Treat any dependencies of the tests as secondary build targets so that they
@@ -183,7 +186,7 @@ release: $(_GO_RELEASE_TARGETS_ALL)
 
 # archives --- Builds zip archives containing the release binaries and an
 # additional files specified in GO_ARCHIVE_FILES.
-archives: $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-,$(addsuffix .zip,$(subst /,-,$(_GO_BUILD_PLATFORM_MATRIX_ALL))))
+archives: $(GO_ARCHIVES)
 
 ################################################################################
 
