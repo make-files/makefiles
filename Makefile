@@ -10,6 +10,10 @@ JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslint
 # JS_JEST_CONFIG_FILE is the path to any existing Jest configuration.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.*)
 
+# JS_SIZE_LIMIT_CONFIG_FILE is the path to any existing Size Limit
+# configuration.
+JS_SIZE_LIMIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .size-limit.*)
+
 # JS_WEBPACK_CONFIG_FILE is the path to any existing Webpack configuration.
 JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpack.config.*)
 
@@ -41,4 +45,8 @@ endif
 
 ifneq ($(JS_ESLINT_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/eslint.mk
+endif
+
+ifneq ($(JS_SIZE_LIMIT_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/size-limit.mk
 endif
