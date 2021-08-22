@@ -14,4 +14,4 @@ fi
 cd "$MF_PROJECT_ROOT"
 files="$(git ls-files; git ls-files --other --exclude-standard)"
 files="$(find $files 2>/dev/null || true)"
-find $files -type f -iname "$1"
+[[ -n "$files" ]] && find $files -type f -iname "$1"
