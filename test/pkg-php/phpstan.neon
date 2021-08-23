@@ -1,0 +1,7 @@
+parameters:
+  level: max
+  paths: [src, test]
+  ignoreErrors:
+    - /^Function describe not found.$/
+    - /^Function expect not found.$/
+    - /^Function it not found.$/
