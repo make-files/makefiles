@@ -1,0 +1,7 @@
+language: go
+go: '1.15'
+install:
+- go mod download
+- go install github.com/golang/protobuf/protoc-gen-go
+script: make ci
+after_success: bash <(curl -s https://codecov.io/bash)
