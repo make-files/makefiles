@@ -1,0 +1,8 @@
+run:
+  tests: false
+linters:
+  enable:
+    - sqlclosecheck
+    - rowserrcheck
+  disable-all: false
+  fast: false
