@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -n "${GITHUB_ACTION:-}" ]]; then
+    echo gha
+elif [[ -n "${TRAVIS:-}" ]]; then
+    echo travisci
+elif [[ -n "${CI:-}" ]]; then
+    echo generic
+fi

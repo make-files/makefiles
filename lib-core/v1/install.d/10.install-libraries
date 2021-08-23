@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$MF_PROJECT_ROOT/.makefiles/lib/core/include/common.bash"
+
+CI_SYSTEM="$(ci-system-name)"
+
+if [[ "$CI_SYSTEM" == travisci ]]; then
+    install-lib travisci
+fi
+
+if [[ "$CI_SYSTEM" == gha ]]; then
+    install-lib gha
+fi
