@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+
+$supported = ['pcov', 'xdebug', 'phpdbg'];
+$drivers = [];
+
+for ($i = 1; $i < $argc; ++$i) {
+    $driver = $argv[$i];
+
+    if (!in_array($driver, $supported, true)) {
+        error_log(sprintf('Unsupported coverage driver %s', $driver));
+        exit(1);
+    }
+
+    $drivers[] = $driver;
+}
+
+if (count($drivers) < 1) {
+    error_log('Usage: coverage-driver driver...');
+    error_log(sprintf('  each driver must be one of %s', implode(', ', $supported)));
+    exit(1);
+}
+
+foreach ($drivers as $driver) {
+    if ('pcov' === $driver) {
+        if (extension_loaded('pcov')) {
+            echo "pcov\n";
+            exit(0);
+        }
+
+        continue;
+    }
+
+    if ('xdebug' === $driver) {
+        if (extension_loaded('xdebug')) {
+            echo "xdebug\n";
+            exit(0);
+        }
+
+        continue;
+    }
+
+    if ('phpdbg' === $driver) {
+        echo "phpdbg\n";
+        exit(0);
+    }
+}
+
+error_log(sprintf('No suitable coverage driver detected (tried %s)', implode(', ', $drivers)));
+exit(1);
