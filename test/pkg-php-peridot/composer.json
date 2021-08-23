@@ -1,0 +1,21 @@
+{
+    "name": "makefiles/test",
+    "description": "Test project for make-files/pkg-php",
+    "license": "MIT",
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6",
+        "peridot-php/peridot": "^1.19",
+        "peridot-php/peridot-code-coverage-reporters": "^3.0",
+        "peridot-php/leo": "^1.6",
+        "peridot-php/peridot-dot-reporter": "^1.0",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "pcov/clobber": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Makefiles\\Test\\": "src"
+        }
+    }
+}

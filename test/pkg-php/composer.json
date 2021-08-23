@@ -1,0 +1,23 @@
+{
+    "name": "makefiles/test",
+    "description": "Test project for make-files/pkg-php",
+    "license": "MIT",
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpstan/phpstan": "^0.11.19",
+        "kahlan/kahlan": "^4.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Makefiles\\Test\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Makefiles\\Test\\": "test/phpunit"
+        }
+    }
+}
