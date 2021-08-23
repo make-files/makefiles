@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$MF_PROJECT_ROOT/.makefiles/lib/core/include/common.bash"
+
+if [ -n "$(find "$MF_PROJECT_ROOT" -name '*.proto')" ]; then
+    sudo "$MF_ROOT/lib/travisci/bin/install-protoc"
+fi

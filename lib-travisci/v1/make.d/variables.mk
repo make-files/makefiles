@@ -1,0 +1,10 @@
+ifneq ($(TRAVIS_TAG),)
+CI_TRIGGER := tag
+CI_TAG := $(TRAVIS_TAG)
+else ifneq ($(TRAVIS_PULL_REQUEST_BRANCH),)
+CI_TRIGGER := pr
+CI_PR := $(TRAVIS_PULL_REQUEST)
+else
+CI_TRIGGER := branch
+CI_BRANCH := $(TRAVIS_BRANCH)
+endif
