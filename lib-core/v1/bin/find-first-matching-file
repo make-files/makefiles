@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
+
+if [[ $# < 1 ]]; then
+    echo "Usage: find-first-matching-file pattern [pattern...]"
+    echo
+    echo "  Attempts to find a file that matches the supplied filename pattern."
+    echo "  Multiple patterns can be specified, with earlier patterns having "
+    echo "  higher precedence."
+    echo
+    exit 1
+fi
+
+cd "$MF_PROJECT_ROOT"
+
+for PATTERN in "$@"; do
+    for FILE in $PATTERN; do
+        if [[ -f "$FILE" ]]; then
+            echo $FILE
+            exit 0
+        fi
+    done
+done
