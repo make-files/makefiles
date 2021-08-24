@@ -14,13 +14,6 @@ version="$2"
 
 target="$MF_ROOT/pkg/$name/v$version"
 
-if [ ! -d "$target" ]; then
-    archive=$(fetch-archive "make-files/pkg-$name" "v$version")
-    log "unpacking $name@v$version package archive"
-    mkdir -p "$target"
-    unzip -q "$archive" -d "$target"
-fi
-
 if [ -d "$target/install.d" ]; then
     log "executing $name@v$version package install hooks"
     for file in "$target/install.d/"*; do
