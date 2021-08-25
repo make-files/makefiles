@@ -21,4 +21,5 @@ if [ -d "$target/install.d" ]; then
     done
 fi
 
+touch "$target/.installed"
 "$MF_ROOT/lib/core/bin/generate-lib-include" > "$MF_ROOT/lib/core/include/lib.mk"
