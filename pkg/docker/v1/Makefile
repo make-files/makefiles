@@ -16,6 +16,9 @@ DOCKER_BUILD_REQ +=
 # the "docker build" command.
 DOCKER_BUILD_ARGS +=
 
+# DOCKER_PLATFORM specifies the target platform for the Docker image.
+DOCKER_PLATFORM ?= linux/amd64
+
 ################################################################################
 
 # _DOCKER_TAG_TOUCH_FILES is a list of touch files for tagging Docker builds.
@@ -55,6 +58,7 @@ artifacts/docker/image-id/$(DOCKER_REPO): Dockerfile .dockerignore $(DOCKER_BUIL
 		--pull \
 		--build-arg "VERSION=$(SEMVER)" \
 		--iidfile "$@" \
+		--platform "$(DOCKER_PLATFORM)" \
 		$(DOCKER_BUILD_ARGS) \
 		.
 
