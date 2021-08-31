@@ -19,7 +19,7 @@ for entry in "${packages[@]}"; do
 
     if version="$(go list -f '{{.Version}}' -m "$module" 2> /dev/null)"; then
         echo "installing $package@$version as per go.mod"
-        GOBIN="$1" go get "$package@$version"
+        GOBIN="$1" go install "$package@$version"
         exit
     fi
 done
@@ -33,6 +33,6 @@ for entry in "${packages[@]}"; do
     version="latest"
 
     echo "installing $package@$version by default"
-    GOBIN="$1" go get "$package@$version"
+    GOBIN="$1" go install "$package@$version"
     exit
 done
