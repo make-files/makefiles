@@ -119,8 +119,8 @@ _GO_RELEASE_TARGETS_ALL  = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATR
 _GO_RELEASE_TARGETS_HOST = $(addprefix artifacts/build/release/,$(_GO_BUILD_MATRIX_HOST))
 .SECONDARY: $(_GO_RELEASE_TARGETS_HOST)
 
-# Ensure that Linux release binaries are built before attempting to build a Docker image.
-DOCKER_BUILD_REQ += $(addprefix artifacts/build/release/linux/amd64/,$(_GO_BINARIES_NIX))
+# Ensure that release binaries are built before attempting to build a Docker image.
+DOCKER_BUILD_REQ += $(foreach PLATFORM,$(DOCKER_PLATFORMS),$(addprefix artifacts/build/release/$(PLATFORM)/,$(_GO_BINARIES_NIX)))
 
 ifneq ($(GO_BUILD_BEFORE_TEST),)
 GO_TEST_REQ += $(_GO_DEBUG_TARGETS_HOST)
