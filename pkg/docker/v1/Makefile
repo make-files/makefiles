@@ -46,6 +46,8 @@ _DOCKER_PLATFORMS_LIST = $(shell echo $(DOCKER_PLATFORMS) | tr ' ' ',')
 docker: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
 		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
+		--build-arg "VERSION=$(SEMVER)" \
+		--pull \
 		--load \
 		.
 
@@ -56,6 +58,8 @@ docker-test: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
 		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
 		--platform $(_DOCKER_PLATFORMS_LIST) \
+		--build-arg "VERSION=$(SEMVER)" \
+		--pull \
 		.
 
 # docker-build --- Builds docker images for each target platform and pushes
@@ -65,6 +69,8 @@ docker-push: $(_DOCKER_BUILD_REQ) $(_DOCKER_PUSH_GUARDS)
 	docker buildx build \
 		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
 		--platform $(_DOCKER_PLATFORMS_LIST) \
+		--build-arg "VERSION=$(SEMVER)" \
+		--pull \
 		--push \
 		.
 
