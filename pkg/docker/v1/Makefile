@@ -29,14 +29,11 @@ _DOCKER_PUSH_GUARDS := $(foreach TAG,$(DOCKER_TAGS),_docker-push-guard-$(TAG))
 # are always considered prerequisites to Docker builds.
 _DOCKER_BUILD_REQ = Dockerfile .dockerignore $(DOCKER_BUILD_REQ)
 
-# _DOCKER_QUALIFIED_TAGS is the list of fully-qualified Docker image tags made
-# by concatenating DOCKER_REPO wich each value from DOCKER_TAGS. 
-_DOCKER_QUALIFIED_TAGS = $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO):$(TAG))
+# _DOCKER_TAG_FLAGS is the set of --tag flags to pass to the build command.
+_DOCKER_TAG_FLAGS = $(foreach TAG,$(DOCKER_TAGS),--tag "$(DOCKER_REPO):$(TAG)")
 
-# _DOCKER_QUALIFIED_TAGS_LIST and _DOCKER_PLATFORMS_LIST are comma-separated
-# versions of _DOCKER_QUALIFIED_TAGS and DOCKER_PLATFORMS, respectively.
-_DOCKER_QUALIFIED_TAGS_LIST = $(shell echo $(_DOCKER_QUALIFIED_TAGS) | tr ' ' ',')
-_DOCKER_PLATFORMS_LIST = $(shell echo $(DOCKER_PLATFORMS) | tr ' ' ',')
+# _DOCKER_PLATFORM_FLAG is the --platform flag to pass to the build command.
+_DOCKER_PLATFORM_FLAG = --platform $(shell echo $(DOCKER_PLATFORMS) | tr ' ' ',')
 
 ################################################################################
 
@@ -45,7 +42,7 @@ _DOCKER_PLATFORMS_LIST = $(shell echo $(DOCKER_PLATFORMS) | tr ' ' ',')
 .PHONY: docker
 docker: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
-		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
+		$(_DOCKER_TAG_FLAGS) \
 		--build-arg "VERSION=$(SEMVER)" \
 		--pull \
 		--load \
@@ -56,8 +53,8 @@ docker: $(_DOCKER_BUILD_REQ)
 .PHONY: docker
 docker-test: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
-		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
-		--platform $(_DOCKER_PLATFORMS_LIST) \
+		$(_DOCKER_TAG_FLAGS) \
+		$(_DOCKER_PLATFORM_FLAG) \
 		--build-arg "VERSION=$(SEMVER)" \
 		--pull \
 		.
@@ -67,8 +64,8 @@ docker-test: $(_DOCKER_BUILD_REQ)
 .PHONY: docker-push
 docker-push: $(_DOCKER_BUILD_REQ) $(_DOCKER_PUSH_GUARDS)
 	docker buildx build \
-		--tag $(_DOCKER_QUALIFIED_TAGS_LIST) \
-		--platform $(_DOCKER_PLATFORMS_LIST) \
+		$(_DOCKER_TAG_FLAGS) \
+		$(_DOCKER_PLATFORM_FLAG) \
 		--build-arg "VERSION=$(SEMVER)" \
 		--pull \
 		--push \
@@ -83,7 +80,6 @@ docker-push: $(_DOCKER_BUILD_REQ) $(_DOCKER_PUSH_GUARDS)
 .dockerignore:
 	@echo .makefiles > "$@"
 	@echo .git >> "$@"
-
 
 .PHONY: $(_DOCKER_PUSH_GUARDS)
 _docker-push-guard-dev:
