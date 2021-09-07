@@ -58,11 +58,17 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go %_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
+%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_opt=module=$$(go list -m) \
 		--go_out=:. \
+		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
+		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+
+%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
+	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
+		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go-grpc_opt=module=$$(go list -m) \
 		--go-grpc_out=. \
 		--go-grpc_opt=require_unimplemented_servers=false \
