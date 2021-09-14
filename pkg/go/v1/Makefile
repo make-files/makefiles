@@ -1,3 +1,5 @@
+MF_LANGUAGES += go
+
 # Always run tests by default, even if other makefiles are included beforehand.
 .DEFAULT_GOAL := test
 
