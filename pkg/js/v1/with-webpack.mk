@@ -5,8 +5,8 @@ DOCKER_BUILD_REQ += artifacts/webpack/build/production
 
 # release --- Produce all build assets necessary for a release.
 .PHONY: release
-release:: artifacts/webpack/build/production
+release:: artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production
 
 # debug --- Produce all debugging build assets.
 .PHONY: debug
-debug:: artifacts/webpack/build/development
+debug:: artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/development
