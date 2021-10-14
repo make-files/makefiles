@@ -8,7 +8,7 @@ PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
 
 # PHP_CS_FIXER_CONFIG_FILE is the path to any existing PHP CS Fixer
 # configuration.
-PHP_CS_FIXER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .php_cs .php_cs.dist)
+PHP_CS_FIXER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .php-cs-fixer.php .php-cs-fixer.dist.php .php_cs .php_cs.dist)
 
 # PHP_KAHLAN_CONFIG_FILE is the path to any existing Kahlan configuration.
 PHP_KAHLAN_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file kahlan-config.php)
