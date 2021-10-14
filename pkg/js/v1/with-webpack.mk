@@ -1,5 +1,5 @@
 # Ensure that the Webpack build runs before attempting to build a Docker image.
-DOCKER_BUILD_REQ += artifacts/webpack/build/production
+DOCKER_BUILD_REQ += artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production
 
 ################################################################################
 
