@@ -8,3 +8,8 @@ PHP_PHPUNIT_RESULT_CACHE_FILE :=
 
 .makefiles/%:
 	@curl -sfL https://makefiles.dev/v1 | bash /dev/stdin "$@"
+
+################################################################################
+
+.PHONY: noop
+noop:

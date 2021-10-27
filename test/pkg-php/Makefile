@@ -6,3 +6,8 @@ DOCKER_REPO := makefiles/test
 
 .makefiles/%:
 	@curl -sfL https://makefiles.dev/v1 | bash /dev/stdin "$@"
+
+################################################################################
+
+.PHONY: noop
+noop:
