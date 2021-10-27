@@ -1,5 +1,5 @@
 # PROTO_FILES is a space separated list of Protocol Buffers files.
-PROTO_FILES += $(shell PATH="$(PATH)" git-find '*.proto')
+PROTO_FILES += $(shell PATH="$(PATH)" git-find . -name '*.proto')
 
 # PROTO_GRPC_FILES is the subset of PROTO_FILES that contain gRPC service
 # definitions.

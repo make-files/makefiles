@@ -4,7 +4,7 @@ MF_LANGUAGES += php
 .DEFAULT_GOAL := test
 
 # PHP_SOURCE_FILES is a space separated list of source files in the repo.
-PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find '*.php')
+PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find . -name '*.php')
 
 # PHP_CS_FIXER_CONFIG_FILE is the path to any existing PHP CS Fixer
 # configuration.
