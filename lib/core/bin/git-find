@@ -3,15 +3,31 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 
 if [[ $# < 1 ]]; then
-    echo "Usage: git-find pattern"
+    echo "Usage: git-find pathname ..."
     echo
-    echo "  Lists files within the Git repository that match the given filename"
-    echo "  pattern. Files ignored by Git are not included in the output."
+    echo "  A wrapper around the find command that excludes files ignored by"
+    echo "  Git. Only supports a single pathname argument, relative to the"
+    echo "  project root. No additional pathnames may be specified with -f."
+    echo "  Because Git has no knowledge of directories, this command will only"
+    echo "  ever find files, not directories."
     echo
     exit 1
 fi
 
 cd "$MF_PROJECT_ROOT"
-files="$(git ls-files; git ls-files --other --exclude-standard)"
+
+# git ls-files -- "$1"
+#    lists all files in the repository under the specified path, including those
+#    in the staging area
+# git ls-files --other --exclude-standard -- "$1"
+#    lists all untracked files under the specified path, except those ignored by
+#    Git
+files="$(git ls-files -- "$1"; git ls-files --other --exclude-standard -- "$1")"
+
+# filter out any non-existent paths to prevent subsequent find calls from
+# producing "No such file or directory" errors
 files="$(find $files 2>/dev/null || true)"
-[[ -n "$files" ]] && find $files -type f -iname "$1"
+
+# [[ -n "$files" ]]
+#    do not run find unless there are some files to match
+[[ -n "$files" ]] && find $files "${@:2}"
