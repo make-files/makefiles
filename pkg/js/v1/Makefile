@@ -4,10 +4,10 @@ MF_LANGUAGES += js
 .DEFAULT_GOAL := test
 
 # JS_SOURCE_FILES is a space separated list of all files in the src directory.
-JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src -name '*.js')
+JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)
 
 # JS_TEST_FILES is a space separated list of all files in the test directory.
-JS_TEST_FILES += $(shell PATH="$(PATH)" git-find test -name '*.js')
+JS_TEST_FILES += $(shell PATH="$(PATH)" git-find test)
 
 # JS_ESLINT_CONFIG_FILE is the path to any existing ESLint configuration.
 JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslintrc.* .eslintrc)
