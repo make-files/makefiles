@@ -5,7 +5,7 @@ JS_ESLINT_REQ +=
 
 # _JS_ESLINT_REQ is a space separated list of automatically detected
 # prerequisites needed to run ESLint.
-_JS_ESLINT_REQ += node_modules $(JS_ESLINT_CONFIG_FILE) $(JS_SOURCE_FILES) $(GENERATED_FILES)
+_JS_ESLINT_REQ += node_modules $(JS_ESLINT_CONFIG_FILE) $(JS_SOURCE_FILES) $(JS_TEST_FILES) $(GENERATED_FILES)
 
 # _JS_ESLINT_CACHE_FILE is a path to the cache file to use when running ESLint.
 _JS_ESLINT_CACHE_FILE := artifacts/lint/eslint/cache
