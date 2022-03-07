@@ -80,10 +80,11 @@ docker-push: $(_DOCKER_BUILD_REQ) $(_DOCKER_PUSH_GUARDS)
 .dockerignore:
 	@echo .makefiles > "$@"
 	@echo .git >> "$@"
+	@echo .github >> "$@"
 
 .PHONY: $(_DOCKER_PUSH_GUARDS)
 _docker-push-guard-dev:
 	@echo "The 'dev' tag can not be pushed to the registry, did you forget to set the DOCKER_TAGS environment variable?"
 	@exit 1
 
-_docker-push-guard-%: 
+_docker-push-guard-%:
