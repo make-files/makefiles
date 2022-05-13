@@ -88,4 +88,4 @@ artifacts/protobuf/args/common:
 artifacts/protobuf/args/go: go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
-	go list -f "--proto_path={{if .Dir}}{{ .Path }}={{ .Dir }}{{end}}" -m all > "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths > "$@"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+go_modules=($(go list -f '{{.Path}}={{.Dir}} ' -m all))
+
+for i in "${go_modules[@]}"
+do
+    path="${i%=*}"
+    dir="${i#*=}"
+    if find "$dir" -type f -iname '*.proto' > /dev/null; then
+       # Print the protobuf include path to the standard output
+       # if the Go module directory contains *.proto files.
+       echo "--proto_path=$path=$dir"
+    fi
+done
