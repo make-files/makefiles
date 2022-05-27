@@ -15,10 +15,6 @@ esac
 
 ARCH="$(uname -m)"
 
-# Use x86_64 on Apple Silicon, as there is no official arm64 support.
-#
-# See https://github.com/protocolbuffers/protobuf/issues/8062.
-# See https://github.com/protocolbuffers/protobuf/issues/8428.
 if [[ "$OS" == "osx" && "$ARCH" == "arm64" ]]; then
     ARCH="aarch_64"
 fi
