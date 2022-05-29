@@ -15,16 +15,11 @@ esac
 
 ARCH="$(uname -m)"
 
-# Use x86_64 on Apple Silicon, as there is no official arm64 support.
-#
-# See https://github.com/protocolbuffers/protobuf/issues/8062.
-# See https://github.com/protocolbuffers/protobuf/issues/8428.
 if [[ "$OS" == "osx" && "$ARCH" == "arm64" ]]; then
-    softwareupdate --install-rosetta --agree-to-license
-    ARCH="x86_64"
+    ARCH="aarch_64"
 fi
 
-VERSION="$(curl --head --silent https://github.com/protocolbuffers/protobuf/releases/latest | grep -i '^Location:' | egrep -o '[0-9]+.[0-9]+.[0-9]+')"
+VERSION="$(curl --head --silent https://github.com/protocolbuffers/protobuf/releases/latest | grep -i '^Location:' | egrep -o '[0-9]+.[0-9]+')"
 
 if [[ -f "${PROTOC_ROOT}/bin/protoc" ]]; then
     LOCAL_VERSION="$(${PROTOC_ROOT}/bin/protoc --version | sed -e 's/.* //')"
