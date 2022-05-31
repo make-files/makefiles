@@ -5,13 +5,13 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find . -name '*.proto')
 # definitions.
 PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_FILES))
 
-# PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
+# PROTO_INCLUDE_PATHS is a space separated list of include paths to use when
 # building the .proto files from this repository.
 #
 # NOTE: Please avoid adding the current directory (.) in this variable as it may
 # cause a "type redefinition" error from the protobuf compiler. The absolute
 # path to the current repository is already added to the list of include paths
-# via the 'artifacts/protobuf/args/proto_paths' file.
+# via the 'artifacts/protobuf/args/common' file.
 PROTO_INCLUDE_PATHS ?=
 
 # PROTOC_COMMAND is the path to the protoc command, if this is not specified
