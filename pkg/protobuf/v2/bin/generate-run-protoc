@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
-dir=$(dirname $1)
+protoc_path=$1
+dir=$(dirname "${protoc_path}")
 script_name="run-protoc"
 
 $(cat <<EOF > "${dir}/${script_name}"
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script runs a local copy of protoc compiler and sets its path as a part
-# of PATH environment variable.
+# Configure PATH so that the protoc plugins installed by the Makefiles take
+# precedence.
 PATH="${dir}:\$PATH" \\
 "$1" "\${@}"
 EOF
