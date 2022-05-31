@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+dir=$(dirname $1)
+script_name="run-protoc"
+
+$(cat <<EOF > "${dir}/${script_name}"
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script runs a local copy of protoc compiler and sets its path as a part
+# of PATH environment variable.
+PATH="${dir}:\$PATH" \\
+"$1" "\${@}"
+EOF
+)
+
+chmod +x "${dir}/${script_name}"

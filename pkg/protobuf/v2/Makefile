@@ -58,16 +58,16 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
-%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
+%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
+	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_opt=module=$$(go list -m) \
 		--go_out=:. \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/args/common artifacts/protobuf/args/go
-	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
+%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
+	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go-grpc_opt=module=$$(go list -m) \
 		--go-grpc_out=. \
@@ -77,6 +77,9 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 
 $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
+
+artifacts/protobuf/bin/run-protoc:
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-protoc-run $(PROTOC_COMMAND)
 
 artifacts/protobuf/bin/go.mod: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
