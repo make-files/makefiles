@@ -1,3 +1,5 @@
+MF_LANGUAGES += proto
+
 # PROTO_FILES is a space separated list of Protocol Buffers files.
 PROTO_FILES += $(shell PATH="$(PATH)" git-find . -name '*.proto')
 
