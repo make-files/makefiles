@@ -59,7 +59,6 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
 %.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
-	cat -n $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_opt=module=$$(go list -m) \
@@ -68,7 +67,6 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
 %_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
-	cat -n $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go-grpc_opt=module=$$(go list -m) \

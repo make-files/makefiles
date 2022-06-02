@@ -11,8 +11,7 @@ set -euo pipefail
 
 # Configure PATH so that the protoc plugins installed by the Makefiles take
 # precedence.
-PATH="${dir}:\$PATH" \\
-"$1" "\${@}"
+PATH="${dir}:\$PATH" "$1" "\${@}"
 EOF
 )
 
