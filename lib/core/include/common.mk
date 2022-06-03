@@ -143,6 +143,12 @@ _verify-generated:
 .PHONY: test
 test::
 
+# benchmark --- Executes all benchmarks.
+# Individual language Makefiles are expected to add additional recipies for this
+# target.
+.PHONY: benchmark
+benchmark::
+
 # lint --- Check for syntax, configuration, code style and/or formatting issues.
 # Individual language Makefiles are expected to add additional recipies for this
 # target.

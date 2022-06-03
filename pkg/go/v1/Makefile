@@ -143,6 +143,11 @@ GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-
 test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 	go test ./...
 
+# benchmark --- Executes all go benchmarks in this module.
+.PHONY: benchmark
+benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
+	go test -benchmem -bench='.*' ./...
+
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
 coverage:: artifacts/coverage/index.html
