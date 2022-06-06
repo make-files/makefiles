@@ -15,6 +15,9 @@ JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslint
 # JS_JEST_CONFIG_FILE is the path to any existing Jest configuration.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.*)
 
+# JS_PRETTIER_CONFIG_FILE is the path to any existing Prettier configuration.
+JS_PRETTIER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .prettierrc .prettierrc.* prettier.config.*)
+
 # JS_SIZE_LIMIT_CONFIG_FILE is the path to any existing Size Limit
 # configuration.
 JS_SIZE_LIMIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .size-limit.*)
@@ -46,6 +49,10 @@ endif
 
 ifneq ($(JS_ESLINT_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/eslint.mk
+endif
+
+ifneq ($(JS_PRETTIER_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/prettier.mk
 endif
 
 ifneq ($(JS_SIZE_LIMIT_CONFIG_FILE),)
