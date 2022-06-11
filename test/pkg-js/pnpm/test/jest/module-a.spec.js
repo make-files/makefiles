@@ -1,0 +1,1 @@
+../../../common/test/jest/module-a.spec.js

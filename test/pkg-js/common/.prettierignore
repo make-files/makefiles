@@ -1,4 +1,4 @@
 /.makefiles/
 /artifacts/
 /package.json
-/yarn.lock
+/*lock*
