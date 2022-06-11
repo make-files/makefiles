@@ -1,0 +1,13 @@
+{
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "env": {
+    "jest": true,
+    "node": true
+  },
+  "rules": {
+    "no-console": "warn"
+  }
+}

@@ -1,4 +1,4 @@
-const { functionA } = require("../../src/module-a.js");
+import { functionA } from "../../src/module-a.js";
 
 test("functionA()", () => {
   expect(functionA()).toBe("a");

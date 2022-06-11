@@ -1,12 +1,7 @@
-module.exports = {
-  functionA,
-  functionB,
-};
-
-function functionA() {
+export function functionA() {
   return "a";
 }
 
-function functionB() {
+export function functionB() {
   return "b";
 }

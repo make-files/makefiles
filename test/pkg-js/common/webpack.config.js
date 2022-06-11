@@ -1,17 +1,18 @@
-const { join } = require("path");
-const { StatsWriterPlugin } = require("webpack-stats-plugin");
+import { join } from "path";
 
-module.exports = (_, { mode = "development" } = {}) => {
-  const isProduction = mode === "production";
-  const { JS_WEBPACK_BUILD_NAME: buildName = "" } = process.env;
+export function createConfig (rootPath, {StatsWriterPlugin}) {
+  return (_, { mode = "development" } = {}) => {
+    const isProduction = mode === "production";
+    const { JS_WEBPACK_BUILD_NAME: buildName = "" } = process.env;
 
-  return {
-    mode,
-    output: {
-      path: buildName
-        ? join(__dirname, "artifacts/webpack/build/named", buildName, mode)
-        : join(__dirname, "artifacts/webpack/build", mode),
-    },
-    plugins: [new StatsWriterPlugin({ filename: ".stats.json" })],
+    return {
+      mode,
+      output: {
+        path: buildName
+          ? join(rootPath, "artifacts/webpack/build/named", buildName, mode)
+          : join(rootPath, "artifacts/webpack/build", mode),
+      },
+      plugins: [new StatsWriterPlugin({ filename: ".stats.json" })],
+    };
   };
-};
+}
