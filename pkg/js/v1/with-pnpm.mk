@@ -7,14 +7,6 @@ endif
 
 ################################################################################
 
-# set-package-version --- Sets the version field in package.json to a semver
-# representation of the HEAD commit.
-.PHONY: set-package-version
-set-package-version:
-	pnpm version --no-git-tag-version --allow-same-version "$(SEMVER)"
-
-################################################################################
-
 node_modules: package.json
 ifeq ($(wildcard pnpm-lock.yaml),)
 	pnpm install $(JS_PNPM_INSTALL_ARGS)
