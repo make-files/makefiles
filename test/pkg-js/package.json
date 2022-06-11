@@ -8,6 +8,7 @@
   "devDependencies": {
     "eslint": "^8.17.0",
     "jest": "^28.1.1",
+    "prettier": "^2.6.2",
     "webpack-bundle-analyzer": "^4.5.0"
   }
 }

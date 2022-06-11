@@ -1,6 +1,4 @@
 module.exports = {
-  collectCoverageFrom: [
-    'src/**/*.js',
-  ],
-  coverageDirectory: 'artifacts/coverage/jest',
-}
+  collectCoverageFrom: ["src/**/*.js"],
+  coverageDirectory: "artifacts/coverage/jest",
+};

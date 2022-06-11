@@ -7,7 +7,6 @@ module.exports = {
     node: true,
   },
   rules: {
-    'comma-dangle': ['error', 'always-multiline'],
-    'no-console': 'warn',
+    "no-console": "warn",
   },
-}
+};

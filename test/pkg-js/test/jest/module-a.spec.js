@@ -1,5 +1,5 @@
-const {functionA} = require('../../src/module-a.js')
+const { functionA } = require("../../src/module-a.js");
 
-test('functionA()', () => {
-  expect(functionA()).toBe('a')
-})
+test("functionA()", () => {
+  expect(functionA()).toBe("a");
+});

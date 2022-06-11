@@ -1,12 +1,12 @@
 module.exports = {
   functionA,
   functionB,
+};
+
+function functionA() {
+  return "a";
 }
 
-function functionA () {
-  return 'a'
-}
-
-function functionB () {
-  return 'b'
+function functionB() {
+  return "b";
 }

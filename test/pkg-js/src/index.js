@@ -1,1 +1,1 @@
-window.makefiles = true
+window.makefiles = true;
