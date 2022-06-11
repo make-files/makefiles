@@ -1,5 +1,5 @@
 const {join} = require('path')
-const StatsPlugin = require('stats-webpack-plugin')
+const { StatsWriterPlugin } = require('webpack-stats-plugin')
 
 module.exports = (_, {mode = 'development'} = {}) => {
   const isProduction = mode === 'production'
@@ -13,7 +13,7 @@ module.exports = (_, {mode = 'development'} = {}) => {
         : join(__dirname, 'artifacts/webpack/build', mode),
     },
     plugins: [
-      new StatsPlugin('.stats.json'),
+      new StatsWriterPlugin({filename: '.stats.json'}),
     ],
   }
 }
