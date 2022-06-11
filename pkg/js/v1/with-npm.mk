@@ -7,7 +7,16 @@ endif
 
 ################################################################################
 
-node_modules: package.json
+# _js_node_exec returns a command that executes the supplied executable.
+define _js_node_exec
+npm exec -- $1
+endef
+
+################################################################################
+
+artifacts/link-dependencies.touch: package.json
+	@mkdir -p "$(@D)"
+
 ifeq ($(wildcard package-lock.json),)
 	npm install $(JS_NPM_INSTALL_ARGS)
 else
@@ -16,7 +25,14 @@ endif
 
 	@touch "$@"
 
-artifacts/npm/production/node_modules: package.json
+################################################################################
+
+artifacts/npm/production/node_modules: artifacts/linker/production/node_modules
+	@mkdir -p "$(@D)"
+
+	ln -s "$<" "$@"
+
+artifacts/linker/production/node_modules: package.json
 	@mkdir -p "$(@D)"
 	cp package.json "$(@D)/package.json"
 

@@ -6,7 +6,7 @@ JS_SIZE_LIMIT_REQ +=
 
 # _JS_SIZE_LIMIT_REQ is a space separated list of automatically detected
 # prerequisites needed to run Size Limit.
-_JS_SIZE_LIMIT_REQ += node_modules
+_JS_SIZE_LIMIT_REQ += artifacts/link-dependencies.touch
 
 ################################################################################
 
@@ -27,4 +27,4 @@ ci:: size-limit
 # size-limit --- Check code size against pre-configured limits using Size Limit.
 .PHONY: size-limit
 size-limit: $(JS_SIZE_LIMIT_REQ) $(_JS_SIZE_LIMIT_REQ)
-	node_modules/.bin/size-limit
+	$(call _js_node_exec,size-limit)

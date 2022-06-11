@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "npm@8.11.0",
+  "packageManager": "yarn@3.2.1",
   "type": "module",
   "dependencies": {
     "webpack": "^5.73.0",

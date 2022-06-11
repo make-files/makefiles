@@ -6,7 +6,7 @@ JS_JEST_REQ +=
 
 # _JS_JEST_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Jest tests.
-_JS_JEST_REQ += node_modules $(GENERATED_FILES)
+_JS_JEST_REQ += artifacts/link-dependencies.touch $(GENERATED_FILES)
 
 # _JS_JEST_ARGS is a set of arguments to use for every execution of Jest.
 _JS_JEST_ARGS := --config "$(JS_JEST_CONFIG_FILE)"
@@ -38,7 +38,7 @@ ci:: jest-coverage-lcov
 # jest --- Executes all Jest tests in this package.
 .PHONY: jest
 jest: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	node_modules/.bin/jest $(_JS_JEST_ARGS)
+	$(call _js_node_exec,jest) $(_JS_JEST_ARGS)
 
 # jest-coverage --- Produces a Jest HTML coverage report.
 .PHONY: jest-coverage
@@ -57,8 +57,8 @@ jest-coverage: artifacts/coverage/jest/lcov.info
 
 .PHONY: artifacts/coverage/jest/index.html # always rebuild
 artifacts/coverage/jest/index.html: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	node_modules/.bin/jest $(_JS_JEST_ARGS) --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters html
+	$(call _js_node_exec,jest) $(_JS_JEST_ARGS) --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters html
 
 .PHONY: artifacts/coverage/jest/lcov.info # always rebuild
 artifacts/coverage/jest/lcov.info: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	node_modules/.bin/jest $(_JS_JEST_ARGS) --ci --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters lcovonly
+	$(call _js_node_exec,jest) $(_JS_JEST_ARGS) --ci --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters lcovonly

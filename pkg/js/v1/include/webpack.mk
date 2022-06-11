@@ -19,7 +19,7 @@ endif
 
 # _JS_WEBPACK_REQ is a space separated list of automatically detected
 # prerequisites needed to run Webpack.
-_JS_WEBPACK_REQ += node_modules $(JS_WEBPACK_CONFIG_FILE) $(JS_SOURCE_FILES) $(GENERATED_FILES)
+_JS_WEBPACK_REQ += artifacts/link-dependencies.touch $(JS_WEBPACK_CONFIG_FILE) $(JS_SOURCE_FILES) $(GENERATED_FILES)
 
 ################################################################################
 
@@ -45,17 +45,17 @@ webpack-analyze-open: artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/development: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@rm -rf "$@"
-	node_modules/.bin/webpack --mode development
+	$(call _js_node_exec,webpack) --mode development
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@rm -rf "$@"
-	NODE_ENV=production node_modules/.bin/webpack --mode production
+	NODE_ENV=production $(call _js_node_exec,webpack) --mode production
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production/.stats.json: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@mkdir -p "$(@D)"
 	@rm -f "$@"
-	NODE_ENV=production node_modules/.bin/webpack --mode production --json > "$@"
+	NODE_ENV=production $(call _js_node_exec,webpack) --mode production --json > "$@"
 
 artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production.html: artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production/.stats.json
-	$(eval _WEBPACK_BUNDLE_ANALYZER  := $(if $(wildcard node_modules/.bin/webpack-bundle-analyzer),node_modules/.bin/webpack-bundle-analyzer,npx webpack-bundle-analyzer))
+	$(eval _WEBPACK_BUNDLE_ANALYZER  := $(if $(wildcard $(call _js_node_exec,webpack)-bundle-analyzer),$(call _js_node_exec,webpack)-bundle-analyzer,npx webpack-bundle-analyzer))
 	$(_WEBPACK_BUNDLE_ANALYZER) --mode static --no-open --report "$@" "$<" artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production

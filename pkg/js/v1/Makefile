@@ -37,9 +37,11 @@ set-package-version:
 
 ################################################################################
 
-# Ensure that dependencies are installed before attempting to build a Docker
-# image.
-DOCKER_BUILD_REQ += node_modules $(JS_SOURCE_FILES)
+# Docker builds depend on linking dependencies.
+DOCKER_BUILD_REQ += artifacts/link-dependencies.touch
+
+# Docker builds depend on all JS source files.
+DOCKER_BUILD_REQ += $(JS_SOURCE_FILES)
 
 ################################################################################
 

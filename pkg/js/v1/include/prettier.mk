@@ -6,7 +6,7 @@ JS_PRETTIER_REQ +=
 
 # _JS_PRETTIER_REQ is a space separated list of automatically detected
 # prerequisites needed to run Prettier.
-_JS_PRETTIER_REQ += node_modules
+_JS_PRETTIER_REQ += artifacts/link-dependencies.touch
 
 # _JS_PRETTIER_ARGS is a space separated list of arguments to pass to Prettier.
 _JS_PRETTIER_ARGS := --config "$(JS_PRETTIER_CONFIG_FILE)"
@@ -30,9 +30,9 @@ ci:: prettier-check
 # prettier --- Automatically fix JavaScript code style and formatting issues.
 .PHONY: prettier
 prettier: $(JS_PRETTIER_REQ) $(_JS_PRETTIER_REQ)
-	node_modules/.bin/prettier $(_JS_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
+	$(call _js_node_exec,prettier) $(_JS_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
 
 # prettier-check --- Check for JavaScript code style and formatting issues.
 .PHONY: prettier-check
 prettier-check: $(JS_PRETTIER_REQ) $(_JS_PRETTIER_REQ)
-	node_modules/.bin/prettier $(_JS_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"
+	$(call _js_node_exec,prettier) $(_JS_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"

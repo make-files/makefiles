@@ -7,7 +7,16 @@ endif
 
 ################################################################################
 
-node_modules: package.json
+# _js_node_exec returns a command that executes the supplied executable.
+define _js_node_exec
+pnpm exec -- $1
+endef
+
+################################################################################
+
+artifacts/link-dependencies.touch: package.json
+	@mkdir -p "$(@D)"
+
 ifeq ($(wildcard pnpm-lock.yaml),)
 	pnpm install $(JS_PNPM_INSTALL_ARGS)
 else
@@ -16,7 +25,14 @@ endif
 
 	@touch "$@"
 
-artifacts/pnpm/production/node_modules: package.json
+################################################################################
+
+artifacts/pnpm/production/node_modules: artifacts/linker/production/node_modules
+	@mkdir -p "$(@D)"
+
+	ln -s "$<" "$@"
+
+artifacts/linker/production/node_modules: package.json
 ifeq ($(wildcard pnpm-lock.yaml),)
 	pnpm install $(JS_PNPM_INSTALL_ARGS) --prod --modules-dir "$@"
 else

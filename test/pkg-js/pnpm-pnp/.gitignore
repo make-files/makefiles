@@ -1,5 +1,5 @@
 /.makefiles/
 /artifacts/
+/node_modules/
 /.pnp.*
-/*lock*
-/package.json
+/pnpm-lock.yaml
