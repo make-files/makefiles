@@ -11,7 +11,7 @@ endif
 # representation of the HEAD commit.
 .PHONY: set-package-version
 set-package-version:
-	pnpm version --no-git-tag-version "$(SEMVER)"
+	pnpm version --no-git-tag-version --allow-same-version "$(SEMVER)"
 
 ################################################################################
 
