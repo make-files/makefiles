@@ -7,14 +7,6 @@ endif
 
 ################################################################################
 
-# set-package-version --- Sets the version field in package.json to a semver
-# representation of the HEAD commit.
-.PHONY: set-package-version
-set-package-version:
-	yarn version --no-git-tag-version --new-version "$(SEMVER)"
-
-################################################################################
-
 node_modules: package.json
 ifeq ($(wildcard yarn.lock),)
 	yarn install $(JS_YARN_INSTALL_ARGS)

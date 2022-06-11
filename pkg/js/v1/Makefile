@@ -27,6 +27,16 @@ JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpac
 
 ################################################################################
 
+# set-package-version --- Sets the version field in package.json to a semver
+# representation of the HEAD commit.
+.PHONY: set-package-version
+set-package-version:
+	cp package.json package.old.json
+	jq '.version = "$(SEMVER)"' package.old.json > package.json
+	rm package.old.json
+
+################################################################################
+
 # Ensure that dependencies are installed before attempting to build a Docker
 # image.
 DOCKER_BUILD_REQ += node_modules $(JS_SOURCE_FILES)
