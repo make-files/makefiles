@@ -35,6 +35,9 @@ set-package-version:
 	jq '.version = "$(SEMVER)"' package.old.json > package.json
 	rm package.old.json
 
+.PHONY: link-dependencies
+link-dependencies: artifacts/link-dependencies.touch
+
 ################################################################################
 
 # Docker builds depend on linking dependencies.
@@ -49,6 +52,9 @@ package.json:
 ifeq ($(wildcard package.json),)
 	cp "$(MF_ROOT)/pkg/js/v1/etc/init.package.json" "$(MF_PROJECT_ROOT)/package.json"
 endif
+
+node_modules: artifacts/link-dependencies.touch
+	echo "WARNING (from makefiles.dev, pkg-js): The node_modules target is deprecated. Use the link-dependencies target instead."
 
 ################################################################################
 
