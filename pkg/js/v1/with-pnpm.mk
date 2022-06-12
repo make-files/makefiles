@@ -2,7 +2,7 @@
 JS_PNPM_INSTALL_ARGS ?=
 
 ifneq ($(MF_NON_INTERACTIVE),)
-	JS_PNPM_INSTALL_ARGS += --reporter append-only
+JS_PNPM_INSTALL_ARGS += --reporter append-only
 endif
 
 ################################################################################

@@ -2,7 +2,7 @@
 JS_NPM_INSTALL_ARGS ?=
 
 ifneq ($(MF_NON_INTERACTIVE),)
-	JS_NPM_INSTALL_ARGS += --no-progress
+JS_NPM_INSTALL_ARGS += --no-progress
 endif
 
 ################################################################################

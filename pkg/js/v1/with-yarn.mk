@@ -2,7 +2,7 @@
 JS_YARN_INSTALL_ARGS ?=
 
 ifneq ($(MF_NON_INTERACTIVE),)
-	JS_YARN_INSTALL_ARGS += --non-interactive --no-progress
+JS_YARN_INSTALL_ARGS += --non-interactive --no-progress
 endif
 
 ################################################################################
