@@ -51,7 +51,7 @@ jest-coverage-open: artifacts/coverage/jest/index.html
 
 # jest-coverage-lcov --- Produces a Jest LCOV coverage report.
 .PHONY: jest-coverage-lcov
-jest-coverage: artifacts/coverage/jest/lcov.info
+jest-coverage-lcov: artifacts/coverage/jest/lcov.info
 
 ################################################################################
 
