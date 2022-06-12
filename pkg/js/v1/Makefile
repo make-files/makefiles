@@ -43,6 +43,13 @@ DOCKER_BUILD_REQ += node_modules $(JS_SOURCE_FILES)
 
 ################################################################################
 
+package.json:
+ifeq ($(wildcard package.json),)
+	cp "$(MF_ROOT)/pkg/js/v1/etc/init.package.json" "$(MF_PROJECT_ROOT)/package.json"
+endif
+
+################################################################################
+
 # Build systems
 
 ifneq ($(JS_WEBPACK_CONFIG_FILE),)

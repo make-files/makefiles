@@ -16,11 +16,6 @@ endif
 
 	@touch "$@"
 
-package.json:
-ifeq ($(wildcard package.json),)
-	cp "$(MF_ROOT)/pkg/js/v1/etc/init.package.json" "$(MF_PROJECT_ROOT)/package.json"
-endif
-
 artifacts/npm/production/node_modules: package.json
 	@mkdir -p "$(@D)"
 	cp package.json "$(@D)/package.json"

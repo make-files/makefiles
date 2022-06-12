@@ -16,11 +16,6 @@ endif
 
 	@touch "$@"
 
-package.json:
-ifeq ($(wildcard package.json),)
-	cp "$(MF_ROOT)/pkg/js/v1/etc/init.package.json" "$(MF_PROJECT_ROOT)/package.json"
-endif
-
 artifacts/pnpm/production/node_modules: package.json
 ifeq ($(wildcard pnpm-lock.yaml),)
 	pnpm install $(JS_PNPM_INSTALL_ARGS) --prod --modules-dir "$@"
