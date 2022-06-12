@@ -54,7 +54,7 @@ ifeq ($(wildcard package.json),)
 endif
 
 node_modules: artifacts/link-dependencies.touch
-	echo "WARNING (from makefiles.dev, pkg-js): The node_modules target is deprecated. Use the link-dependencies target instead."
+	@>&2 echo 'WARNING: The "node_modules" make target is deprecated. Use the "link-dependencies" target instead.'
 
 ################################################################################
 
