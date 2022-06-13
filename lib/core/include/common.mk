@@ -1,8 +1,10 @@
-# Remove all "Old-Fashioned Suffix Rules" to simplify make -d output when
-# debugging.
-#
+# Remove "Old-Fashioned Suffix Rules".
 # See https://www.gnu.org/software/make/manual/html_node/Suffix-Rules.html
 .SUFFIXES:
+
+# Remove all "built-in" rules.
+# See https://www.gnu.org/software/make/manual/html_node/Catalogue-of-Rules.html
+MAKEFLAGS += --no-builtin-rules
 
 export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
