@@ -51,6 +51,9 @@ artifacts/yarn/production/node_modules: artifacts/linker/production/node_modules
 
 	ln -sf ../../linker/production/node_modules "$@"
 
+	@>&2 echo 'WARNING: The "artifacts/yarn/production/node_modules" make target is deprecated. Please update your Makefile.'
+	@>&2 echo '  - Use the new "artifacts/linker/production/node_modules" target instead.'
+
 artifacts/linker/production/node_modules: package.json
 ifeq ($(wildcard yarn.lock),)
 	yarn install $(JS_YARN_INSTALL_ARGS) --production --modules-folder "$@" --pure-lockfile
