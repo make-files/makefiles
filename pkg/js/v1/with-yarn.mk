@@ -49,7 +49,7 @@ ifneq ($(_JS_YARN_MODERN),true)
 artifacts/yarn/production/node_modules: artifacts/linker/production/node_modules
 	@mkdir -p "$(@D)"
 
-	ln -s "$<" "$@"
+	ln -sf ../../linker/production/node_modules "$@"
 
 artifacts/linker/production/node_modules: package.json
 ifeq ($(wildcard yarn.lock),)
