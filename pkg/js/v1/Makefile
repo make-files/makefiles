@@ -53,12 +53,16 @@ ifeq ($(wildcard package.json),)
 	cp "$(MF_ROOT)/pkg/js/v1/etc/init.package.json" "$(MF_PROJECT_ROOT)/package.json"
 endif
 
+define _JS_NODE_MODULES_DEPRECATED
+WARNING: The "node_modules" make target is deprecated.
+  a) If you're writing a make target that needs dependencies installed:
+    - Use the new "artifacts/link-dependencies.touch" target instead.
+  b) If you're using "make node_modules" directly (e.g. in a CI workflow):
+    - Use "make link-dependencies" instead.
+endef
+
 node_modules: artifacts/link-dependencies.touch
-	@>&2 echo 'WARNING: The "node_modules" make target is deprecated. Please update your Makefile.'
-	@>&2 echo '  A) If you are writing a make target that needs dependencies installed:'
-	@>&2 echo '    - Use the new "artifacts/link-dependencies.touch" target instead.'
-	@>&2 echo '  B) If you are using "make node_modules" directly (e.g. in a CI workflow):'
-	@>&2 echo '    - Use "make link-dependencies" instead.'
+	$(warning $(_JS_NODE_MODULES_DEPRECATED))
 
 ################################################################################
 

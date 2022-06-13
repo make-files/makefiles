@@ -46,6 +46,11 @@ endif
 
 ifneq ($(_JS_YARN_MODERN),true)
 
+define _JS_YARN_PRODUCTION_NODE_MODULES_DEPRECATED
+WARNING: The "artifacts/yarn/production/node_modules" make target is deprecated.
+  - Use the new "artifacts/linker/production/node_modules" target instead.
+endef
+
 artifacts/yarn/production/node_modules: package.json
 ifeq ($(wildcard yarn.lock),)
 	yarn install $(JS_YARN_INSTALL_ARGS) --production --modules-folder "$@" --pure-lockfile
@@ -54,9 +59,7 @@ else
 endif
 
 	@touch "$@"
-
-	@>&2 echo 'WARNING: The "artifacts/yarn/production/node_modules" make target is deprecated. Please update your Makefile.'
-	@>&2 echo '  - Use the new "artifacts/linker/production/node_modules" target instead.'
+	$(warning $(_JS_YARN_PRODUCTION_NODE_MODULES_DEPRECATED))
 
 artifacts/linker/production/node_modules: package.json
 ifeq ($(wildcard yarn.lock),)
