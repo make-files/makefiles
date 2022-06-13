@@ -27,11 +27,6 @@ endif
 
 ################################################################################
 
-artifacts/npm/production/node_modules: artifacts/linker/production/node_modules
-	@mkdir -p "$(@D)"
-
-	ln -sf ../../linker/production/node_modules "$@"
-
 artifacts/linker/production/node_modules: package.json
 	@mkdir -p "$(@D)"
 	cp package.json "$(@D)/package.json"

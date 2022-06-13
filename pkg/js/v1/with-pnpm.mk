@@ -27,11 +27,6 @@ endif
 
 ################################################################################
 
-artifacts/pnpm/production/node_modules: artifacts/linker/production/node_modules
-	@mkdir -p "$(@D)"
-
-	ln -sf ../../linker/production/node_modules "$@"
-
 artifacts/linker/production/node_modules: package.json
 ifeq ($(wildcard pnpm-lock.yaml),)
 	pnpm install $(JS_PNPM_INSTALL_ARGS) --prod --modules-dir "$@"
