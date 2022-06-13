@@ -45,17 +45,17 @@ webpack-analyze-open: artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/development: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@rm -rf "$@"
-	$(call _js_node_exec,webpack) --mode development
+	$(call js_exec,webpack) --mode development
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@rm -rf "$@"
-	NODE_ENV=production $(call _js_node_exec,webpack) --mode production
+	NODE_ENV=production $(call js_exec,webpack) --mode production
 
 artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production/.stats.json: $(JS_WEBPACK_REQ) $(_JS_WEBPACK_REQ)
 	@mkdir -p "$(@D)"
 	@rm -f "$@"
-	NODE_ENV=production $(call _js_node_exec,webpack) --mode production --json > "$@"
+	NODE_ENV=production $(call js_exec,webpack) --mode production --json > "$@"
 
 artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production.html: artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production/.stats.json
-	$(eval _WEBPACK_BUNDLE_ANALYZER  := $(if $(wildcard $(call _js_node_exec,webpack)-bundle-analyzer),$(call _js_node_exec,webpack)-bundle-analyzer,npx webpack-bundle-analyzer))
+	$(eval _WEBPACK_BUNDLE_ANALYZER  := $(if $(wildcard $(call js_exec,webpack)-bundle-analyzer),$(call js_exec,webpack)-bundle-analyzer,npx webpack-bundle-analyzer))
 	$(_WEBPACK_BUNDLE_ANALYZER) --mode static --no-open --report "$@" "$<" artifacts/webpack/build$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production

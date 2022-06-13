@@ -34,17 +34,17 @@ ci:: eslint-check
 #            to fail, but errors will.
 .PHONY: eslint
 eslint: $(JS_ESLINT_REQ) $(_JS_ESLINT_REQ)
-	$(call _js_node_exec,eslint) $(_JS_ESLINT_ARGS) --fix "$(MF_PROJECT_ROOT)"
+	$(call js_exec,eslint) $(_JS_ESLINT_ARGS) --fix "$(MF_PROJECT_ROOT)"
 
 # eslint-strict --- Same as the eslint target, but ESLint warnings will cause
 #                   failures.
 .PHONY: eslint-strict
 eslint-strict: $(JS_ESLINT_REQ) $(_JS_ESLINT_REQ)
-	$(call _js_node_exec,eslint) $(_JS_ESLINT_ARGS) --fix --max-warnings 0 "$(MF_PROJECT_ROOT)"
+	$(call js_exec,eslint) $(_JS_ESLINT_ARGS) --fix --max-warnings 0 "$(MF_PROJECT_ROOT)"
 
 # eslint-check --- Same as the eslint-strict target, but issues that could
 #                  automatically be fixed will instead cause this target to
 #                  fail.
 .PHONY: eslint-check
 eslint-check: $(JS_ESLINT_REQ) $(_JS_ESLINT_REQ)
-	$(call _js_node_exec,eslint) $(_JS_ESLINT_ARGS) --max-warnings 0 "$(MF_PROJECT_ROOT)"
+	$(call js_exec,eslint) $(_JS_ESLINT_ARGS) --max-warnings 0 "$(MF_PROJECT_ROOT)"

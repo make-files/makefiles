@@ -14,13 +14,13 @@ endif
 
 ################################################################################
 
-# _js_node_exec returns a command that executes the supplied executable.
+# js_exec returns a command that executes the supplied executable.
 ifeq ($(_JS_YARN_MODERN),true)
-define _js_node_exec
+define js_exec
 yarn exec -- $1
 endef
 else
-define _js_node_exec
+define js_exec
 yarn exec --silent -- $1
 endef
 endif

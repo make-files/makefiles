@@ -7,8 +7,8 @@ endif
 
 ################################################################################
 
-# _js_node_exec returns a command that executes the supplied executable.
-define _js_node_exec
+# js_exec returns a command that executes the supplied executable.
+define js_exec
 pnpm exec -- $1
 endef
 
