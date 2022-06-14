@@ -30,9 +30,9 @@ ci:: prettier-check
 # prettier --- Automatically fix JavaScript code style and formatting issues.
 .PHONY: prettier
 prettier: $(JS_PRETTIER_REQ) $(_JS_PRETTIER_REQ)
-	$(call js_exec,prettier) $(_JS_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
+	$(JS_EXEC) prettier $(_JS_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
 
 # prettier-check --- Check for JavaScript code style and formatting issues.
 .PHONY: prettier-check
 prettier-check: $(JS_PRETTIER_REQ) $(_JS_PRETTIER_REQ)
-	$(call js_exec,prettier) $(_JS_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"
+	$(JS_EXEC) prettier $(_JS_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"

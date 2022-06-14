@@ -7,10 +7,8 @@ endif
 
 ################################################################################
 
-# js_exec returns a command that executes the supplied executable.
-define js_exec
-pnpm exec -- $1
-endef
+# JS_EXEC is the command to use for executing locally installed dependencies.
+JS_EXEC := pnpm exec --
 
 ################################################################################
 

@@ -27,4 +27,4 @@ ci:: size-limit
 # size-limit --- Check code size against pre-configured limits using Size Limit.
 .PHONY: size-limit
 size-limit: $(JS_SIZE_LIMIT_REQ) $(_JS_SIZE_LIMIT_REQ)
-	$(call js_exec,size-limit)
+	$(JS_EXEC) size-limit

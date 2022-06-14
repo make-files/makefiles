@@ -14,15 +14,11 @@ endif
 
 ################################################################################
 
-# js_exec returns a command that executes the supplied executable.
+# JS_EXEC is the command to use for executing locally installed dependencies.
 ifeq ($(_JS_YARN_MODERN),true)
-define js_exec
-yarn exec -- $1
-endef
+JS_EXEC := yarn exec --
 else
-define js_exec
-yarn exec --silent -- $1
-endef
+JS_EXEC := yarn exec --silent --
 endif
 
 ################################################################################

@@ -38,7 +38,7 @@ ci:: jest-coverage-lcov
 # jest --- Executes all Jest tests in this package.
 .PHONY: jest
 jest: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	$(call js_exec,jest) $(_JS_JEST_ARGS)
+	$(JS_EXEC) jest $(_JS_JEST_ARGS)
 
 # jest-coverage --- Produces a Jest HTML coverage report.
 .PHONY: jest-coverage
@@ -57,8 +57,8 @@ jest-coverage-lcov: artifacts/coverage/jest/lcov.info
 
 .PHONY: artifacts/coverage/jest/index.html # always rebuild
 artifacts/coverage/jest/index.html: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	$(call js_exec,jest) $(_JS_JEST_ARGS) --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters html
+	$(JS_EXEC) jest $(_JS_JEST_ARGS) --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters html
 
 .PHONY: artifacts/coverage/jest/lcov.info # always rebuild
 artifacts/coverage/jest/lcov.info: $(JS_JEST_REQ) $(_JS_JEST_REQ)
-	$(call js_exec,jest) $(_JS_JEST_ARGS) --ci --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters lcovonly
+	$(JS_EXEC) jest $(_JS_JEST_ARGS) --ci --coverage --coverage-directory="$(@D)" --coverage-reporters text-summary --coverage-reporters lcovonly
