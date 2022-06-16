@@ -62,18 +62,11 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # unknown this syntax does NOT work under Travis CI.
 %.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
 	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
-		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
-		--go_opt=module=$$(go list -m) \
-		--go_out=:. \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
 %_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
 	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
-		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
-		--go-grpc_opt=module=$$(go list -m) \
-		--go-grpc_out=. \
-		--go-grpc_opt=require_unimplemented_servers=false \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
@@ -88,9 +81,15 @@ artifacts/protobuf/bin/go.mod: go.mod
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
-	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > $@
+	echo "--proto_path=$(dir $(PROTOC_COMMAND))../include" > "$@"
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
 
 artifacts/protobuf/args/go: go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths > "$@"
+	echo "--go_opt=module=$$(go list -m)" > "$@"
+	echo "--go_out=:." >> "$@"
+	echo "--go-grpc_opt=module=$$(go list -m)" >> "$@"
+	echo "--go-grpc_out=." >> "$@"
+	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
