@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -ne 1 ]]; then
+	echo "this script needs exactly 1 argument"
+    exit 1
+fi
+
+settings_file="${1}"
+
+# If VSCode settings file does not exist, create a VSCode workspace directory if
+# reqiured and load an empty JSON object to the settings file.
+if [ ! -f "${settings_file}" ]
+then
+    mkdir -p $(dirname "${settings_file}")
+    echo "{}" > "${settings_file}"
+fi
