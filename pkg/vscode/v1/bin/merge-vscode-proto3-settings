@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if ! hash jq 2>/dev/null; then
-    echo "no jq binary is installed in the executable path, merging vscode-protoc3 extension settings is ignored"
+    echo "no jq binary is installed in the executable path, vscode-protoc3 settings will not be merged"
     exit 0
 fi
 
