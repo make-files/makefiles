@@ -26,10 +26,8 @@ endif
 
 endif
 
-RUN_PROTOC_SCRIPT = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
-
 $(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
-	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(RUN_PROTOC_SCRIPT)" $^
+	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(PROTO_PROTOC_PATH)" $^
 endif
