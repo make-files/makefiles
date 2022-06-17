@@ -7,7 +7,7 @@ GENERATE_VSCODE_SETTINGS ?= true
 # defaults.
 # More about VSCODE workspace settings can be found at:
 # https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
-VSCODE_SETTINGS_FILE = $(MF_PROJECT_ROOT)/.vscode/settings.json
+_VSCODE_SETTINGS_FILE = $(MF_PROJECT_ROOT)/.vscode/settings.json
 
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
 GENERATED_FILES += $(VSCODE_SETTINGS_FILE)
