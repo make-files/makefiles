@@ -2,7 +2,7 @@
 # out of generating the VSCode settings file.
 GENERATE_VSCODE_SETTINGS ?= true
 
-# VSCODE_SETTINGS_FILE is the VSCode workspace settings file that contains
+# _VSCODE_SETTINGS_FILE is the VSCode workspace settings file that contains
 # workspace-specific settings that override user-defined settings and their
 # defaults.
 # More about VSCODE workspace settings can be found at:
@@ -10,7 +10,7 @@ GENERATE_VSCODE_SETTINGS ?= true
 _VSCODE_SETTINGS_FILE = $(MF_PROJECT_ROOT)/.vscode/settings.json
 
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
-GENERATED_FILES += $(VSCODE_SETTINGS_FILE)
+GENERATED_FILES += $(_VSCODE_SETTINGS_FILE)
 endif
 
 # VSCODE_SETTINGS_REQ is a space separated list of prerequisites requred to
@@ -28,7 +28,7 @@ endif
 
 RUN_PROTOC_SCRIPT = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
-$(VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
+$(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
 ifneq ($(filter go,$(MF_LANGUAGES)),)
