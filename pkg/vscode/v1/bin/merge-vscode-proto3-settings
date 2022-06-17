@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euox pipefail
+set -euo pipefail
 
 if ! hash jq 2>/dev/null; then
     echo "no jq binary is installed in the executable path, merging vscode-protoc3 extension settings is ignored"
@@ -15,24 +15,11 @@ settings_file="${1}"
 protoc_path="${2}"
 arg_files="${@:3}"
 
-options=$(cat ${arg_files} | xargs -I{} echo \"{}\",)
-# local_proto_path is required for vscode-proto3 extension to locate the proto
-# files in the root of repository.
-local_proto_path='"--proto_path=."'
+out=$(cat ${settings_file} | jq --arg path "${protoc_path}" '. * {"protoc":{"path":$path, "compile_on_save":false, "options":["--proto_path=."]}}')
 
-proto3_extention_settings_json=$(cat <<EOF
-{
-    "protoc": {
-        "path": "${protoc_path}",
-        "compile_on_save": false,
-        "options": [
-            ${options}
-            ${local_proto_path}
-        ]
-    }
-}
-EOF
-)
+for option in $(cat ${arg_files})
+do
+    out=$(echo "${out}" | jq --arg option "${option}" '.protoc.options |= . + [$option]')
+done
 
-# Merge the vscode-protoc3 extension settings into settings file.
-cat ${settings_file} | jq ". * ${proto3_extention_settings_json}"
+echo $out | jq > ${settings_file}
