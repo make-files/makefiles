@@ -10,17 +10,17 @@ GENERATE_VSCODE_SETTINGS ?= true
 VSCODE_SETTINGS_FILE = $(MF_PROJECT_ROOT)/.vscode/settings.json
 
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
-GENERATED_FILES += VSCODE_SETTINGS_FILE
+GENERATED_FILES += $(VSCODE_SETTINGS_FILE)
 endif
 
 # VSCODE_SETTINGS_REQ is a space separated list of prerequisites requred to
 # generate the VSCode workspace settings file.
 VSCODE_SETTINGS_REQ ?=
 
-ifneq ($(filter proto,$(MF_LANGUAGE)),)
+ifneq ($(filter proto,$(MF_LANGUAGES)),)
 VSCODE_SETTINGS_REQ += $(MF_PROJECT_ROOT)/artifacts/protobuf/args/common
 
-ifneq ($(filter go,$(MF_LANGUAGE)),)
+ifneq ($(filter go,$(MF_LANGUAGES)),)
 VSCODE_SETTINGS_REQ += $(MF_PROJECT_ROOT)/artifacts/protobuf/args/go
 endif
 
@@ -30,8 +30,8 @@ RUN_PROTOC_SCRIPT = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
 $(VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
-ifneq ($(filter proto,$(MF_LANGUAGE)),)
-ifneq ($(filter go,$(MF_LANGUAGE)),)
-	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(RUN_PROTOC_SCRIPT)" $^ > "$@"
+ifneq ($(filter proto,$(MF_LANGUAGES)),)
+ifneq ($(filter go,$(MF_LANGUAGES)),)
+	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(RUN_PROTOC_SCRIPT)" $^
 endif
 endif
