@@ -20,6 +20,11 @@ PROTO_INCLUDE_PATHS ?=
 # the latest version of protoc is installed for the host operating system.
 PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 
+# PROTO_PROTOC_PATH is the path the script file that includes
+# $(MF_PROJECT_ROOT)/artifacts/protobuf/bin directory in the PATH environment
+# variable when the script is executed.
+PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
+
 ################################################################################
 
 # This Makefile provides the recipes used to build each language's source files
@@ -61,12 +66,12 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
 %.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
-	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
+	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
 %_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
-	$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc \
+	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
