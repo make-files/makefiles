@@ -7,7 +7,7 @@ if ! hash jq 2>/dev/null; then
 fi
 
 if [[ "$#" -lt 3 ]]; then
-	echo "this script needs at least 3 arguments"
+    echo "this script needs at least 3 arguments"
     exit 1
 fi
 
