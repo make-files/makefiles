@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! hash jq 2>/dev/null; then
+    echo "no jq binary is installed in the executable path, vscode-protoc3 settings will not be merged"
+    exit 0
+fi
+
+if [[ "$#" -lt 3 ]]; then
+    echo "this script needs at least 3 arguments"
+    exit 1
+fi
+
+settings_file="${1}"
+protoc_path="${2}"
+arg_files="${@:3}"
+
+out=$(cat ${settings_file} | jq --arg path "${protoc_path}" '. * {"protoc":{"path":$path, "compile_on_save":false, "options":["--proto_path=."]}}')
+
+for option in $(cat ${arg_files})
+do
+    out=$(echo "${out}" | jq --arg option "${option}" '.protoc.options |= . + [$option]')
+done
+
+echo $out | jq > ${settings_file}
