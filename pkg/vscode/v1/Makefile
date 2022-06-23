@@ -7,7 +7,7 @@ GENERATE_VSCODE_SETTINGS ?= true
 # defaults.
 # More about VSCODE workspace settings can be found at:
 # https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
-_VSCODE_SETTINGS_FILE = $(MF_PROJECT_ROOT)/.vscode/settings.json
+_VSCODE_SETTINGS_FILE = .vscode/settings.json
 
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
 GENERATED_FILES += $(_VSCODE_SETTINGS_FILE)
@@ -18,10 +18,10 @@ endif
 VSCODE_SETTINGS_REQ ?=
 
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += $(MF_PROJECT_ROOT)/artifacts/protobuf/args/common
+VSCODE_SETTINGS_REQ += artifacts/protobuf/args/common
 
 ifneq ($(filter go,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += $(MF_PROJECT_ROOT)/artifacts/protobuf/args/go
+VSCODE_SETTINGS_REQ += artifacts/protobuf/args/go
 endif
 
 endif
