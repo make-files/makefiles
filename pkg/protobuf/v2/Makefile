@@ -25,6 +25,10 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # variable when the script is executed.
 PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
+# PROTO_SWIFT_OUT is the relative path to the directory into which generated
+# Swift files are placed.
+PROTO_SWIFT_OUT ?= .
+
 ################################################################################
 
 $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
@@ -47,8 +51,13 @@ artifacts/protobuf/args/common:
 # Makefile; otherwise any project that included the protobuf Makefile would
 # attempt to build source files for every supported language.
 #
-# This recipe below includes each Golang module available through `go list -m
-# all` command as an import path for the protoc compiler.
+# NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
+# unknown this syntax does NOT work under Travis CI.
+
+# GO ###########################################################################
+
+# The recipes below includes each Go module available through `go list -m all`
+# command as an import path for the protoc compiler.
 #
 # The path of the module is used as a virtual path to make the import in the
 # .proto file look more natural. For example, with the module's path
@@ -76,11 +85,6 @@ artifacts/protobuf/args/common:
 #
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
-#
-# NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
-# unknown this syntax does NOT work under Travis CI.
-
-# GO ###########################################################################
 
 %.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
 	$(PROTO_PROTOC_PATH) \
@@ -105,3 +109,27 @@ artifacts/protobuf/args/go-grpc: go.mod
 	echo "--go-grpc_opt=module=$$(go list -m)" >> "$@"
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
+
+# SWIFT ########################################################################
+
+$(PROTO_SWIFT_OUT)/%.pb.swift: %.proto artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift
+	$(PROTO_PROTOC_PATH) \
+		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift) \
+		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
+
+$(PROTO_SWIFT_OUT)/%.grpc.swift: %.proto artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc
+	$(PROTO_PROTOC_PATH) \
+		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc) \
+		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
+
+artifacts/protobuf/args/swift:
+	@mkdir -p "$(@D)"
+	echo "--proto_path=$(MF_PROJECT_ROOT)" > "$@"
+	echo "--swift_opt=Visibility=Public" >> "$@"
+	echo "--swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
+
+artifacts/protobuf/args/swift-grpc:
+	@mkdir -p "$(@D)"
+	echo "--proto_path=$(MF_PROJECT_ROOT)" > "$@"
+	echo "--grpc-swift_opt=Visibility=Public" >> "$@"
+	echo "--grpc-swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
