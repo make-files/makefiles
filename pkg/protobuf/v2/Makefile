@@ -27,6 +27,20 @@ PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
 ################################################################################
 
+$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
+	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
+
+artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND)
+
+artifacts/protobuf/bin/go.mod: go.mod
+	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
+
+artifacts/protobuf/args/common:
+	@mkdir -p "$(@D)"
+	echo "--proto_path=$(dir $(PROTOC_COMMAND))../include" > "$@"
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
+
 # This Makefile provides the recipes used to build each language's source files
 # from the .proto files, but it does NOT automatically add these source files to
 # the GENERATED_FILES list. This is the responsibility of each language-specific
@@ -65,6 +79,9 @@ PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 #
 # NOTE: The $$(cat ...) syntax can NOT be swapped to $$(< ...). For reasons
 # unknown this syntax does NOT work under Travis CI.
+
+# GO ###########################################################################
+
 %.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
@@ -74,20 +91,6 @@ PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go artifacts/protobuf/args/go-grpc) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
-
-$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
-
-artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND)
-
-artifacts/protobuf/bin/go.mod: go.mod
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
-
-artifacts/protobuf/args/common:
-	@mkdir -p "$(@D)"
-	echo "--proto_path=$(dir $(PROTOC_COMMAND))../include" > "$@"
-	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
 
 artifacts/protobuf/args/go: go.mod
 	go mod download all
