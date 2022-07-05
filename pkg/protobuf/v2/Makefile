@@ -106,7 +106,7 @@ artifacts/protobuf/args/go: go.mod
 artifacts/protobuf/args/go-grpc: go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
-	echo "--go-grpc_opt=module=$$(go list -m)" >> "$@"
+	echo "--go-grpc_opt=module=$$(go list -m)" > "$@"
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
 	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
