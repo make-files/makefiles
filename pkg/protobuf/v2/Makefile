@@ -91,9 +91,9 @@ artifacts/protobuf/args/common:
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-%_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go artifacts/protobuf/args/go-grpc
+%_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc
 	$(PROTO_PROTOC_PATH) \
-		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go artifacts/protobuf/args/go-grpc) \
+		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
 artifacts/protobuf/args/go: go.mod
@@ -109,6 +109,7 @@ artifacts/protobuf/args/go-grpc: go.mod
 	echo "--go-grpc_opt=module=$$(go list -m)" >> "$@"
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
 
 # SWIFT ########################################################################
 
