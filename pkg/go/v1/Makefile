@@ -190,6 +190,13 @@ release: $(_GO_RELEASE_TARGETS_ALL)
 # additional files specified in GO_ARCHIVE_FILES.
 archives: $(GO_ARCHIVES)
 
+# pre-intercept --- Removes the debug binaries for the current architecture
+# before starting a Telepresence intercept, forcing them to be rebuild with
+# CGO_ENABLED within the intercept.
+.PHONY: pre-intercept
+pre-intercept::
+	rm -f $(_GO_DEBUG_TARGETS_HOST)
+
 ################################################################################
 
 artifacts/coverage/index.html: artifacts/coverage/cover.out
