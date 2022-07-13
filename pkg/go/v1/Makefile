@@ -155,15 +155,15 @@ coverage-open:: artifacts/coverage/index.html
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
-precommit:: # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+precommit:: debug release # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
 	go fmt ./...
 	go mod tidy
 	make test
 
-# ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
-# from the common makefile.
+# ci --- Builds all binaries and a machine-readable coverage report. Stacks with
+# the "ci" target from the common makefile.
 .PHONY: ci
-ci:: artifacts/coverage/cover.out # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+ci::  debug release artifacts/coverage/cover.out # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
