@@ -155,9 +155,10 @@ coverage-open:: artifacts/coverage/index.html
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
-precommit:: test # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+precommit:: # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
 	go fmt ./...
 	go mod tidy
+	make test
 
 # ci --- Builds a machine-readable coverage report. Stacks with the "ci" target
 # from the common makefile.
