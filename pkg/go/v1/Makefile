@@ -143,6 +143,11 @@ GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-
 test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 	go test ./...
 
+# benchmark --- Executes all go benchmarks (but not tests) in this module.
+.PHONY: benchmark
+benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
+	go test -bench=. -run=^$$ ./...
+
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
 coverage:: artifacts/coverage/index.html
@@ -163,7 +168,7 @@ precommit:: debug release # artifacts/go/lint/golangci-lint.touch # Removed beca
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
 .PHONY: ci
-ci::  debug release artifacts/coverage/cover.out # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+ci:: debug release artifacts/coverage/cover.out benchmark # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
