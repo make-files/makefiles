@@ -146,7 +146,7 @@ test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
 benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
-	go test -bench=. -run=^$$ ./...
+	go test -bench=. -benchmem -run=^$$ ./...
 
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
