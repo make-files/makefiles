@@ -72,7 +72,7 @@ GO_RACE_DETECTION ?= true
 
 ################################################################################
 
-ifneq ($(GO_RACE_DETECTION),)
+ifeq ($(GO_RACE_DETECTION),true)
 GO_TEST_ARGS  += -race
 
 ifneq ($(CGO_ENABLED),0)
