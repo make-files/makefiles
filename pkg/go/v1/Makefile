@@ -32,11 +32,15 @@ CGO_ENABLED ?= 0
 # at link time.
 GO_APP_VERSION ?= $(SEMVER)
 
+# GO_TEST_ARGS and GO_BENCHMARK_ARGS are arguments passed to "go test" command
+# when running tests and benchmarks, respectively.
+GO_TEST_ARGS      ?=
+GO_BENCHMARK_ARGS ?=
+
 # GO_DEBUG_ARGS and GO_RELEASE_ARGS are arguments passed to "go build" for the
 # "debug" and "release" targets, respectively.
 GO_DEBUG_ARGS   ?= -v -ldflags "-X main.version=$(GO_APP_VERSION)"
 GO_RELEASE_ARGS ?= -v -ldflags "-X main.version=$(GO_APP_VERSION) -s -w"
-
 
 # Build matrix configuration.
 #
@@ -63,7 +67,18 @@ GO_TEST_REQ +=
 # GO_TEST_REQ.
 GO_BUILD_BEFORE_TEST ?=
 
+# GO_RACE_DETECTION enables race detection in tests and debug builds.
+GO_RACE_DETECTION ?= true
+
 ################################################################################
+
+ifneq ($(GO_RACE_DETECTION),)
+GO_TEST_ARGS  += -race
+
+ifneq ($(CGO_ENABLED),0)
+GO_DEBUG_ARGS += -race
+endif
+endif
 
 # _GO_COMMAND_DIR and _GO_PLUGIN_DIR are the names of directories in the root of
 # the project that contain subdirectories that are "main" packages that are to
@@ -141,12 +156,12 @@ GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-
 # test --- Executes all go tests in this module.
 .PHONY: test
 test:: $(GENERATED_FILES) $(GO_TEST_REQ)
-	go test ./...
+	go test $(GO_TEST_ARGS) ./...
 
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
 benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
-	go test -bench=. -benchmem -run=^$$ ./...
+	go test $(GO_BENCHMARK_ARGS) -bench=. -benchmem -run=^$$ ./...
 
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
@@ -211,7 +226,7 @@ artifacts/coverage/index.html: artifacts/coverage/cover.out
 .PHONY: artifacts/coverage/cover.out # always rebuild
 artifacts/coverage/cover.out: $(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
-	go test -covermode=count -coverprofile=$@ ./...
+	go test $(GO_TEST_ARGS) -covermode=count -coverprofile=$@ ./...
 ifneq ($(strip $(GENERATED_FILES)),)
 	grep --fixed-strings --invert-match $(foreach F,$(GENERATED_FILES),--regexp="$F") "$@" > "$@.tmp"
 	mv "$@.tmp" "$@"
