@@ -226,7 +226,7 @@ artifacts/coverage/index.html: artifacts/coverage/cover.out
 .PHONY: artifacts/coverage/cover.out # always rebuild
 artifacts/coverage/cover.out: $(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
-	go test $(GO_TEST_ARGS) -covermode=count -coverprofile=$@ ./...
+	go test $(GO_TEST_ARGS) -covermode=atomic -coverprofile=$@ ./...
 ifneq ($(strip $(GENERATED_FILES)),)
 	grep --fixed-strings --invert-match $(foreach F,$(GENERATED_FILES),--regexp="$F") "$@" > "$@.tmp"
 	mv "$@.tmp" "$@"
