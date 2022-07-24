@@ -73,11 +73,22 @@ GO_RACE_DETECTION ?= true
 ################################################################################
 
 ifeq ($(GO_RACE_DETECTION),true)
-GO_TEST_ARGS  += -race
 
+# Enable the race detector in tests only if CGO is enabled via the environment.
+#
+# The Makefile doesn't exlicitly set CGO_ENABLED when running tests.
+ifneq ($(shell go env CGO_ENABLED),0)
+GO_TEST_ARGS  += -race
+endif
+
+# Enable the race detector in debug builds only if the user has explicitly
+# enabled CGO either via the environment or the Makefile variable.
+#
+# The Makefile exlicitly sets CGO_ENABLED when building.
 ifneq ($(CGO_ENABLED),0)
 GO_DEBUG_ARGS += -race
 endif
+
 endif
 
 # _GO_COMMAND_DIR and _GO_PLUGIN_DIR are the names of directories in the root of
