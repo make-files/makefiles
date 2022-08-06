@@ -1,0 +1,33 @@
+ #!/usr/bin/env bash
+set -euo pipefail
+
+DATE_VAR="$(date '+%F')"
+TEMP_FILE_TAG="$(mktemp)"
+TEMP_FILE_TAG2="$(mktemp)"
+TEMP_FILE_CHANGELOG="$(mktemp)"
+GIT_REPO="$(echo $(git config --get remote.origin.url) | sed 's/^.*github.com.//' | sed 's/\.git$//')"
+
+v=$1
+# Add version number to the top of the editor
+echo "$v" > "$TEMP_FILE_TAG"
+# If the CHANGELOG.md file does not contain the [vX.X.X] section.
+if ! grep -q "\[$v\]" CHANGELOG.md; then
+    # Build the new CHANGELOG.md [vX.X.X] section
+    sed -e '/^\[unreleased\].*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> $TEMP_FILE_TAG;
+    echo "\n## [$v] - "$DATE_VAR"\n" > "$TEMP_FILE_CHANGELOG";
+    echo "[$v]: https://github.com/$GIT_REPO/releases/tag/$v" >> "$TEMP_FILE_CHANGELOG";
+    # Append the new section to the CHANGELOG.md file under the [unreleased] section.
+    sed -i '' "/^\[unreleased\]/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
+else
+    # Add the existing CHANGELOG.md [vX.X.X] section
+    sed -e "/^\[$v\].*/,/^## /!d" CHANGELOG.md | sed '1d;$$d' >> $TEMP_FILE_TAG;
+fi
+
+# Commit the new CHANGELOG.md file.
+git commit -am "Bump to $v"
+
+# Create new tag annotated with the new CHANGELOG.md section.
+git tag --annotate --cleanup=whitespace -F $TEMP_FILE_TAG $v
+
+# Remove temp files.
+rm "$TEMP_FILE_TAG" "$TEMP_FILE_TAG2" "$TEMP_FILE_CHANGELOG"
