@@ -71,6 +71,7 @@ if [ ! -f CHANGELOG.md ]; then
     echo "CHANGELOG.md does not exist. Creating new CHANGELOG.md from template."
     cp "$MF_GIT_ROOT/include/CHANGELOG.md" CHANGELOG.md
     echo "\n[unreleased]: https://github.com/$GIT_REPO" >> CHANGELOG.md
+    git add CHANGELOG.md
 fi
 
 # Append the new section to the CHANGELOG.md file under the [unreleased] section.
