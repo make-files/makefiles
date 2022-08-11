@@ -8,32 +8,25 @@ DATE_VAR="$(date '+%F')"
 TEMP_FILE_TAG="$(mktemp)"
 
 # TEMP_FILE_TAG2 create a new temp file to determine if changes are made in the editor
-TEMP_FILE_TAG2="$(mktemp)"
+TEMP_FILE_TAG_SNAPSHOT="$(mktemp)"
 
 # TEMP_FILE_CHANGELOG create a new temp file to insert into CHANGELOG.md after editing
 TEMP_FILE_CHANGELOG="$(mktemp)"
 
-# Get remote url of current git repo, extract the user/repo name.
-# Supports both 'ssh' and 'https' style urls.
-GIT_REPO="$(echo $(git config --get remote.origin.url) | sed 's/^.*github.com.//' | sed 's/\.git$//')"
-
-# MF_ROOT is the root of the makefile git package
-MF_GIT_ROOT="$(dirname "$0")/../"
-
 # Build the initial CHANGELOG.md section in the editor
 #
 # Add version number to the top of the editor
-echo "v" > "$TEMP_FILE_TAG"
+echo "v$GIT_HEAD_SEMVER" > "$TEMP_FILE_TAG"
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
-    sed -e '/^\[unreleased\].*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
+    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
 fi
 
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:\ '- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
 if [ ! -z "${GIT_LOG}" ]; then
-    echo "-------- INSERTED FROM GIT LOG --------------" >> "$TEMP_FILE_TAG"
+    echo "<!-------- INSERTED FROM GIT LOG --------------" >> "$TEMP_FILE_TAG"
     echo "\n### Added\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Add" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Changed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Change" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Removed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Remove" || :; } >> "$TEMP_FILE_TAG"
@@ -41,7 +34,7 @@ if [ ! -z "${GIT_LOG}" ]; then
     echo "\n### Deprecated\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Deprecate" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Security\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Security" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Other\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -v "Add" | grep -i -v "Change" | grep -i -v "Remove" | grep -i -v "Fix" | grep -i -v "Deprecate" | grep -i -v "Security" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n------------- END GIT LOG ------------------" >> "$TEMP_FILE_TAG"
+    echo "\n------------- END GIT LOG ------------------>" >> "$TEMP_FILE_TAG"
 fi
 # replace single quotes with backticks if surrounded by identifier
 sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
@@ -49,9 +42,9 @@ sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 #
-cat "$TEMP_FILE_TAG" > "$TEMP_FILE_TAG2"
+cat "$TEMP_FILE_TAG" > "$TEMP_FILE_TAG_SNAPSHOT"
 $EDITOR "$TEMP_FILE_TAG"
-if diff "$TEMP_FILE_TAG" "$TEMP_FILE_TAG2" > /dev/null; then
+if diff "$TEMP_FILE_TAG" "$TEMP_FILE_TAG_SNAPSHOT" > /dev/null; then
     echo "No changes made to CHANGELOG.md. Exiting.";
     exit 1;
 fi
@@ -62,20 +55,12 @@ v=$(sed -n 1p "$TEMP_FILE_TAG")
 # Build the new section for the CHANGELOG.md file.
 #
 echo "\n## [$v] - "$DATE_VAR"\n" > $TEMP_FILE_CHANGELOG
-echo "[$v]: https://github.com/$GIT_REPO/releases/tag/$v" >> $TEMP_FILE_CHANGELOG
+echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $TEMP_FILE_CHANGELOG
 cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
 sed -i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
 
-#Create CHANGELOG.md from template if it does not exist.
-if [ ! -f CHANGELOG.md ]; then
-    echo "CHANGELOG.md does not exist. Creating new CHANGELOG.md from template."
-    cp "$MF_GIT_ROOT/include/CHANGELOG.md" CHANGELOG.md
-    echo "\n[unreleased]: https://github.com/$GIT_REPO" >> CHANGELOG.md
-    git add CHANGELOG.md
-fi
-
-# Append the new section to the CHANGELOG.md file under the [unreleased] section.
-sed -i '' "/^\[unreleased\]/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
+# Append the new section to the CHANGELOG.md file under the ## Unreleased section.
+sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
 # Commit the new CHANGELOG.md file.
 git commit -am "Bump to $v"
@@ -84,4 +69,4 @@ git commit -am "Bump to $v"
 git tag --annotate --cleanup=whitespace -F $TEMP_FILE_TAG $v
 
 # Remove temp files.
-rm $TEMP_FILE_TAG $TEMP_FILE_TAG2 $TEMP_FILE_CHANGELOG
+rm $TEMP_FILE_TAG $TEMP_FILE_TAG_SNAPSHOT $TEMP_FILE_CHANGELOG
