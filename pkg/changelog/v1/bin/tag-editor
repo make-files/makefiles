@@ -17,6 +17,8 @@ TEMP_FILE_CHANGELOG="$(mktemp)"
 #
 # Add version number to the top of the editor
 echo "v$GIT_HEAD_SEMVER" > "$TEMP_FILE_TAG"
+# Add the previous git tag to the editor
+echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
@@ -58,6 +60,9 @@ echo "\n## [$v] - "$DATE_VAR"\n" > $TEMP_FILE_CHANGELOG
 echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $TEMP_FILE_CHANGELOG
 cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
 sed -i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
+
+# Remove existing unreleased section if it is not already empty
+sed -i '' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
 sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
