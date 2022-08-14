@@ -61,6 +61,9 @@ echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $TEMP_FILE_CHANGELOG
 cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
 sed -i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
 
+# Remove existing unreleased section if it is not already empty
+sed -i '' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
+
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
 sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
