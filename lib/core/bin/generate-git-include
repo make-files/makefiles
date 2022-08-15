@@ -5,7 +5,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 # This script outputs Makefile syntax that defines the GIT_xxx variables.
 
 GIT_SLUG="$(git config --get remote.origin.url | sed 's/^.*github.com.//' | sed 's/\.git$//')"
-GIT_TAG_LATEST="$(git describe --abbrev=0 2> /dev/null)"
+GIT_TAG_LATEST="$(git describe --abbrev=0 2> /dev/null || true)"
 
 GIT_HEAD_HASH_FULL="$(git rev-parse --verify HEAD)"
 GIT_HEAD_HASH="$(git rev-parse --short --verify HEAD)"
