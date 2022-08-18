@@ -16,7 +16,7 @@ TEMP_FILE_CHANGELOG="$(mktemp)"
 # Build the initial CHANGELOG.md section in the editor
 #
 # Add version number to the top of the editor
-echo "v$GIT_HEAD_SEMVER" > "$TEMP_FILE_TAG"
+echo "vX.Y.Z" > "$TEMP_FILE_TAG"
 # Add the previous git tag to the editor
 echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
 # Add the existing CHANGELOG.md [unreleased] section if file exists
