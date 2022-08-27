@@ -19,8 +19,17 @@ TEMP_FILE_CHANGELOG="$(mktemp)"
 echo "vX.Y.Z" > "$TEMP_FILE_TAG"
 # Add the previous git tag to the editor
 echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
+
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
+    sed -i '' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
+
+    # If there is no Unreleased section, insert the Unreleased section on line 11, and blank line after on line 12
+    if ! grep -q '## Unreleased' CHANGELOG.md; then
+        sed -i '' $'11i\\\n## Unreleased\n' CHANGELOG.md
+        sed -i '' $'12i\\\n\n' CHANGELOG.md
+    fi
+
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
 fi
 
