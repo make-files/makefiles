@@ -52,6 +52,14 @@ fi
 # replace single quotes with backticks if surrounded by identifier
 sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
 
+# If EDITOR is not set, set it to default git editor
+if [ -z "${EDITOR:-}" ]; then
+    EDITOR="$(git config --global --get core.editor)"
+fi
+# If EDITOR is still not set, set it to vim
+if [ -z "${EDITOR:-}" ]; then
+    EDITOR="vim"
+fi
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 #
