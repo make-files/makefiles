@@ -73,6 +73,12 @@ fi
 # Extract the version number from the edited log.
 v=$(sed -n 1p "$TEMP_FILE_TAG")
 
+# Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
+sed -i '' '/^<!--* INSERTED FROM GIT LOG/,/END GIT LOG.*-->$/d' $TEMP_FILE_TAG
+
+# Remove the <!-- Previous tag section -->
+sed -i '' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
+
 # Build the new section for the CHANGELOG.md file.
 #
 echo "\n## [$v] - "$DATE_VAR"\n" > $TEMP_FILE_CHANGELOG
