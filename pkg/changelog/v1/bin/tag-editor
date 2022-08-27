@@ -92,6 +92,9 @@ sed -i '' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
 sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
+# Remove all double blank lines from the CHANGELOG.md file
+sed -i '' '/^$/N;/^\n$/D' CHANGELOG.md
+
 # Commit the new CHANGELOG.md file.
 git commit -am "Bump to $v"
 
