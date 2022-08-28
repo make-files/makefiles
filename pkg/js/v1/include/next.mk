@@ -12,6 +12,16 @@ _JS_NEXT_REQ += artifacts/link-dependencies.touch $(JS_NEXT_CONFIG_FILE) $(JS_SO
 
 ################################################################################
 
+# next-analyze --- Analyze the Next.js application client bundle.
+.PHONY: next-analyze
+next-analyze: artifacts/next/dist/analyze/client.html
+
+# next-analyze-open --- Analyze the Next.js application client bundle, and open
+#                       the results in a browser.
+.PHONY: next-analyze-open
+next-analyze-open: artifacts/next/dist/analyze/client.html
+	open "$<"
+
 # next-build --- Compile the Next.js application for production deployment.
 .PHONY: next-build
 next-build: artifacts/next/dist/BUILD_ID
@@ -26,3 +36,6 @@ next-dev: artifacts/link-dependencies.touch
 artifacts/next/dist/BUILD_ID: $(JS_NEXT_REQ) $(_JS_NEXT_REQ)
 	@rm -rf "$@"
 	$(JS_EXEC) next build
+
+artifacts/next/dist/analyze/client.html: $(JS_NEXT_REQ) $(_JS_NEXT_REQ)
+	ANALYZE=true $(JS_EXEC) next build
