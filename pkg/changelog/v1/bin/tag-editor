@@ -96,6 +96,7 @@ sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 sed -i '' '/^$/N;/^\n$/D' CHANGELOG.md
 
 # Commit the new CHANGELOG.md file.
+git add CHANGELOG.md
 git commit -am "Bump to $v"
 
 # Create new tag annotated with the new CHANGELOG.md section.
