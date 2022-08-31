@@ -25,10 +25,9 @@ if [ -f CHANGELOG.md ]; then
     # If there is the old [unreleased] section, replace it with ## Unreleased header
     sed -i '' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
 
-    # If there is no Unreleased section, insert the Unreleased section on line 11, and blank line after on line 12
+    # If there is no Unreleased section, insert the Unreleased section before the first release section.
     if ! grep -q '## Unreleased' CHANGELOG.md; then
-        sed -i '' $'11i\\\n## Unreleased\n' CHANGELOG.md
-        sed -i '' $'12i\\\n\n' CHANGELOG.md
+        sed -i '' $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
