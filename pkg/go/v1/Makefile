@@ -169,6 +169,11 @@ GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-
 test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 	go test $(GO_TEST_ARGS) ./...
 
+# test-until-failure --- Execute all go tests in this module until they fail.
+.PHONY: test-until-failure
+test-until-failure:
+	while go test -count=1 $(GO_TEST_ARGS) ./...; do :; done
+
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
 benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
