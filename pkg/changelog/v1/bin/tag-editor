@@ -16,11 +16,20 @@ TEMP_FILE_CHANGELOG="$(mktemp)"
 # Build the initial CHANGELOG.md section in the editor
 #
 # Add version number to the top of the editor
-echo "v$GIT_HEAD_SEMVER" > "$TEMP_FILE_TAG"
+echo "vX.Y.Z" > "$TEMP_FILE_TAG"
 # Add the previous git tag to the editor
 echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
+
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
+    # If there is the old [unreleased] section, replace it with ## Unreleased header
+    sed -i '' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
+
+    # If there is no Unreleased section, insert the Unreleased section before the first release section.
+    if ! grep -q '## Unreleased' CHANGELOG.md; then
+        sed -i '' $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
+    fi
+
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
 fi
 
@@ -28,19 +37,28 @@ fi
 GIT_LOG=$(git log --pretty=format:\ '- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
 if [ ! -z "${GIT_LOG}" ]; then
-    echo "<!-------- INSERTED FROM GIT LOG --------------" >> "$TEMP_FILE_TAG"
-    echo "\n### Added\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Add" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Changed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Change" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Removed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Remove" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Fixed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Fix" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Deprecated\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Deprecate" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Security\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i "Security" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n### Other\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -v "Add" | grep -i -v "Change" | grep -i -v "Remove" | grep -i -v "Fix" | grep -i -v "Deprecate" | grep -i -v "Security" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n------------- END GIT LOG ------------------>" >> "$TEMP_FILE_TAG"
+    echo "<!---------------------------- INSERTED FROM GIT LOG ---------------------------------" >> "$TEMP_FILE_TAG"
+    echo "-- If this header is not removed, all content inside this section will be deleted ----" >> "$TEMP_FILE_TAG"
+    echo "\n### Added\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Changed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Removed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Remove" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Fixed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Deprecated\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Security\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n### Other\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
+    echo "\n-------------------------------- END GIT LOG ------------------------------------->" >> "$TEMP_FILE_TAG"
 fi
 # replace single quotes with backticks if surrounded by identifier
 sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
 
+# If EDITOR is not set, set it to default git editor
+if [ -z "${EDITOR:-}" ]; then
+    EDITOR="$(git config --global --get core.editor)"
+fi
+# If EDITOR is still not set, set it to vim
+if [ -z "${EDITOR:-}" ]; then
+    EDITOR="vim"
+fi
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 #
@@ -53,6 +71,12 @@ fi
 
 # Extract the version number from the edited log.
 v=$(sed -n 1p "$TEMP_FILE_TAG")
+
+# Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
+sed -i '' '/^<!--* INSERTED FROM GIT LOG/,/END GIT LOG.*-->$/d' $TEMP_FILE_TAG
+
+# Remove the <!-- Previous tag section -->
+sed -i '' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
 
 # Build the new section for the CHANGELOG.md file.
 #
@@ -67,7 +91,11 @@ sed -i '' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
 sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
+# Remove all double blank lines from the CHANGELOG.md file
+sed -i '' '/^$/N;/^\n$/D' CHANGELOG.md
+
 # Commit the new CHANGELOG.md file.
+git add CHANGELOG.md
 git commit -am "Bump to $v"
 
 # Create new tag annotated with the new CHANGELOG.md section.
