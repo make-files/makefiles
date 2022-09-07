@@ -34,7 +34,7 @@ if [ -f CHANGELOG.md ]; then
 fi
 
 # GIT_LOG gets git log messages since the last tag to the editor
-GIT_LOG=$(git log --pretty=format:\ '- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
+GIT_LOG=$(git log --pretty=format:'- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
 if [ ! -z "${GIT_LOG}" ]; then
     echo "<!---------------------------- INSERTED FROM GIT LOG ---------------------------------" >> "$TEMP_FILE_TAG"
