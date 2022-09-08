@@ -5,7 +5,7 @@ set -euo pipefail
 DATE_VAR="$(date '+%F')"
 
 # TEMP_FILE_TAG create a new temp file to build up the git tag annotation
-TEMP_FILE_TAG="$(mktemp)"
+TEMP_FILE_TAG="$(mktemp).md"
 
 # TEMP_FILE_TAG2 create a new temp file to determine if changes are made in the editor
 TEMP_FILE_TAG_SNAPSHOT="$(mktemp)"
@@ -34,11 +34,11 @@ if [ -f CHANGELOG.md ]; then
 fi
 
 # GIT_LOG gets git log messages since the last tag to the editor
-GIT_LOG=$(git log --pretty=format:\ '- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
+GIT_LOG=$(git log --pretty=format:'- '%s%n%b%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
 if [ ! -z "${GIT_LOG}" ]; then
-    echo "<!---------------------------- INSERTED FROM GIT LOG ---------------------------------" >> "$TEMP_FILE_TAG"
-    echo "-- If this header is not removed, all content inside this section will be deleted ----" >> "$TEMP_FILE_TAG"
+    echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TEMP_FILE_TAG"
+    echo "<!---------------------------- INSERTED FROM GIT LOG --------------------------------->" >> "$TEMP_FILE_TAG"
     echo "\n### Added\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Changed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Removed\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Remove" || :; } >> "$TEMP_FILE_TAG"
@@ -46,7 +46,7 @@ if [ ! -z "${GIT_LOG}" ]; then
     echo "\n### Deprecated\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Security\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
     echo "\n### Other\n" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
-    echo "\n-------------------------------- END GIT LOG ------------------------------------->" >> "$TEMP_FILE_TAG"
+    echo "\n<!-------------------------------- END GIT LOG ------------------------------------->" >> "$TEMP_FILE_TAG"
 fi
 # replace single quotes with backticks if surrounded by identifier
 sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
@@ -73,7 +73,7 @@ fi
 v=$(sed -n 1p "$TEMP_FILE_TAG")
 
 # Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed -i '' '/^<!--* INSERTED FROM GIT LOG/,/END GIT LOG.*-->$/d' $TEMP_FILE_TAG
+sed -i '' '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
 
 # Remove the <!-- Previous tag section -->
 sed -i '' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
