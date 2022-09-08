@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workload=$1
+
+defer=$(mktemp)
+chmod +x "$defer"
+
+function leave {
+    cat "$defer"
+    "$defer"
+}
+trap leave EXIT
+
+i=3 # account for $0, $workflow and "--" argument
+
+for port in ${@:2}; do
+    if [[ "$port" == "--" ]]; then
+        break
+    fi
+
+    name="${workload}_${port}"
+    local_port="$((32768 + $RANDOM))"
+
+    telepresence intercept \
+        "$name" \
+        --workload "$workload" \
+        --port "${local_port}:${port}"
+
+    echo "telepresence leave '${name}'" >> "$defer"
+    ((i++))
+
+    export TELEPRESENCE_PORT_${port}="$local_port"
+done
+
+command=${@:$i}
+$command
