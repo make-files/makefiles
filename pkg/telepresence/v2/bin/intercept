@@ -4,11 +4,12 @@ set -euo pipefail
 workload=$1
 
 defer=$(mktemp)
+env_file=$(mktemp)
 chmod +x "$defer"
 
 function leave {
-    cat "$defer"
     "$defer"
+    rm "$defer" "$env_file"
 }
 trap leave EXIT
 
@@ -25,13 +26,17 @@ for port in ${@:2}; do
     telepresence intercept \
         "$name" \
         --workload "$workload" \
-        --port "${local_port}:${port}"
+        --port "${local_port}:${port}" \
+        --env-file="${env_file}"
 
     echo "telepresence leave '${name}'" >> "$defer"
     ((i++))
 
-    export TELEPRESENCE_PORT_${port}="$local_port"
+    echo "TELEPRESENCE_PORT_${port}=$local_port" >> "$env_file"
+
+    set -o allexport
+    source "$env_file"
+    set +o allexport
 done
 
-command=${@:$i}
-$command
+${@:$i}
