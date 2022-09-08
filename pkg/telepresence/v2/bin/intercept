@@ -34,9 +34,10 @@ for port in ${@:2}; do
 
     echo "TELEPRESENCE_PORT_${port}=$local_port" >> "$env_file"
 
-    set -o allexport
+    # Add single quotes to each environment variable
+    sed -i -e "s/^\([^=]*\)=\(.*\)$/export \1='\2'/" "$env_file"
     source "$env_file"
-    set +o allexport
+
 done
 
 ${@:$i}
