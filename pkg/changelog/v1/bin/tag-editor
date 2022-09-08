@@ -5,7 +5,7 @@ set -euo pipefail
 DATE_VAR="$(date '+%F')"
 
 # TEMP_FILE_TAG create a new temp file to build up the git tag annotation
-TEMP_FILE_TAG="$(mktemp)"
+TEMP_FILE_TAG="$(mktemp).md"
 
 # TEMP_FILE_TAG2 create a new temp file to determine if changes are made in the editor
 TEMP_FILE_TAG_SNAPSHOT="$(mktemp)"
