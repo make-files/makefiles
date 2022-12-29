@@ -18,17 +18,11 @@ TELEPRESENCE_RUN_CMD ?= make run
 ################################################################################
 
 .PHONY: intercept
-intercept: pre-intercept
+intercept:
 	CGO_ENABLED=true \
 		$(MF_ROOT)/pkg/telepresence/v2/bin/intercept $(TELEPRESENCE_WORKLOAD) $(TELEPRESENCE_PORTS) -- $(shell echo $$SHELL)
 
 .PHONY: intercept-run
-intercept-run: pre-intercept-run
+intercept-run:
 	CGO_ENABLED=true \
 		$(MF_ROOT)/pkg/telepresence/v2/bin/intercept $(TELEPRESENCE_WORKLOAD) $(TELEPRESENCE_PORTS) -- $(TELEPRESENCE_RUN_CMD)
-
-.PHONY: pre-intercept
-pre-intercept::
-
-.PHONY: pre-intercept-run
-pre-intercept-run:: pre-intercept
