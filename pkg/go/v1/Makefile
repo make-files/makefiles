@@ -57,8 +57,12 @@ endif
 # OS & architecture.
 GO_DEBUG_DIR=artifacts/build/debug/$(GOHOSTOS)/$(GOHOSTARCH)
 
+# GO_BUILDREQ is a space separated list of prerequisites needed to build the Go
+# binaries.
+GO_BUILD_REQ += go.mod
+
 # GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
-GO_TEST_REQ +=
+GO_TEST_REQ += go.mod
 
 # GO_BUILD_BEFORE_TEST indicates whether debug binaries should be built before
 # running the tests.
@@ -248,7 +252,7 @@ ifneq ($(strip $(GENERATED_FILES)),)
 	mv "$@.tmp" "$@"
 endif
 
-artifacts/build/%: $(GO_SOURCE_FILES) $(GENERATED_FILES) $(GO_EMBEDDED_FILES)
+artifacts/build/%: $(GO_BUILD_REQ) $(GO_SOURCE_FILES) $(GENERATED_FILES) $(GO_EMBEDDED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
 	$(eval BUILD := $(word 1,$(PARTS)))
 	$(eval OS    := $(word 2,$(PARTS)))
