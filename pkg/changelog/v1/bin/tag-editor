@@ -23,11 +23,11 @@ echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
     # If there is the old [unreleased] section, replace it with ## Unreleased header
-    sed -i '' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
+    sed -i'' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
 
     # If there is no Unreleased section, insert the Unreleased section before the first release section.
     if ! grep -q '## Unreleased' CHANGELOG.md; then
-        sed -i '' $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
+        sed -i'' $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
@@ -73,10 +73,10 @@ fi
 v=$(sed -n 1p "$TEMP_FILE_TAG")
 
 # Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed -i '' '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
+sed -i'' '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
 
 # Remove the <!-- Previous tag section -->
-sed -i '' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
+sed -i'' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
 
 # Build the new section for the CHANGELOG.md file.
 #
@@ -86,13 +86,13 @@ cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
 sed -i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
 
 # Remove existing unreleased section if it is not already empty
-sed -i '' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
+sed -i'' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
-sed -i '' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
+sed -i'' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
 # Remove all double blank lines from the CHANGELOG.md file
-sed -i '' '/^$/N;/^\n$/D' CHANGELOG.md
+sed -i'' '/^$/N;/^\n$/D' CHANGELOG.md
 
 # Commit the new CHANGELOG.md file.
 git add CHANGELOG.md
