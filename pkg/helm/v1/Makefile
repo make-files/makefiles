@@ -15,13 +15,21 @@ _HELM_PACKAGE_REQ = $(shell PATH="$(PATH)" git-find "$(HELM_CHART_PATH)")
 
 ################################################################################
 
-# helm-package --- Packages the Helm chart in preparation for pushing to a Helm
-# repository. Automatically sets the chart and app version to a
-# SemVer-compatible representation of the current Git tag/commit.
+# helm-package --- Packages the Helm chart in preparation for pushing to the
+# registry. Automatically sets the chart and app version to a SemVer-compatible
+# representation of the current Git tag/commit.
 #
 # See lib/core/include/common.mk for details on how this version is built.
 .PHONY: helm-package
 helm-package: $(_HELM_PACKAGE)
+
+# helm-push --- Pushes the packaged Helm chart to the registry.
+.PHONY: helm-push
+helm-push: $(_HELM_PACKAGE)
+ifndef HELM_REGISTRY
+	$(error "HELM_REGISTRY must be defined in order to push.")
+endif
+	helm push $(_HELM_PACKAGE) $(HELM_REGISTRY)
 
 ################################################################################
 
