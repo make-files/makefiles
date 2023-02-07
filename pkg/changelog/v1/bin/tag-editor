@@ -1,6 +1,17 @@
  #!/usr/bin/env bash
 set -euo pipefail
 
+PLATFORM="$(uname)"
+
+# Implement sed -i (with no extension) in a cross-platform manner
+function sed_i {
+    if [[ "$PLATFORM" == "Linux" ]]; then
+        sed -i "$@"
+    else
+        sed -i "" "$@"
+    fi
+}
+
 # DATE_VAR get the current date in YYYY-MM-DD format
 DATE_VAR="$(date '+%F')"
 
@@ -23,11 +34,11 @@ echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
     # If there is the old [unreleased] section, replace it with ## Unreleased header
-    sed -i'' '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
+    sed_i '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
 
     # If there is no Unreleased section, insert the Unreleased section before the first release section.
     if ! grep -q '## Unreleased' CHANGELOG.md; then
-        sed -i'' $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
+        sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
@@ -49,7 +60,7 @@ if [ ! -z "${GIT_LOG}" ]; then
     echo "\n<!-------------------------------- END GIT LOG ------------------------------------->" >> "$TEMP_FILE_TAG"
 fi
 # replace single quotes with backticks if surrounded by identifier
-sed -i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
+sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
 
 # If EDITOR is not set, set it to default git editor
 if [ -z "${EDITOR:-}" ]; then
@@ -73,26 +84,26 @@ fi
 v=$(sed -n 1p "$TEMP_FILE_TAG")
 
 # Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed -i'' '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
+sed_i '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
 
 # Remove the <!-- Previous tag section -->
-sed -i'' '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
+sed_i '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
 
 # Build the new section for the CHANGELOG.md file.
 #
 echo "\n## [$v] - "$DATE_VAR"\n" > $TEMP_FILE_CHANGELOG
 echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $TEMP_FILE_CHANGELOG
 cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
-sed -i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
+sed_i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
 
 # Remove existing unreleased section if it is not already empty
-sed -i'' '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
+sed_i '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
-sed -i'' "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
+sed_i "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
 
 # Remove all double blank lines from the CHANGELOG.md file
-sed -i'' '/^$/N;/^\n$/D' CHANGELOG.md
+sed_i '/^$/N;/^\n$/D' CHANGELOG.md
 
 # Commit the new CHANGELOG.md file.
 git add CHANGELOG.md
