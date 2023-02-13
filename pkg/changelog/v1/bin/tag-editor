@@ -84,6 +84,11 @@ if diff "$TEMP_FILE_TAG" "$TEMP_FILE_TAG_SNAPSHOT" > /dev/null; then
     exit 1;
 fi
 
+if [ "$(head -n 1 "$TEMP_FILE_TAG")" = "$(head -n 1 "$TEMP_FILE_TAG_SNAPSHOT")" ]; then
+	echo "No new tag set, first line must be changed to reflect the new tag. Exiting."
+	exit 1
+fi
+
 # Extract the version number from the edited log.
 v=$(sed -n 1p "$TEMP_FILE_TAG")
 
