@@ -39,7 +39,7 @@ webpack-analyze: artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/prod
 #                          browser.
 .PHONY: webpack-analyze-open
 webpack-analyze-open: artifacts/webpack/analyze$(_JS_WEBPACK_BUILD_PATH_SEGMENT)/production.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 ################################################################################
 

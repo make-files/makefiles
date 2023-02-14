@@ -58,7 +58,7 @@ kahlan-coverage: artifacts/coverage/kahlan/index.html
 # kahlan-coverage-open --- Opens the Kahlan HTML coverage report in a browser.
 .PHONY: kahlan-coverage-open
 kahlan-coverage-open: artifacts/coverage/kahlan/index.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 ################################################################################
 

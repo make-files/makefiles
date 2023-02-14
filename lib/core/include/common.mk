@@ -10,6 +10,20 @@ export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
 export PATH := $(MF_ROOT)/lib/core/bin:$(PATH)
 
+# MF_OS is the name of the operating system.
+# MF_BROWSER is the command to run to open the default browser.
+_UNAME_S = $(shell uname -s)
+ifeq ($(_UNAME_S),Darwin)
+export MF_OS = macos
+export MF_BROWSER = open
+else ifeq ($(_UNAME_S),Linux)
+export MF_OS = linux
+export MF_BROWSER = xdg-open
+else
+export MF_OS = unknown
+export MF_BROWSER = echo Open in browser:
+endif
+
 # MF_CI is the name of any detected continuous integration system. If no CI
 # system is detected, MF_CI will be empty.
 export MF_CI ?= $(shell PATH="$(PATH)" ci-system-name)

@@ -47,7 +47,7 @@ jest-coverage: artifacts/coverage/jest/index.html
 # jest-coverage-open --- Opens the Jest HTML coverage report in a browser.
 .PHONY: jest-coverage-open
 jest-coverage-open: artifacts/coverage/jest/index.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 # jest-coverage-lcov --- Produces a Jest LCOV coverage report.
 .PHONY: jest-coverage-lcov

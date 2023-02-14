@@ -54,7 +54,7 @@ peridot-coverage: artifacts/coverage/peridot/index.html
 # peridot-coverage-open --- Opens the Peridot HTML coverage report in a browser.
 .PHONY: peridot-coverage-open
 peridot-coverage-open: artifacts/coverage/peridot/index.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 ################################################################################
 

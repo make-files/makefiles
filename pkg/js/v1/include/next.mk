@@ -20,7 +20,7 @@ next-analyze: artifacts/next/dist/analyze/client.html
 #                       the results in a browser.
 .PHONY: next-analyze-open
 next-analyze-open: artifacts/next/dist/analyze/client.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 # next-build --- Compile the Next.js application for production deployment.
 .PHONY: next-build

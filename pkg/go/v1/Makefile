@@ -190,7 +190,7 @@ coverage:: artifacts/coverage/index.html
 # coverage-open --- Opens the HTML coverage report in a browser.
 .PHONY: coverage-open
 coverage-open:: artifacts/coverage/index.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.

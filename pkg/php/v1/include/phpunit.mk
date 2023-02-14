@@ -59,7 +59,7 @@ phpunit-coverage: artifacts/coverage/phpunit/index.html
 # phpunit-coverage-open --- Opens the PHPUnit HTML coverage report in a browser.
 .PHONY: phpunit-coverage-open
 phpunit-coverage-open: artifacts/coverage/phpunit/index.html
-	open "$<"
+	$(MF_BROWSER) "$<"
 
 ################################################################################
 
