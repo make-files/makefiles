@@ -31,6 +31,12 @@ endif
 helm-lint:
 	helm lint --strict $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)"
 
+# helm-lint-template --- Uses helm tempalte to verify that the template can be
+# rendered.
+.PHONY: helm-lint-template
+helm-lint-template:
+	helm template $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)" > /dev/null
+
 # helm-template --- Render the Helm templates to an artifacts directory.
 .PHONY: helm-template
 helm-template: artifacts/helm/template
