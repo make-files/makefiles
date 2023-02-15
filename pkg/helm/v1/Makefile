@@ -25,6 +25,20 @@ endif
 
 ################################################################################
 
+# lint --- Check for syntax, configuration, code style and/or formatting issues.
+.PHONY: lint
+lint:: helm-lint helm-lint-template
+
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: helm-lint helm-lint-template
+
+# ci --- Perform tasks that should be run as part of continuous integration.
+.PHONY: ci
+ci:: helm-lint helm-lint-template
+
+################################################################################
+
 # helm-lint --- Uses helm lint to verify that the syntax of the templates are
 # correct.
 .PHONY: helm-lint
