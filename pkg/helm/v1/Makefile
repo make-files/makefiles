@@ -4,9 +4,6 @@ HELM_CHART_NAME ?= $(notdir $(MF_PROJECT_ROOT))
 # HELM_CHART_PATH is the path to the Helm chart for this repo.
 HELM_CHART_PATH ?= charts
 
-# HELM_VALUES_PATH is the path to the Helm values for this repo.
-HELM_VALUES_PATH ?= $(HELM_CHART_PATH)/values.yaml
-
 ################################################################################
 
 # _HELM_PACKAGE is the filename of the Helm package.
@@ -14,14 +11,6 @@ _HELM_PACKAGE = artifacts/helm/package/$(HELM_CHART_NAME)-$(SEMVER).tgz
 
 # _HELM_FILES is a space separated list of every file in HELM_CHART_PATH.
 _HELM_FILES = $(shell PATH="$(PATH)" git-find "$(HELM_CHART_PATH)")
-
-# _HELM_VALUES_ARG is a conditional flag that adds --values if HELM_VALUES_PATH
-# exists.
-ifeq ($(wildcard $(HELM_VALUES_PATH)),)
-_HELM_VALUES_ARG =
-else
-_HELM_VALUES_ARG = --values "$(HELM_VALUES_PATH)"
-endif
 
 ################################################################################
 
@@ -43,13 +32,13 @@ ci:: helm-lint helm-lint-template
 # correct.
 .PHONY: helm-lint
 helm-lint:
-	helm lint --strict $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)"
+	helm lint --strict "$(HELM_CHART_PATH)"
 
 # helm-lint-template --- Uses helm tempalte to verify that the template can be
 # rendered.
 .PHONY: helm-lint-template
 helm-lint-template:
-	helm template $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)" > /dev/null
+	helm template "$(HELM_CHART_PATH)" > /dev/null
 
 # helm-template --- Render the Helm templates to an artifacts directory.
 .PHONY: helm-template
@@ -75,7 +64,7 @@ endif
 
 artifacts/helm/template: $(_HELM_FILES)
 	@rm -rf "$@"
-	helm template --output-dir "$@" $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)"
+	helm template --output-dir "$@" "$(HELM_CHART_PATH)"
 
 $(_HELM_PACKAGE): $(_HELM_FILES)
 	helm package \
