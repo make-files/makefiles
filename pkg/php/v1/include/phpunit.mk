@@ -50,7 +50,8 @@ ci:: artifacts/coverage/phpunit/clover.xml
 
 # phpunit --- Executes all PHPUnit tests in this package.
 .PHONY: phpunit
-phpunit: artifacts/test/phpunit.touch
+phpunit: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
+	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --no-coverage
 
 # phpunit-coverage --- Produces a PHPUnit HTML coverage report.
 .PHONY: phpunit-coverage
@@ -63,6 +64,7 @@ phpunit-coverage-open: artifacts/coverage/phpunit/index.html
 
 ################################################################################
 
+.PHONY: artifacts/coverage/phpunit/index.html # always rebuild
 artifacts/coverage/phpunit/index.html: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
 ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
@@ -73,6 +75,7 @@ else
 	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-html="$(@D)"
 endif
 
+.PHONY: artifacts/coverage/phpunit/clover.xml # always rebuild
 artifacts/coverage/phpunit/clover.xml: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
 ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -qrr vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
@@ -82,9 +85,3 @@ else ifeq ($(_PHP_PHPUNIT_COVERAGE_DRIVER),pcov)
 else
 	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --coverage-clover="$@"
 endif
-
-artifacts/test/phpunit.touch: $(PHP_PHPUNIT_REQ) $(_PHP_PHPUNIT_REQ)
-	vendor/bin/phpunit $(_PHP_PHPUNIT_ARGS) --no-coverage
-
-	@mkdir -p "$(@D)"
-	@touch "$@"

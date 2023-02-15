@@ -49,7 +49,8 @@ ci:: artifacts/coverage/kahlan/clover.xml
 
 # kahlan --- Executes all Kahlan tests in this package.
 .PHONY: kahlan
-kahlan: artifacts/test/kahlan.touch
+kahlan: $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
+	vendor/bin/kahlan $(_PHP_KAHLAN_ARGS)
 
 # kahlan-coverage --- Produces a Kahlan HTML coverage report.
 .PHONY: kahlan-coverage
@@ -65,6 +66,7 @@ kahlan-coverage-open: artifacts/coverage/kahlan/index.html
 artifacts/coverage/kahlan:
 	@mkdir -p "$@"
 
+.PHONY: artifacts/coverage/kahlan/clover.xml # always rebuild
 artifacts/coverage/kahlan/clover.xml: artifacts/coverage/kahlan $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
 ifeq ($(_PHP_KAHLAN_COVERAGE_DRIVER),phpdbg)
 	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --clover="$@"
@@ -72,18 +74,14 @@ else
 	vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --clover="$@"
 endif
 
+.PHONY: artifacts/coverage/kahlan/index.html # always rebuild
 artifacts/coverage/kahlan/index.html: artifacts/coverage/kahlan/lcov.info
 	@genhtml -t "$(PROJECT_NAME)" -o "$(@D)" "$<" > /dev/null
 
+.PHONY: artifacts/coverage/kahlan/lcov.info # always rebuild
 artifacts/coverage/kahlan/lcov.info: artifacts/coverage/kahlan $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
 ifeq ($(_PHP_KAHLAN_COVERAGE_DRIVER),phpdbg)
 	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --lcov="$@"
 else
 	vendor/bin/kahlan $(_PHP_KAHLAN_COVERAGE_ARGS) --lcov="$@"
 endif
-
-artifacts/test/kahlan.touch: $(PHP_KAHLAN_REQ) $(_PHP_KAHLAN_REQ)
-	vendor/bin/kahlan $(_PHP_KAHLAN_ARGS)
-
-	@mkdir -p "$(@D)"
-	@touch "$@"

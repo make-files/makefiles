@@ -45,7 +45,8 @@ ci:: artifacts/coverage/peridot/clover.xml
 
 # peridot --- Executes all Peridot tests in this package.
 .PHONY: peridot
-peridot: artifacts/test/peridot.touch
+peridot: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ)
+	vendor/bin/peridot $(_PHP_PERIDOT_ARGS)
 
 # peridot-coverage --- Produces a Peridot HTML coverage report.
 .PHONY: peridot-coverage
@@ -58,6 +59,7 @@ peridot-coverage-open: artifacts/coverage/peridot/index.html
 
 ################################################################################
 
+.PHONY: artifacts/coverage/peridot/index.html # always rebuild
 artifacts/coverage/peridot/index.html: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ)
 ifeq ($(_PHP_PERIDOT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter html-code-coverage --code-coverage-path "$(@D)"
@@ -65,15 +67,10 @@ else
 	vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter html-code-coverage --code-coverage-path "$(@D)"
 endif
 
+.PHONY: artifacts/coverage/peridot/clover.xml # always rebuild
 artifacts/coverage/peridot/clover.xml: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ)
 ifeq ($(_PHP_PERIDOT_COVERAGE_DRIVER),phpdbg)
 	phpdbg -d=pcov.enabled=0 -qrr vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter clover-code-coverage --code-coverage-path "$(@D)"
 else
 	vendor/bin/peridot $(_PHP_PERIDOT_ARGS) --reporter clover-code-coverage --code-coverage-path "$(@D)"
 endif
-
-artifacts/test/peridot.touch: $(PHP_PERIDOT_REQ) $(_PHP_PERIDOT_REQ)
-	vendor/bin/peridot $(_PHP_PERIDOT_ARGS)
-
-	@mkdir -p "$(@D)"
-	@touch "$@"

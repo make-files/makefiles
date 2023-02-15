@@ -17,31 +17,22 @@ _PHP_PHPSTAN_ARGS := analyze -c "$(PHP_PHPSTAN_CONFIG_FILE)"
 .PHONY: lint
 lint:: phpstan
 
+# precommit --- Perform tasks that need to be executed before committing.
+.PHONY: precommit
+precommit:: phpstan
+
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
-ci:: artifacts/lint/phpstan/ci.touch
+ci:: phpstan-ci
 
 ################################################################################
 
 # phpstan --- Statically analyze code and report potential issues.
 .PHONY: phpstan
-phpstan: artifacts/lint/phpstan/analyze.touch
-
-# precommit --- Perform tasks that need to be executed before committing.
-.PHONY: precommit
-precommit:: phpstan
-
-################################################################################
-
-artifacts/lint/phpstan:
-	@mkdir -p "$@"
-
-artifacts/lint/phpstan/analyze.touch: artifacts/lint/phpstan $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
+phpstan: $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
 	vendor/bin/phpstan $(_PHP_PHPSTAN_ARGS)
 
-	@touch "$@"
-
-artifacts/lint/phpstan/ci.touch: artifacts/lint/phpstan $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
+# phpstan-ci --- Statically analyze code and report potential issues.
+.PHONY: phpstan-ci
+phpstan-ci: $(PHP_PHPSTAN_REQ) $(_PHP_PHPSTAN_REQ)
 	vendor/bin/phpstan $(_PHP_PHPSTAN_ARGS) --no-progress
-
-	@touch "$@"
