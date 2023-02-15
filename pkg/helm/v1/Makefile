@@ -12,10 +12,10 @@ HELM_VALUES_PATH ?= $(HELM_CHART_PATH)/values.yaml
 # _HELM_PACKAGE is the filename of the Helm package.
 _HELM_PACKAGE = artifacts/helm/package/$(HELM_CHART_NAME)-$(SEMVER).tgz
 
-# _HELM_FILES is a space separated list of every file in the HELM_CHART_PATH.
+# _HELM_FILES is a space separated list of every file in HELM_CHART_PATH.
 _HELM_FILES = $(shell PATH="$(PATH)" git-find "$(HELM_CHART_PATH)")
 
-# _HELM_VALUES_ARG is a condintional flag that adds --values if HELM_VALUES_PATH
+# _HELM_VALUES_ARG is a conditional flag that adds --values if HELM_VALUES_PATH
 # exists.
 ifeq ($(wildcard $(HELM_VALUES_PATH)),)
 _HELM_VALUES_ARG =
@@ -25,13 +25,13 @@ endif
 
 ################################################################################
 
-# helm-lint --- Uses helm lint command to verify that the syntax of the
-# templates are correct.
+# helm-lint --- Uses helm lint to verify that the syntax of the templates are
+# correct.
 .PHONY: helm-lint
 helm-lint:
 	helm lint --strict $(_HELM_VALUES_ARG) "$(HELM_CHART_PATH)"
 
-# helm-template --- Output the rendered helm templates.
+# helm-template --- Render the Helm templates to an artifacts directory.
 .PHONY: helm-template
 helm-template: artifacts/helm/template
 
