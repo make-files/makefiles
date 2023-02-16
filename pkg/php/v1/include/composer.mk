@@ -31,7 +31,7 @@ _PHP_COMPOSER_VALIDATE_ARGS := $(if $(PHP_COMPOSER_PUBLISH),$(PHP_COMPOSER_VALID
 
 # Ensure that dependencies are installed before attempting to build a Docker
 # image.
-DOCKER_BUILD_REQ += composer.json composer.lock
+DOCKER_BUILD_REQ += composer.json
 
 ################################################################################
 
@@ -49,27 +49,21 @@ ci:: composer-validate
 
 ################################################################################
 
-# composer-validate --- Validate composer.json and composer.lock.
+# composer-validate --- Validate composer.json.
 .PHONY: composer-validate
 composer-validate: composer.json
 	composer validate $(_PHP_COMPOSER_VALIDATE_ARGS)
 
 ################################################################################
 
-vendor: composer.lock
+vendor: composer.json
 	composer install $(PHP_COMPOSER_INSTALL_ARGS)
-
-composer.lock: composer.json
-ifeq ($(wildcard composer.lock),)
-	composer install $(PHP_COMPOSER_INSTALL_ARGS)
-else
-	composer validate $(_PHP_COMPOSER_VALIDATE_ARGS) && touch "$@"
-endif
+	@touch "$@"
 
 composer.json:
 ifeq ($(wildcard composer.json),)
 	composer init --no-interaction
 endif
 
-artifacts/composer/production/vendor: composer.lock
+artifacts/composer/production/vendor: composer.json
 	COMPOSER_VENDOR_DIR="$@" composer install $(PHP_COMPOSER_INSTALL_ARGS) --no-dev
