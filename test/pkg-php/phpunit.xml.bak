@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.4/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
          executionOrder="depends,defects"
-         requireCoverageMetadata="false"
-         beStrictAboutCoverageMetadata="false"
+         forceCoversAnnotation="false"
+         beStrictAboutCoversAnnotation="false"
          beStrictAboutOutputDuringTests="true"
-         cacheDirectory="artifacts/test/phpunit/cache">
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true">
     <testsuites>
         <testsuite name="default">
             <directory suffix="Test.php">test</directory>
         </testsuite>
     </testsuites>
 
-    <coverage>
-        <report>
-            <text outputFile="php://stdout" showOnlySummary="true"/>
-        </report>
+    <logging>
+        <log type="coverage-text" target="php://stdout" showOnlySummary="true" />
+    </logging>
 
-        <include>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
-        </include>
-    </coverage>
+        </whitelist>
+    </filter>
 </phpunit>

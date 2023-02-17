@@ -1,3 +1,5 @@
+export PHP_CS_FIXER_IGNORE_ENV := true
+
 DOCKER_REPO := makefiles/test
 
 -include .makefiles/Makefile

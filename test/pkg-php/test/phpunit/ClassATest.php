@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassATest extends TestCase
 {
-    public function testMethodA()
+    public function testMethodA(): void
     {
         $this->assertSame('a', ClassA::methodA());
     }

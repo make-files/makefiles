@@ -5,8 +5,9 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude([
         'vendor',
     ]);
+$config = new PhpCsFixer\Config();
 
-return PhpCsFixer\Config::create()
+return $config
     ->setRules([
         '@PSR2' => true,
     ])
