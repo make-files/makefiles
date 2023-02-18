@@ -1,5 +1,0 @@
-/.makefiles/
-/.phpunit.result.cache
-/artifacts/
-/composer.lock
-/vendor/
