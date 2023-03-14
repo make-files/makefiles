@@ -56,6 +56,11 @@ GENERATED_FILES +=
 # the files in GENERATED_FILES are up-to-date.
 CI_VERIFY_GENERATED_FILES ?=
 
+# _CI_VERIFY_GENERATED_FILES_ALWAYS is a subset of GENERATED_FILES that should
+# always be verified by the "ci" target, even if CI_VERIFY_GENERATED_FILES is
+# empty.
+_CI_VERIFY_GENERATED_FILES_ALWAYS +=
+
 # CLEAN_EXCLUSIONS is a space separated list of gitignore patterns to exclude
 # from being removed by "make clean".
 CLEAN_EXCLUSIONS +=
@@ -152,12 +157,9 @@ regenerate::
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
 # list and checks for differences to the committed files. The target fails if
 # differences are detected.
-.PHONY: verify-generated _verify-generated
-verify-generated: $$(if $$(GENERATED_FILES),_verify-generated,)
-_verify-generated:
-	@echo "--- checking for out-of-date generated files"
-	@$(MAKE) --no-print-directory regenerate
-	@git diff --exit-code -- $(GENERATED_FILES)
+.PHONY: verify-generated
+verify-generated:
+	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipies for this
@@ -189,5 +191,7 @@ precommit:: $$(GENERATED_FILES)
 .PHONY: ci
 ci::
 ifneq ($(CI_VERIFY_GENERATED_FILES),)
-ci:: verify-generated
+	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
+else
+	@PATH="$(PATH)" verify-generated-files $(_CI_VERIFY_GENERATED_FILES_ALWAYS)
 endif

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
+
+if [[ $# = 0 ]]; then
+    exit 0
+fi
+
+log "checking for out-of-date generated files"
+rm -f -- "$@"
+make --no-print-directory "$@"
+git diff --exit-code -- "$@"
