@@ -178,8 +178,8 @@ test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 test-until-failure:
 	@counter=0; while go test -count=1 $(GO_TEST_ARGS) ./...; do \
 		counter=$$(expr $$counter + 1); \
-		echo "----------| Test Run $$counter Succeeded |----------"; \
-	done; echo "Test(s) failed after $$counter successful runs"
+		echo "--- test run $$counter succeeded"; \
+	done; echo "--- failed after $$counter successful run(s)"
 
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
