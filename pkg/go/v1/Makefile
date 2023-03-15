@@ -176,7 +176,10 @@ test:: $(GENERATED_FILES) $(GO_TEST_REQ)
 # test-until-failure --- Execute all go tests in this module until they fail.
 .PHONY: test-until-failure
 test-until-failure:
-	while go test -count=1 $(GO_TEST_ARGS) ./...; do :; done
+	@counter=0; while go test -count=1 $(GO_TEST_ARGS) ./...; do \
+		counter=$$(expr $$counter + 1); \
+		echo "--- test run $$counter succeeded"; \
+	done; echo "--- failed after $$counter successful run(s)"
 
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
