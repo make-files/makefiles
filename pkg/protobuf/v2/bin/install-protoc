@@ -37,7 +37,9 @@ mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
 curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
 unzip -o "${ARCHIVE}"
-[[ ! -x bin/protoc ]] && chmod +x bin/protoc
+if [[ ! -x bin/protoc ]]; then ## if bin/protoc already executable, skip chmod, see PR#107.
+    chmod +x bin/protoc
+fi
 find include/google -type d -exec chmod 755 {} \;
 find include/google -type f -exec chmod 644 {} \;
 popd
