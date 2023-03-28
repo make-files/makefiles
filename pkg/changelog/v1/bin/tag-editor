@@ -54,18 +54,24 @@ fi
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
-if [ ! -z "${GIT_LOG}" ]; then
-    echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
-    echo "<!---------------------------- INSERTED FROM GIT LOG --------------------------------->" >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Added${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Changed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Removed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Remove" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Fixed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Deprecated${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Security${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}### Other${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; } >> "$TAG_ANNOTATION_FILE"
-    echo "${EOL}<!-------------------------------- END GIT LOG ------------------------------------->" >> "$TAG_ANNOTATION_FILE"
-fi
+CHANGELOG_ENTRIES_ADDED="$(echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; })"
+CHANGELOG_ENTRIES_CHANGED="$(echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; })"
+CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "Remove" || :; })"
+CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; })"
+CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; })"
+CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; })"
+CHANGELOG_ENTRIES_OTHER="$(echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; })"
+
+echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+
+echo >> "$TAG_ANNOTATION_FILE"
+echo "### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "### Other${EOL}${EOL}${CHANGELOG_ENTRIES_OTHER:-- }" >> "$TAG_ANNOTATION_FILE"
 
 # replace single quotes with backticks if surrounded by identifier
 sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
