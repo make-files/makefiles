@@ -19,21 +19,24 @@ EOL=$'\n'
 # DATE_VAR get the current date in YYYY-MM-DD format
 DATE_VAR="$(date '+%F')"
 
-# TEMP_FILE_TAG create a new temp file to build up the git tag annotation
-TEMP_FILE_TAG="$(mktemp).md"
+# TAG_ANNOTATION_FILE is the file edited by the tagger containing the tag annotation content
+TAG_ANNOTATION_FILE="artifacts/changelog/TAG_ANNOTATION.md"
 
-# TEMP_FILE_TAG2 create a new temp file to determine if changes are made in the editor
-TEMP_FILE_TAG_SNAPSHOT="$(mktemp)"
+# TAG_ANNOTATION_SNAPSHOT_FILE keeps a snapshot of the original tag annotation content to determine if changes are made
+TAG_ANNOTATION_SNAPSHOT_FILE="artifacts/changelog/TAG_ANNOTATION_SNAPSHOT.md"
 
-# TEMP_FILE_CHANGELOG create a new temp file to insert into CHANGELOG.md after editing
-TEMP_FILE_CHANGELOG="$(mktemp)"
+# CHANGELOG_ADDITIONS_FILE contains the changes to insert into CHANGELOG.md after editing
+CHANGELOG_ADDITIONS_FILE=artifacts/changelog/CHANGELOG_ADDITIONS.md
+
+# Ensure the working directory exists
+mkdir -p artifacts/changelog
 
 # Build the initial CHANGELOG.md section in the editor
 #
 # Add version number to the top of the editor
-echo "vX.Y.Z" > "$TEMP_FILE_TAG"
+echo "vX.Y.Z" > "$TAG_ANNOTATION_FILE"
 # Add the previous git tag to the editor
-echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TEMP_FILE_TAG"
+echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
 
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
@@ -45,26 +48,26 @@ if [ -f CHANGELOG.md ]; then
         sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
-    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TEMP_FILE_TAG";
+    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TAG_ANNOTATION_FILE";
 fi
 
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
 if [ ! -z "${GIT_LOG}" ]; then
-    echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TEMP_FILE_TAG"
-    echo "<!---------------------------- INSERTED FROM GIT LOG --------------------------------->" >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Added${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Changed${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Removed${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Remove" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Fixed${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Deprecated${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Security${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}### Other${EOL}" >> "$TEMP_FILE_TAG" && echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; } >> "$TEMP_FILE_TAG"
-    echo "${EOL}<!-------------------------------- END GIT LOG ------------------------------------->" >> "$TEMP_FILE_TAG"
+    echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+    echo "<!---------------------------- INSERTED FROM GIT LOG --------------------------------->" >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Added${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Changed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Removed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Remove" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Fixed${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Deprecated${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Security${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}### Other${EOL}" >> "$TAG_ANNOTATION_FILE" && echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; } >> "$TAG_ANNOTATION_FILE"
+    echo "${EOL}<!-------------------------------- END GIT LOG ------------------------------------->" >> "$TAG_ANNOTATION_FILE"
 fi
 # replace single quotes with backticks if surrounded by identifier
-sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TEMP_FILE_TAG"
+sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
 
 # If EDITOR is not set, set it to default git editor
 if [ -z "${EDITOR:-}" ]; then
@@ -77,39 +80,39 @@ fi
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 #
-cat "$TEMP_FILE_TAG" > "$TEMP_FILE_TAG_SNAPSHOT"
-$EDITOR "$TEMP_FILE_TAG"
-if diff "$TEMP_FILE_TAG" "$TEMP_FILE_TAG_SNAPSHOT" > /dev/null; then
+cat "$TAG_ANNOTATION_FILE" > "$TAG_ANNOTATION_SNAPSHOT_FILE"
+$EDITOR "$TAG_ANNOTATION_FILE"
+if diff "$TAG_ANNOTATION_FILE" "$TAG_ANNOTATION_SNAPSHOT_FILE" > /dev/null; then
     echo "No changes made to CHANGELOG.md. Exiting.";
     exit 1;
 fi
 
-if [ "$(head -n 1 "$TEMP_FILE_TAG")" = "$(head -n 1 "$TEMP_FILE_TAG_SNAPSHOT")" ]; then
+if [ "$(head -n 1 "$TAG_ANNOTATION_FILE")" = "$(head -n 1 "$TAG_ANNOTATION_SNAPSHOT_FILE")" ]; then
 	echo "No new tag set, first line must be changed to reflect the new tag. Exiting."
 	exit 1
 fi
 
 # Extract the version number from the edited log.
-v=$(sed -n 1p "$TEMP_FILE_TAG")
+v=$(sed -n 1p "$TAG_ANNOTATION_FILE")
 
 # Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed_i '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TEMP_FILE_TAG
+sed_i '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TAG_ANNOTATION_FILE
 
 # Remove the <!-- Previous tag section -->
-sed_i '/^<!--* Previous tag:/d' $TEMP_FILE_TAG
+sed_i '/^<!--* Previous tag:/d' $TAG_ANNOTATION_FILE
 
 # Build the new section for the CHANGELOG.md file.
 #
-echo "${EOL}## [$v] - "$DATE_VAR"${EOL}" > $TEMP_FILE_CHANGELOG
-echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $TEMP_FILE_CHANGELOG
-cat "$TEMP_FILE_TAG" >> $TEMP_FILE_CHANGELOG
-sed_i -e '5d' $TEMP_FILE_CHANGELOG # Strip the vX.X.X first line
+echo "${EOL}## [$v] - "$DATE_VAR"${EOL}" > $CHANGELOG_ADDITIONS_FILE
+echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $CHANGELOG_ADDITIONS_FILE
+cat "$TAG_ANNOTATION_FILE" >> $CHANGELOG_ADDITIONS_FILE
+sed_i -e '5d' $CHANGELOG_ADDITIONS_FILE # Strip the vX.X.X first line
 
 # Remove existing unreleased section if it is not already empty
 sed_i '/^## Unreleased.*/,/^## /{//!d;/## Unreleased/G;}' CHANGELOG.md
 
 # Append the new section to the CHANGELOG.md file under the ## Unreleased section.
-sed_i "/^## Unreleased/r $TEMP_FILE_CHANGELOG" CHANGELOG.md
+sed_i "/^## Unreleased/r $CHANGELOG_ADDITIONS_FILE" CHANGELOG.md
 
 # Remove all double blank lines from the CHANGELOG.md file
 sed_i '/^$/N;/^\n$/D' CHANGELOG.md
@@ -119,7 +122,4 @@ git add CHANGELOG.md
 git commit -am "Bump to $v"
 
 # Create new tag annotated with the new CHANGELOG.md section.
-git tag --annotate --cleanup=whitespace -F $TEMP_FILE_TAG $v
-
-# Remove temp files.
-rm $TEMP_FILE_TAG $TEMP_FILE_TAG_SNAPSHOT $TEMP_FILE_CHANGELOG
+git tag --annotate --cleanup=whitespace -F $TAG_ANNOTATION_FILE $v
