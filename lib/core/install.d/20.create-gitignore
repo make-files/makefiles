@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ! -e .gitignore ]]; then
+    echo '/.makefiles/' > .gitignore
+    echo '/artifacts/' >> .gitignore
+fi
