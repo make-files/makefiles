@@ -34,6 +34,10 @@ for port in ${@:2}; do
 
     echo "TELEPRESENCE_PORT_${port}=$local_port" >> "$env_file"
 
+    # Remove lines without a valid name. Telepresence circa v2.11 seems to
+    # produce a nameless variable in its output.
+    sed -i -e "/^[ \t]*=/d" "$env_file"
+
     # Add single quotes to each environment variable
     sed -i -e "s/^\([^=]*\)=\(.*\)$/export \1='\2'/" "$env_file"
     source "$env_file"
