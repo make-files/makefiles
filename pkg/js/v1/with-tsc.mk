@@ -1,7 +1,17 @@
+# JS_TSC_TYPECHECK_SKIP_LIB is "true" if checking library types should be
+# skipped.
+JS_TSC_TYPECHECK_SKIP_LIB ?=
+
+################################################################################
+
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
 .PHONY: tsc-typecheck
 tsc-typecheck: artifacts/link-dependencies.touch
+ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
+	$(JS_EXEC) tsc --noEmit --skipLibCheck
+else
 	$(JS_EXEC) tsc --noEmit
+endif
 
 ################################################################################
 
