@@ -17,7 +17,7 @@ GO_ARCHIVE_FILES +=
 
 # GO_SOURCE_FILES is a space separated list of source files that are used by the
 # build process.
-GO_SOURCE_FILES += $(shell PATH="$(PATH)" git-find . -name '*.go' -not -regex '.*/_.*')
+GO_SOURCE_FILES += $(shell PATH="$(PATH)" git-find . -name '*.go' -not -regex '^_.*' -not -regex '.*\/_.*')
 
 # GO_EMBEDDED_FILES is a space separated list of files that are embedded into
 # the Go binary using the standard "embed" package.

@@ -1,5 +1,5 @@
 # PROTO_FILES is a space separated list of Protocol Buffers files.
-PROTO_FILES += $(shell PATH="$(PATH)" git-find . -name '*.proto' -not -regex '.*/_.*')
+PROTO_FILES += $(shell PATH="$(PATH)" git-find . -name '*.proto' -not -regex '^_.*' -not -regex '.*\/_.*')
 
 # PROTO_INCLUDE_PATHS is a space separate list of include paths to use when
 # building the .proto files from this repository.
