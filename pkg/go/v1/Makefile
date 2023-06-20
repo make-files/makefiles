@@ -104,8 +104,8 @@ _GO_PLUGIN_DIR = lib
 # _GO_COMMAND_PACKAGES and _GO_PLUGIN_PACKAGES are lists of directory names that
 # contain "main" packages that are to be built into executables and plugins,
 # respectively.
-_GO_COMMAND_PACKAGES = $(notdir $(shell find $(_GO_COMMAND_DIR) -type d -mindepth 1 -maxdepth 1 2> /dev/null))
-_GO_PLUGIN_PACKAGES = $(notdir $(shell find $(_GO_PLUGIN_DIR) -type d -mindepth 1 -maxdepth 1 2> /dev/null))
+_GO_COMMAND_PACKAGES = $(shell find $(_GO_COMMAND_DIR) -type f -mindepth 2 -maxdepth 2 -name '*.go' -not -regex '.*\/_.*' | xargs -n1 dirname | xargs -n1 basename 2> /dev/null)
+_GO_PLUGIN_PACKAGES  = $(shell find $(_GO_PLUGIN_DIR)  -type f -mindepth 2 -maxdepth 2 -name '*.go' -not -regex '.*\/_.*' | xargs -n1 dirname | xargs -n1 basename 2> /dev/null)
 
 # _GO_BUILDMODE_PLUGIN_PATTERNS is a list of patterns that are matched against
 # the binary name to determine if we're building a command or a plugin.
