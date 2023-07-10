@@ -85,10 +85,20 @@ if [ -z "${EDITOR:-}" ]; then
     EDITOR="vim"
 fi
 
+open_in_editor() {
+  # NOTE: could support other methods too eg. xdg-open or open commands if they exist
+  if [ -n "${VISUAL:-}" ]; then
+    $VISUAL "$@" || $EDITOR "$@"
+  else
+    $EDITOR "$@"
+  fi
+  return $?
+}
+
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 cat "$TAG_ANNOTATION_FILE" > "$TAG_ANNOTATION_SNAPSHOT_FILE"
-${VISUAL:-$EDITOR} "$TAG_ANNOTATION_FILE"
+open_in_editor "$TAG_ANNOTATION_FILE"
 if diff "$TAG_ANNOTATION_FILE" "$TAG_ANNOTATION_SNAPSHOT_FILE" > /dev/null; then
     echo "No changes made to CHANGELOG.md. Exiting.";
     exit 1;
