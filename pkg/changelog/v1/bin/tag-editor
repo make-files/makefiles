@@ -77,7 +77,7 @@ echo "### Other${EOL}${EOL}${CHANGELOG_ENTRIES_OTHER:-- }" >> "$TAG_ANNOTATION_F
 sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
 
 # If EDITOR is not set, set it to default git editor
-if [ -z "${EDITOR:-}" ]; then
+if [ -z "${VISUAL:-${EDITOR:-}}" ]; then
     EDITOR="$(git config --global --get core.editor)"
 fi
 # If EDITOR is still not set, set it to vim
@@ -88,7 +88,7 @@ fi
 # Allow user to edit the log and assign a version number.
 # Quit immediately if the user aborts the edit.
 cat "$TAG_ANNOTATION_FILE" > "$TAG_ANNOTATION_SNAPSHOT_FILE"
-$EDITOR "$TAG_ANNOTATION_FILE"
+${VISUAL:-$EDITOR} "$TAG_ANNOTATION_FILE"
 if diff "$TAG_ANNOTATION_FILE" "$TAG_ANNOTATION_SNAPSHOT_FILE" > /dev/null; then
     echo "No changes made to CHANGELOG.md. Exiting.";
     exit 1;
