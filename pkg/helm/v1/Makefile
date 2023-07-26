@@ -31,7 +31,7 @@ ci:: helm-lint
 # helm-lint --- Uses helm lint to verify that the syntax of the templates are
 # correct.
 .PHONY: helm-lint
-helm-lint:
+helm-lint: $(HELM_CHART_PATH)/charts
 	helm lint --strict "$(HELM_CHART_PATH)"
 
 # helm-template --- Render the Helm templates to an artifacts directory.
@@ -56,11 +56,16 @@ endif
 
 ################################################################################
 
-artifacts/helm/template: $(_HELM_FILES)
+artifacts/helm/template: $(_HELM_FILES) $(HELM_CHART_PATH)/charts
 	@rm -rf "$@"
 	helm template --output-dir "$@" "$(HELM_CHART_PATH)"
 
-$(_HELM_PACKAGE): $(_HELM_FILES)
+$(HELM_CHART_PATH)/charts: $(HELM_CHART_PATH)/Chart.yaml
+	@mkdir -p "$@"
+	helm dependency build $(HELM_CHART_PATH)
+	@touch "$@"
+
+$(_HELM_PACKAGE): $(_HELM_FILES) $(HELM_CHART_PATH)/charts
 	helm package \
 		"$(HELM_CHART_PATH)" \
 		--destination "$(@D)" \
