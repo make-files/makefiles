@@ -14,14 +14,6 @@ _HELM_FILES = $(shell PATH="$(PATH)" git-find "$(HELM_CHART_PATH)")
 
 ################################################################################
 
-# lint --- Check for syntax, configuration, code style and/or formatting issues.
-.PHONY: lint
-lint:: helm-lint
-
-# precommit --- Perform tasks that need to be executed before committing.
-.PHONY: precommit
-precommit:: helm-lint
-
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
 ci:: helm-lint
