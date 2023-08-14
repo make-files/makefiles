@@ -62,7 +62,7 @@ artifacts/helm/template: $(_HELM_FILES) $(HELM_CHART_PATH)/charts
 
 $(HELM_CHART_PATH)/charts: $(HELM_CHART_PATH)/Chart.yaml
 	@mkdir -p "$@"
-	helm dependency build $(HELM_CHART_PATH)
+	if ! helm dependency build $(HELM_CHART_PATH); then rm -rf "$@"; exit 1; fi
 	@touch "$@"
 
 $(_HELM_PACKAGE): $(_HELM_FILES) $(HELM_CHART_PATH)/charts
