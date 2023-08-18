@@ -37,7 +37,7 @@ $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
 artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
 	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND)
 
-artifacts/protobuf/bin/go.mod: go.mod
+artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
 
 artifacts/protobuf/args/common:
@@ -86,12 +86,12 @@ artifacts/protobuf/args/common:
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
 
-%.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
+%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
 
-%_grpc.pb.go: %.proto artifacts/protobuf/bin/go.mod artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc
+%_grpc.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go-grpc artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
