@@ -170,7 +170,7 @@ GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-
 
 # test --- Executes all go tests in this module.
 .PHONY: test
-test:: $(GENERATED_FILES) $(GO_TEST_REQ)
+test:: $$(GENERATED_FILES) $(GO_TEST_REQ)
 	go test $(GO_TEST_ARGS) ./...
 
 # test-until-failure --- Execute all go tests in this module until they fail.
@@ -183,7 +183,7 @@ test-until-failure:
 
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
-benchmark:: $(GENERATED_FILES) $(GO_TEST_REQ)
+benchmark:: $$(GENERATED_FILES) $(GO_TEST_REQ)
 	go test $(GO_BENCHMARK_ARGS) -bench=. -benchmem -run=^$$ ./...
 
 # coverage --- Produces an HTML coverage report.
@@ -247,15 +247,12 @@ artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"
 
 .PHONY: artifacts/coverage/cover.out # always rebuild
-artifacts/coverage/cover.out: $(GENERATED_FILES) $(GO_TEST_REQ)
+artifacts/coverage/cover.out: $$(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
 	go test $(GO_TEST_ARGS) -covermode=atomic -coverprofile=$@ ./...
-ifneq ($(strip $(GENERATED_FILES)),)
-	grep --fixed-strings --invert-match $(foreach F,$(GENERATED_FILES),--regexp="$F") "$@" > "$@.tmp"
-	mv "$@.tmp" "$@"
-endif
+	$(MF_ROOT)/pkg/go/v1/bin/filter-coverage-report $@ $(GENERATED_FILES)
 
-artifacts/build/%: $(GO_BUILD_REQ) $(GO_SOURCE_FILES) $(GENERATED_FILES) $(GO_EMBEDDED_FILES)
+artifacts/build/%: $(GO_BUILD_REQ) $(GO_SOURCE_FILES) $$(GENERATED_FILES) $(GO_EMBEDDED_FILES)
 	$(eval PARTS := $(subst /, ,$*))
 	$(eval BUILD := $(word 1,$(PARTS)))
 	$(eval OS    := $(word 2,$(PARTS)))

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+coverage_file=$1
+filtered_files=${@:2}
+module=$(go list -m)
+
+if [ ! -f "$coverage_file" ]; then
+    echo "coverage file $coverage_file does not exist"
+    exit 1
+fi
+
+for file in $filtered_files; do
+    egrep -v "^$module/$file" "$coverage_file" > "$coverage_file.tmp"
+    mv "$coverage_file.tmp" "$coverage_file"
+done
