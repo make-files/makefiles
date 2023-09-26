@@ -127,9 +127,9 @@ makefiles:
 .PHONY: clean _clean
 _clean::
 clean:
-	$(MAKE) --no-print-directory _clean
-	$(MAKE) --no-print-directory clean-generated
-	$(MAKE) --no-print-directory clean-ignored
+	@$(MAKE) --no-print-directory _clean
+	@$(MAKE) --no-print-directory clean-generated
+	@$(MAKE) --no-print-directory clean-ignored
 
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
@@ -151,8 +151,14 @@ generate:: $$(GENERATED_FILES)
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
 regenerate::
-	$(MAKE) --no-print-directory clean-generated
-	$(MAKE) --no-print-directory generate
+	@$(MAKE) --no-print-directory clean-generated
+	@$(MAKE) --no-print-directory generate
+
+# try-regenerate --- Removes and regenerates all files in the GENERATED_FILES
+# list, but restores them if the generation fails.
+.PHONY: try-regenerate
+try-regenerate::
+	@$(MAKE) --no-print-directory regenerate || (echo 'Regenerate failed, restoring files...'; git restore $(GENERATED_FILES))
 
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
 # list and checks for differences to the committed files. The target fails if
