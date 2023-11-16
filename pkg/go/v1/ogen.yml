@@ -1,0 +1,6 @@
+parser:
+  allow_remote: true
+generator:
+  features:
+    disable:
+      - ogen/unimplemented

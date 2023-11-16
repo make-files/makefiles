@@ -9,10 +9,10 @@ artifacts/go/bin/ogen: go.mod
 	$(eval PACKAGE := $(notdir $(@D)))
 
 	artifacts/go/bin/ogen \
-		--target $(@D) \
-		--package $(PACKAGE) \
-		--clean \
-		--allow-remote \
+		-target $(@D) \
+		-package $(PACKAGE) \
+		-clean \
+		-config $(MF_ROOT)/pkg/go/v1/ogen.yml \
 		$<
 
 	@echo "// This file is used by the makefiles as a stand-in for the complete" > $@
