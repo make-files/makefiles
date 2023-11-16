@@ -12,7 +12,6 @@ artifacts/go/bin/ogen: go.mod
 		--target $(@D) \
 		--package $(PACKAGE) \
 		--clean \
-		--skip-unimplemented \
 		--allow-remote \
 		$<
 
