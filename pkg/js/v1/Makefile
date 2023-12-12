@@ -25,6 +25,9 @@ JS_PRETTIER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .pret
 # configuration.
 JS_SIZE_LIMIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .size-limit.*)
 
+# JS_VITEST_CONFIG_FILE is the path to any existing Vitest configuration.
+JS_VITEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file vitest.config.*)
+
 # JS_WEBPACK_CONFIG_FILE is the path to any existing Webpack configuration.
 JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpack.config.*)
 
@@ -83,6 +86,10 @@ endif
 
 ifneq ($(JS_JEST_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/jest.mk
+endif
+
+ifneq ($(JS_VITEST_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/vitest.mk
 endif
 
 # Lint tools
