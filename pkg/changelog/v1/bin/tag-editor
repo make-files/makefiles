@@ -57,13 +57,12 @@ CHANGELOG_ENTRIES_UNSORTED="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" 
 echo "vX.Y.Z" > "$TAG_ANNOTATION_FILE"
 
 # Add the changelog sections
-echo >> "$TAG_ANNOTATION_FILE"
-echo "### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }" >> "$TAG_ANNOTATION_FILE"
 
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
