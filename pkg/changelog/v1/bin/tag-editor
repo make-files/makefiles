@@ -49,7 +49,7 @@ CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYW
 CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" || :; })"
 CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
 CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_UNSORTED="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_UNCATEGORIZED="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
 
 # Build the initial CHANGELOG.md section in the editor
 #
@@ -82,9 +82,9 @@ echo "<!------------------------------------ >8 --------------------------------
 # Add the previous git tag
 echo "${EOL}Previous tag: $GIT_TAG_LATEST" >> "$TAG_ANNOTATION_FILE"
 
-# Add any unsorted commits
-if [ -n "$CHANGELOG_ENTRIES_UNSORTED" ]; then
-    echo "${EOL}Unsorted commits:${EOL}${EOL}${CHANGELOG_ENTRIES_UNSORTED}" >> "$TAG_ANNOTATION_FILE"
+# Add any uncategorized commits
+if [ -n "$CHANGELOG_ENTRIES_UNCATEGORIZED" ]; then
+    echo "${EOL}Uncategorized commits:${EOL}${EOL}${CHANGELOG_ENTRIES_UNCATEGORIZED}" >> "$TAG_ANNOTATION_FILE"
 fi
 
 # replace single quotes with backticks if surrounded by identifier
