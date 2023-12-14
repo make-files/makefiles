@@ -31,26 +31,6 @@ CHANGELOG_ADDITIONS_FILE=artifacts/changelog/CHANGELOG_ADDITIONS.md
 # Ensure the working directory exists
 mkdir -p artifacts/changelog
 
-# Build the initial CHANGELOG.md section in the editor
-#
-# Add version number to the top of the editor
-echo "vX.Y.Z" > "$TAG_ANNOTATION_FILE"
-# Add the previous git tag to the editor
-echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
-
-# Add the existing CHANGELOG.md [unreleased] section if file exists
-if [ -f CHANGELOG.md ]; then
-    # If there is the old [unreleased] section, replace it with ## Unreleased header
-    sed_i '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
-
-    # If there is no Unreleased section, insert the Unreleased section before the first release section.
-    if ! grep -q '## Unreleased' CHANGELOG.md; then
-        sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
-    fi
-
-    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TAG_ANNOTATION_FILE";
-fi
-
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
@@ -69,10 +49,14 @@ CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" 
 CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
 CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYWORDS" || :; })"
 CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_OTHER="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_UNSORTED="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
 
-echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+# Build the initial CHANGELOG.md section in the editor
+#
+# Add version number to the top of the editor
+echo "vX.Y.Z" > "$TAG_ANNOTATION_FILE"
 
+# Add the changelog sections
 echo >> "$TAG_ANNOTATION_FILE"
 echo "### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
 echo "### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
@@ -80,7 +64,26 @@ echo "### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }${EOL}" >> "$TAG_AN
 echo "### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
 echo "### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
 echo "### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Other${EOL}${EOL}${CHANGELOG_ENTRIES_OTHER:-- }" >> "$TAG_ANNOTATION_FILE"
+
+# Add the existing CHANGELOG.md [unreleased] section if file exists
+if [ -f CHANGELOG.md ]; then
+    # If there is the old [unreleased] section, replace it with ## Unreleased header
+    sed_i '/^## \[Unreleased\]/,/[unreleased]/d' CHANGELOG.md
+
+    # If there is no Unreleased section, insert the Unreleased section before the first release section.
+    if ! grep -q '## Unreleased' CHANGELOG.md; then
+        sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
+    fi
+
+    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TAG_ANNOTATION_FILE";
+fi
+
+echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+
+# Add the previous git tag
+echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
+
+echo "${EOL}${EOL}<!-- Unsorted commits -->${EOL}${EOL}${CHANGELOG_ENTRIES_UNSORTED:-- }" >> "$TAG_ANNOTATION_FILE"
 
 # replace single quotes with backticks if surrounded by identifier
 sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
