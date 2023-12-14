@@ -81,9 +81,9 @@ fi
 echo "<!------------------------------------ >8 ------------------------------------->" >> "$TAG_ANNOTATION_FILE"
 
 # Add the previous git tag
-echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}<!-- Previous tag -->${EOL}${EOL}$GIT_TAG_LATEST" >> "$TAG_ANNOTATION_FILE"
 
-echo "${EOL}${EOL}<!-- Unsorted commits -->${EOL}${EOL}${CHANGELOG_ENTRIES_UNSORTED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}<!-- Unsorted commits -->${EOL}${EOL}${CHANGELOG_ENTRIES_UNSORTED:-- }" >> "$TAG_ANNOTATION_FILE"
 
 # replace single quotes with backticks if surrounded by identifier
 sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
