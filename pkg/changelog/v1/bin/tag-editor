@@ -31,26 +31,6 @@ CHANGELOG_ADDITIONS_FILE=artifacts/changelog/CHANGELOG_ADDITIONS.md
 # Ensure the working directory exists
 mkdir -p artifacts/changelog
 
-# GIT_LOG gets git log messages since the last tag to the editor
-GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
-
-ADDED_KEYWORDS="add|implement"
-CHANGED_KEYWORDS="change|migrate|refactor|convert|rename"
-REMOVED_KEYWORDS="remove|delete|revert"
-FIXED_KEYWORDS="bug|fix|ensure|issue"
-DEPRECATED_KEYWORDS="deprecate"
-SECURITY_KEYWORDS="security|vulnerab"
-
-ALL_KEYWORDS="$ADDED_KEYWORDS|$CHANGED_KEYWORDS|$REMOVED_KEYWORDS|$FIXED_KEYWORDS|$DEPRECATED_KEYWORDS|$SECURITY_KEYWORDS"
-
-CHANGELOG_ENTRIES_ADDED="$(echo "$GIT_LOG" | { grep -i -E "$ADDED_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_CHANGED="$(echo "$GIT_LOG" | { grep -i -E "$CHANGED_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
-CHANGELOG_ENTRIES_UNCATEGORIZED="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
-
 # Build the initial CHANGELOG.md section in the editor
 #
 # Add version number to the top of the editor
@@ -66,9 +46,45 @@ if [ -f CHANGELOG.md ]; then
         sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
-    # Add the existing unreleased section to the editor, without trailing newlines
-    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' | sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' >> "$TAG_ANNOTATION_FILE";
+    # Prepend entries in each of the unreleased sections
+    UNRELEASED="$(sed -n '/^## Unreleased.*/,/^## /{//!p;}' CHANGELOG.md)"
+    CHANGELOG_ENTRIES_ADDED="$(echo "$UNRELEASED" | sed -n '/^### Added.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_CHANGED="$(echo "$UNRELEASED" | sed -n '/^### Changed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_DEPRECATED="$(echo "$UNRELEASED" | sed -n '/^### Deprecated.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_REMOVED="$(echo "$UNRELEASED" | sed -n '/^### Removed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_FIXED="$(echo "$UNRELEASED" | sed -n '/^### Fixed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_SECURITY="$(echo "$UNRELEASED" | sed -n '/^### Security.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_UNCATEGORIZED="$(echo "$UNRELEASED" | sed -n '/^### Uncategorized.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+
+    # Add a newline to the end of each section if it is not empty
+    [ -n "$CHANGELOG_ENTRIES_ADDED" ] && CHANGELOG_ENTRIES_ADDED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_CHANGED" ] && CHANGELOG_ENTRIES_CHANGED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_DEPRECATED" ] && CHANGELOG_ENTRIES_DEPRECATED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_REMOVED" ] && CHANGELOG_ENTRIES_REMOVED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_FIXED" ] && CHANGELOG_ENTRIES_FIXED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_SECURITY" ] && CHANGELOG_ENTRIES_SECURITY+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_UNCATEGORIZED" ] && CHANGELOG_ENTRIES_UNCATEGORIZED+="${EOL}"
 fi
+
+# GIT_LOG gets git log messages since the last tag to the editor
+GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
+
+ADDED_KEYWORDS="add|implement"
+CHANGED_KEYWORDS="change|migrate|refactor|convert|rename"
+REMOVED_KEYWORDS="remove|delete|revert"
+FIXED_KEYWORDS="bug|fix|ensure|issue"
+DEPRECATED_KEYWORDS="deprecate"
+SECURITY_KEYWORDS="security|vulnerab"
+
+ALL_KEYWORDS="$ADDED_KEYWORDS|$CHANGED_KEYWORDS|$REMOVED_KEYWORDS|$FIXED_KEYWORDS|$DEPRECATED_KEYWORDS|$SECURITY_KEYWORDS"
+
+CHANGELOG_ENTRIES_ADDED+="$(echo "$GIT_LOG" | { grep -i -E "$ADDED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_CHANGED+="$(echo "$GIT_LOG" | { grep -i -E "$CHANGED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_DEPRECATED+="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_REMOVED+="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_FIXED+="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_SECURITY+="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_UNCATEGORIZED+="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
 
 # Add the changelog sections
 echo "${EOL}### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }" >> "$TAG_ANNOTATION_FILE"
