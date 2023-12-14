@@ -78,7 +78,7 @@ if [ -f CHANGELOG.md ]; then
     sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TAG_ANNOTATION_FILE";
 fi
 
-echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+echo "<!------------------------------------ >8 ------------------------------------->" >> "$TAG_ANNOTATION_FILE"
 
 # Add the previous git tag
 echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
@@ -124,11 +124,8 @@ fi
 # Extract the version number from the edited log.
 v=$(sed -n 1p "$TAG_ANNOTATION_FILE")
 
-# Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed_i '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TAG_ANNOTATION_FILE
-
-# Remove the <!-- Previous tag section -->
-sed_i '/^<!--* Previous tag:/d' $TAG_ANNOTATION_FILE
+# Remove everything after the scissors marker.
+sed_i '/^<!--* >8 -*-->$/,$d' $TAG_ANNOTATION_FILE
 
 # Build the new section for the CHANGELOG.md file.
 echo "${EOL}## [$v] - "$DATE_VAR"${EOL}" > $CHANGELOG_ADDITIONS_FILE
