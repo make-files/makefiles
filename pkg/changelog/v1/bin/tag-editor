@@ -54,13 +54,22 @@ fi
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
-CHANGELOG_ENTRIES_ADDED="$(echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; })"
-CHANGELOG_ENTRIES_CHANGED="$(echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; })"
-CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "Remove" || :; })"
-CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; })"
-CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; })"
-CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; })"
-CHANGELOG_ENTRIES_OTHER="$(echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; })"
+ADDED_KEYWORDS="add|implement"
+CHANGED_KEYWORDS="change|migrate|refactor|convert|rename"
+REMOVED_KEYWORDS="remove"
+FIXED_KEYWORDS="fix|ensure"
+DEPRECATED_KEYWORDS="deprecate"
+SECURITY_KEYWORDS="security|vulnerab"
+
+ALL_KEYWORDS="$ADDED_KEYWORDS|$CHANGED_KEYWORDS|$REMOVED_KEYWORDS|$FIXED_KEYWORDS|$DEPRECATED_KEYWORDS|$SECURITY_KEYWORDS"
+
+CHANGELOG_ENTRIES_ADDED="$(echo "$GIT_LOG" | { grep -i -E "$ADDED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_CHANGED="$(echo "$GIT_LOG" | { grep -i -E "$CHANGED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_OTHER="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
 
 echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
 
