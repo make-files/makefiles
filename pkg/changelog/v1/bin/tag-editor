@@ -57,7 +57,7 @@ GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --a
 ADDED_KEYWORDS="add|implement"
 CHANGED_KEYWORDS="change|migrate|refactor|convert|rename"
 REMOVED_KEYWORDS="remove"
-FIXED_KEYWORDS="fix|ensure"
+FIXED_KEYWORDS="bug|fix|ensure|issue"
 DEPRECATED_KEYWORDS="deprecate"
 SECURITY_KEYWORDS="security|vulnerab"
 
