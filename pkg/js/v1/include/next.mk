@@ -29,7 +29,7 @@ next-build: artifacts/next/dist/BUILD_ID
 # next-dev --- Start the Next.js application in development mode.
 .PHONY: next-dev
 next-dev: artifacts/link-dependencies.touch
-	$(JS_EXEC) next dev --port $(JS_NEXT_PORT)
+	NODE_ENV=development $(JS_EXEC) next dev --port $(JS_NEXT_PORT)
 
 ################################################################################
 
