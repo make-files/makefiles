@@ -35,8 +35,6 @@ mkdir -p artifacts/changelog
 #
 # Add version number to the top of the editor
 echo "vX.Y.Z" > "$TAG_ANNOTATION_FILE"
-# Add the previous git tag to the editor
-echo "<!-- Previous tag: $GIT_TAG_LATEST -->" >> "$TAG_ANNOTATION_FILE"
 
 # Add the existing CHANGELOG.md [unreleased] section if file exists
 if [ -f CHANGELOG.md ]; then
@@ -48,30 +46,63 @@ if [ -f CHANGELOG.md ]; then
         sed_i $'1,/^## / s/^## /## Unreleased\\\n\\\n## /' CHANGELOG.md
     fi
 
-    sed -e '/^## Unreleased.*/,/^## /!d' CHANGELOG.md | sed '1d;$d' >> "$TAG_ANNOTATION_FILE";
+    # Prepend entries in each of the unreleased sections
+    UNRELEASED="$(sed -n '/^## Unreleased.*/,/^## /{//!p;}' CHANGELOG.md)"
+    CHANGELOG_ENTRIES_ADDED="$(echo "$UNRELEASED" | sed -n '/^### Added.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_CHANGED="$(echo "$UNRELEASED" | sed -n '/^### Changed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_DEPRECATED="$(echo "$UNRELEASED" | sed -n '/^### Deprecated.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_REMOVED="$(echo "$UNRELEASED" | sed -n '/^### Removed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_FIXED="$(echo "$UNRELEASED" | sed -n '/^### Fixed.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_SECURITY="$(echo "$UNRELEASED" | sed -n '/^### Security.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+    CHANGELOG_ENTRIES_UNCATEGORIZED="$(echo "$UNRELEASED" | sed -n '/^### Uncategorized.*/,/^### /{//!p;}' | { grep -e '^-' || :; })"
+
+    # Add a newline to the end of each section if it is not empty
+    [ -n "$CHANGELOG_ENTRIES_ADDED" ] && CHANGELOG_ENTRIES_ADDED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_CHANGED" ] && CHANGELOG_ENTRIES_CHANGED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_DEPRECATED" ] && CHANGELOG_ENTRIES_DEPRECATED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_REMOVED" ] && CHANGELOG_ENTRIES_REMOVED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_FIXED" ] && CHANGELOG_ENTRIES_FIXED+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_SECURITY" ] && CHANGELOG_ENTRIES_SECURITY+="${EOL}"
+    [ -n "$CHANGELOG_ENTRIES_UNCATEGORIZED" ] && CHANGELOG_ENTRIES_UNCATEGORIZED+="${EOL}"
 fi
 
 # GIT_LOG gets git log messages since the last tag to the editor
 GIT_LOG=$(git log --pretty=format:'- '%s%- --first-parent ..."$(git describe --abbrev=0 2> /dev/null)")
 
-CHANGELOG_ENTRIES_ADDED="$(echo "$GIT_LOG" | { grep -i -E "Add|Implement" || :; })"
-CHANGELOG_ENTRIES_CHANGED="$(echo "$GIT_LOG" | { grep -i -E "Change|Migrate|Refactor|Convert|Rename" || :; })"
-CHANGELOG_ENTRIES_REMOVED="$(echo "$GIT_LOG" | { grep -i -E "Remove" || :; })"
-CHANGELOG_ENTRIES_FIXED="$(echo "$GIT_LOG" | { grep -i -E "Fix|Ensure" || :; })"
-CHANGELOG_ENTRIES_DEPRECATED="$(echo "$GIT_LOG" | { grep -i -E "Deprecate" || :; })"
-CHANGELOG_ENTRIES_SECURITY="$(echo "$GIT_LOG" | { grep -i -E "Security|Vulnerab" || :; })"
-CHANGELOG_ENTRIES_OTHER="$(echo "$GIT_LOG" | { grep -i -E -v "Add|Implement" | grep -i -E -v "Change|Migrate|Refactor|Convert|Rename" | grep -i -E -v "Remove" | grep -i -E -v "Fix|Ensure" | grep -i -E -v "Deprecate" | grep -i -E -v "Security|Vulnerab" || :; })"
+ADDED_KEYWORDS="add|implement"
+CHANGED_KEYWORDS="change|migrate|refactor|convert|rename"
+REMOVED_KEYWORDS="remove|delete|revert"
+FIXED_KEYWORDS="bug|fix|ensure|issue"
+DEPRECATED_KEYWORDS="deprecate"
+SECURITY_KEYWORDS="security|vulnerab"
 
-echo "<!------------------ Everything past this line will be deleted ----------------------->" >> "$TAG_ANNOTATION_FILE"
+ALL_KEYWORDS="$ADDED_KEYWORDS|$CHANGED_KEYWORDS|$REMOVED_KEYWORDS|$FIXED_KEYWORDS|$DEPRECATED_KEYWORDS|$SECURITY_KEYWORDS"
 
-echo >> "$TAG_ANNOTATION_FILE"
-echo "### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }${EOL}" >> "$TAG_ANNOTATION_FILE"
-echo "### Other${EOL}${EOL}${CHANGELOG_ENTRIES_OTHER:-- }" >> "$TAG_ANNOTATION_FILE"
+CHANGELOG_ENTRIES_ADDED+="$(echo "$GIT_LOG" | { grep -i -E "$ADDED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_CHANGED+="$(echo "$GIT_LOG" | { grep -i -E "$CHANGED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_DEPRECATED+="$(echo "$GIT_LOG" | { grep -i -E "$DEPRECATED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_REMOVED+="$(echo "$GIT_LOG" | { grep -i -E "$REMOVED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_FIXED+="$(echo "$GIT_LOG" | { grep -i -E "$FIXED_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_SECURITY+="$(echo "$GIT_LOG" | { grep -i -E "$SECURITY_KEYWORDS" || :; })"
+CHANGELOG_ENTRIES_UNCATEGORIZED+="$(echo "$GIT_LOG" | { grep -i -E -v "$ALL_KEYWORDS" || :; })"
+
+# Add the changelog sections
+echo "${EOL}### Added${EOL}${EOL}${CHANGELOG_ENTRIES_ADDED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Changed${EOL}${EOL}${CHANGELOG_ENTRIES_CHANGED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Deprecated${EOL}${EOL}${CHANGELOG_ENTRIES_DEPRECATED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Removed${EOL}${EOL}${CHANGELOG_ENTRIES_REMOVED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Fixed${EOL}${EOL}${CHANGELOG_ENTRIES_FIXED:-- }" >> "$TAG_ANNOTATION_FILE"
+echo "${EOL}### Security${EOL}${EOL}${CHANGELOG_ENTRIES_SECURITY:-- }" >> "$TAG_ANNOTATION_FILE"
+
+echo "${EOL}<!------------------------------------ >8 --------------------------------------" >> "$TAG_ANNOTATION_FILE"
+
+# Add the previous git tag
+echo "${EOL}Previous tag: $GIT_TAG_LATEST" >> "$TAG_ANNOTATION_FILE"
+
+# Add any uncategorized commits
+if [ -n "$CHANGELOG_ENTRIES_UNCATEGORIZED" ]; then
+    echo "${EOL}Uncategorized commits:${EOL}${EOL}${CHANGELOG_ENTRIES_UNCATEGORIZED}" >> "$TAG_ANNOTATION_FILE"
+fi
 
 # replace single quotes with backticks if surrounded by identifier
 sed_i -e "s/'\([a-zA-Z0-9-]*\)'/\`\1\`/g" "$TAG_ANNOTATION_FILE"
@@ -112,11 +143,8 @@ fi
 # Extract the version number from the edited log.
 v=$(sed -n 1p "$TAG_ANNOTATION_FILE")
 
-# Remove the GIT_LOG section up to END GIT LOG or the next header if it is not already empty
-sed_i '/^<!--* Everything past this line will be deleted -*-->$/,$d' $TAG_ANNOTATION_FILE
-
-# Remove the <!-- Previous tag section -->
-sed_i '/^<!--* Previous tag:/d' $TAG_ANNOTATION_FILE
+# Remove everything after the scissors marker.
+sed_i '/^<!--* >8 -*$/,$d' $TAG_ANNOTATION_FILE
 
 # Build the new section for the CHANGELOG.md file.
 echo "${EOL}## [$v] - "$DATE_VAR"${EOL}" > $CHANGELOG_ADDITIONS_FILE
