@@ -152,11 +152,13 @@ echo "[$v]: $CHANGELOG_TAG_URL_PREFIX$v" >> $CHANGELOG_ADDITIONS_FILE
 cat "$TAG_ANNOTATION_FILE" >> $CHANGELOG_ADDITIONS_FILE
 sed_i -e '5d' $CHANGELOG_ADDITIONS_FILE # Strip the vX.X.X first line
 
-# Remove existing unreleased section
-sed_i '/^## Unreleased/,/^## /{/^## Unreleased/d;}' CHANGELOG.md
+# Find the start of the Unreleased section in the CHANGELOG.md file
+UNRELEASED_START_LINE="$(grep -n '^## Unreleased' CHANGELOG.md | cut -d: -f1)"
+# Find the line of the first second-level header (##) after Unreleased in the CHANGELOG.md file
+INSERT_LINE="$(grep -n '^## ' CHANGELOG.md | cut -d: -f1 | grep -A1 "^${UNRELEASED_START_LINE}$" | tail -n1)"
+# Remove from UNRELEASED_START_LINE to the line above INSERT_LINE
+sed_i "${UNRELEASED_START_LINE},$((${INSERT_LINE}-1))d" CHANGELOG.md
 
-# Find the line of the first second-level header (##) in the CHANGELOG.md file
-INSERT_LINE=$(grep -n '^## ' CHANGELOG.md | head -n 1 | cut -d: -f1)
 
 # Append the new section to the CHANGELOG.md file above the first second-level header (##)
 sed_i -e "${INSERT_LINE}r $CHANGELOG_ADDITIONS_FILE" CHANGELOG.md
