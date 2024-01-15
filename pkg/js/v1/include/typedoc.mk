@@ -17,7 +17,7 @@ typedoc: artifacts/docs/typedoc
 # typedoc-open --- Open TypeDoc documentation.
 .PHONY: typedoc-open
 typedoc-open: artifacts/docs/typedoc
-	$(MF_BROWSER) "$<"
+	$(MF_BROWSER) "$(<)/index.html"
 
 ################################################################################
 
