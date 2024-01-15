@@ -25,6 +25,9 @@ JS_PRETTIER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .pret
 # configuration.
 JS_SIZE_LIMIT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .size-limit.*)
 
+# JS_TYPEDOC_CONFIG_FILE is the path to any existing TypeDoc configuration.
+JS_TYPEDOC_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file typedoc.json typedoc.jsonc typedoc.config.js typedoc.config.cjs typedoc.js typedoc.cjs .config/typedoc.json .config/typedoc.jsonc .config/typedoc.config.js .config/typedoc.config.cjs .config/typedoc.js .config/typedoc.cjs)
+
 # JS_VITEST_CONFIG_FILE is the path to any existing Vitest configuration.
 JS_VITEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file vitest.config.*)
 
@@ -104,4 +107,10 @@ endif
 
 ifneq ($(JS_SIZE_LIMIT_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/size-limit.mk
+endif
+
+# Documentation tools
+
+ifneq ($(JS_TYPEDOC_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/typedoc.mk
 endif
