@@ -22,6 +22,7 @@ typedoc-open: artifacts/docs/typedoc
 ################################################################################
 
 artifacts/docs/typedoc: $(JS_TYPEDOC_REQ) $(_JS_TYPEDOC_REQ)
-	@rm -rf "$@"
-	$(JS_EXEC) typedoc --options "$(JS_TYPEDOC_CONFIG_FILE)"
-	@touch "$@"
+	$(JS_EXEC) typedoc \
+		--cleanOutputDir \
+		--out "$@" \
+		--options "$(JS_TYPEDOC_CONFIG_FILE)"
