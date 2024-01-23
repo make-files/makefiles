@@ -6,7 +6,7 @@ JS_TYPEDOC_REQ +=
 
 # _JS_TYPEDOC_REQ is a space separated list of automatically detected
 # prerequisites needed to run TypeDoc.
-_JS_TYPEDOC_REQ += artifacts/link-dependencies.touch
+_JS_TYPEDOC_REQ += artifacts/link-dependencies.touch $(JS_TYPEDOC_CONFIG_FILE) $(JS_SOURCE_FILES) $(GENERATED_FILES)
 
 ################################################################################
 
