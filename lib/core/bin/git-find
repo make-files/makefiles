@@ -24,10 +24,14 @@ cd "$MF_PROJECT_ROOT"
 #    Git
 files="$(git ls-files -- "$1"; git ls-files --other --exclude-standard -- "$1")"
 
+# exit normally if there are no files to match
+[[ -z "$files" ]] && exit 0
+
 # filter out any non-existent paths to prevent subsequent find calls from
 # producing "No such file or directory" errors
 files="$(find $files 2>/dev/null || true)"
 
-# [[ -n "$files" ]]
-#    do not run find unless there are some files to match
-[[ -n "$files" ]] && find $files "${@:2}"
+# exit normally if there are no files to match
+[[ -z "$files" ]] && exit 0
+
+find $files "${@:2}"
