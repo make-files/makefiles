@@ -42,7 +42,7 @@ vitest: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
 
 # vitest-strict --- Same as vitest, but disallows .only
 .PHONY: vitest-strict
-vitest:-strict $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
+vitest-strict: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
 	$(JS_EXEC) vitest run $(_JS_VITEST_ARGS) --allowOnly=false
 
 # vitest-coverage --- Produces a Vitest HTML coverage report.
