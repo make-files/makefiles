@@ -34,7 +34,7 @@ ci:: eslint-check
 #            to fail, but errors will.
 .PHONY: eslint
 eslint: $(JS_ESLINT_REQ) $(_JS_ESLINT_REQ)
-	$(JS_EXEC) eslint $(_JS_ESLINT_ARGS) --fix "$(MF_PROJECT_ROOT)"
+	$(JS_EXEC) eslint $(_JS_ESLINT_ARGS) --fix --max-warnings 0 "$(MF_PROJECT_ROOT)"
 
 # eslint-strict --- Same as the eslint target, but ESLint warnings will cause
 #                   failures.
