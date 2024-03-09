@@ -279,15 +279,12 @@ artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE
 	@rm -f "$@"
 	zip --recurse-paths --junk-paths "$@" -- $^
 
-artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip.sha256: artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip
-	openssl dgst -sha256 "$<" | awk '{print $$2 "  $(notdir $<)"}' > "$@"
-
 artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/$$(subst -,/,$$*)/,$(_GO_BINARIES_NIX))
 	@mkdir -p "$(@D)"
 	@rm -f "$@"
 	zip --recurse-paths --junk-paths "$@" -- $^
 
-artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip.sha256: artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip
+artifacts/archives/%.sha256: artifacts/archives/%
 	openssl dgst -sha256 "$<" | awk '{print $$2 "  $(notdir $<)"}' > "$@"
 
 artifacts/archives/sums.sha256: $(filter %.sha256,$(GO_ARCHIVE_SUMS))
