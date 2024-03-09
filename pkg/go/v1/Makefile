@@ -158,9 +158,13 @@ ifneq ($(GO_BUILD_BEFORE_TEST),)
 GO_TEST_REQ += $(_GO_DEBUG_TARGETS_HOST)
 endif
 
-# GO_ARCHIVES is the list of archive files to be build, based on the build
+# GO_ARCHIVES is the list of archive files to be built, based on the build
 # matrix.
 GO_ARCHIVES ?= $(addprefix artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-,$(addsuffix .zip,$(subst /,-,$(_GO_BUILD_PLATFORM_MATRIX_ALL))))
+
+# GO_ARCHIVE_SUMS is the list of archive checksum files to be built, based on
+# the build matrix.
+GO_ARCHIVE_SUMS ?= $(addsuffix .sha256,$(GO_ARCHIVES))
 
 ################################################################################
 
@@ -234,6 +238,9 @@ release: $(_GO_RELEASE_TARGETS_ALL)
 # additional files specified in GO_ARCHIVE_FILES.
 archives: $(GO_ARCHIVES)
 
+# archive-sums --- Generates checksums for all release archives.
+archive-sums: artifacts/archives/sums.sha256
+
 # pre-intercept --- Removes the debug binaries for the current architecture
 # before starting a Telepresence intercept, forcing them to be rebuild with
 # CGO_ENABLED within the intercept.
@@ -270,10 +277,19 @@ artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip: $(GO_ARCHIVE
 	@rm -f "$@"
 	zip --recurse-paths --junk-paths "$@" -- $^
 
+artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip.sha256: artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-windows-%.zip
+	openssl dgst -sha256 "$<" | awk '{print $$2 "  $(notdir $<)"}' > "$@"
+
 artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip: $(GO_ARCHIVE_FILES) $$(addprefix artifacts/build/release/$$(subst -,/,$$*)/,$(_GO_BINARIES_NIX))
 	@mkdir -p "$(@D)"
 	@rm -f "$@"
 	zip --recurse-paths --junk-paths "$@" -- $^
+
+artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip.sha256: artifacts/archives/$(PROJECT_NAME)-$(GO_APP_VERSION)-%.zip
+	openssl dgst -sha256 "$<" | awk '{print $$2 "  $(notdir $<)"}' > "$@"
+
+artifacts/archives/sums.sha256: $(filter %.sha256,$(GO_ARCHIVE_SUMS))
+	cat $^ | sort -k 2 > $@
 
 artifacts/go/bin/golangci-lint:
 	$(MF_ROOT)/pkg/go/v1/bin/install-golangci-lint "$(MF_PROJECT_ROOT)/$(@D)"
