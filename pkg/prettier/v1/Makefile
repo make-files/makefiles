@@ -1,12 +1,16 @@
 # PRETTIER_CONFIG_FILE is the path to any existing Prettier configuration file.
 PRETTIER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .prettierrc .prettierrc.* prettier.config.*)
-PRETTIER_CONFIG_FILE ?= .prettierrc.json
 
 # PRETTIER_REQ is a space separated list of prerequisites needed to run
 # Prettier.
 PRETTIER_REQ +=
 
 ################################################################################
+
+# If PRETTIER_CONFIG_FILE is not set, default to .prettierrc.json
+ifeq ($(PRETTIER_CONFIG_FILE),)
+PRETTIER_CONFIG_FILE := .prettierrc.json
+endif
 
 # _PRETTIER_REQ is a space separated list of automatically detected
 # prerequisites needed to run Prettier.
