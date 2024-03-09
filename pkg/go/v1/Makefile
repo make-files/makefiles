@@ -236,9 +236,11 @@ release: $(_GO_RELEASE_TARGETS_ALL)
 
 # archives --- Builds zip archives containing the release binaries and an
 # additional files specified in GO_ARCHIVE_FILES.
+.PHONY: archives
 archives: $(GO_ARCHIVES)
 
 # archive-sums --- Generates checksums for all release archives.
+.PHONY: archive-sums
 archive-sums: artifacts/archives/sums.sha256
 
 # pre-intercept --- Removes the debug binaries for the current architecture
