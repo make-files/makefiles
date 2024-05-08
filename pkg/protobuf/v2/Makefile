@@ -114,11 +114,13 @@ artifacts/protobuf/args/go-grpc: go.mod
 # SWIFT ########################################################################
 
 $(PROTO_SWIFT_OUT)/%.pb.swift: %.proto artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift
+	@mkdir -p "$(PROTO_SWIFT_OUT)"
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift) \
 		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
 
 $(PROTO_SWIFT_OUT)/%.grpc.swift: %.proto artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc
+	@mkdir -p "$(PROTO_SWIFT_OUT)"
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc) \
 		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
