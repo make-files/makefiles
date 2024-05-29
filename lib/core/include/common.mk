@@ -158,7 +158,7 @@ regenerate::
 # list, but restores them if the generation fails.
 .PHONY: try-regenerate
 try-regenerate::
-	@$(MAKE) --no-print-directory regenerate || (echo 'Regenerate failed, restoring files...'; git restore $(GENERATED_FILES))
+	@$(MAKE) --no-print-directory regenerate || (echo 'Regenerate failed, restoring files...'; git restore $(shell git ls-files $(GENERATED_FILES)))
 
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
 # list and checks for differences to the committed files. The target fails if
