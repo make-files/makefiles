@@ -36,10 +36,29 @@ JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpac
 
 ################################################################################
 
-# set-package-version --- Sets the version field in package.json to a semver
-# representation of the HEAD commit.
+# set-package-version --- Sets the version field in all package publishing
+# config files to a semver representation of the HEAD commit.
 .PHONY: set-package-version
 set-package-version:
+ifneq ($(wildcard jsr.json),)
+	$(MAKE) set-jsr-json-version
+endif
+ifneq ($(wildcard package.json),)
+	$(MAKE) set-package-json-version
+endif
+
+# set-jsr-json-version --- Sets the version field in jsr.json to a semver
+# representation of the HEAD commit.
+.PHONY: set-jsr-json-version
+set-jsr-json-version:
+	cp jsr.json jsr.old.json
+	jq '.version = "$(SEMVER)"' jsr.old.json > jsr.json
+	rm jsr.old.json
+
+# set-package-json-version --- Sets the version field in package.json to a
+# semver representation of the HEAD commit.
+.PHONY: set-package-json-version
+set-package-json-version:
 	cp package.json package.old.json
 	jq '.version = "$(SEMVER)"' package.old.json > package.json
 	rm package.old.json
