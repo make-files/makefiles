@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROTOC_ROOT="${1}"
+shift
+
+case "$(uname -s)" in
+    "Darwin")
+      IS_LINUX=false;;
+    *)
+      IS_LINUX=true;;
+esac
+
+QUERY=".assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
+URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases/latest | jq -r "${QUERY}")
+ARCHIVE="protoc-gen-swift.zip"
+
+mkdir -p "${PROTOC_ROOT}"
+pushd "${PROTOC_ROOT}"
+curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
+unzip -o "${ARCHIVE}"
+popd
