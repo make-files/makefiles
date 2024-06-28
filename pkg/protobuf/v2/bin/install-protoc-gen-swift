@@ -17,5 +17,5 @@ ARCHIVE="protoc-gen-swift.zip"
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
 curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
-unzip -o "${ARCHIVE}"
+unzip -oj "${ARCHIVE}"
 popd
