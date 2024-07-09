@@ -1,0 +1,10 @@
+syntax = "proto3";
+package makefiles.api.v1;
+
+option go_package = "github.com/make-files/example";
+
+service API { rpc Endpoint(Request) returns (Response); }
+
+message Request { string id = 1; }
+
+message Response { string id = 1; }
