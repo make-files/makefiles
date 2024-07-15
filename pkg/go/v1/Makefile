@@ -33,9 +33,11 @@ CGO_ENABLED ?= 0
 GO_APP_VERSION ?= $(SEMVER)
 
 # GO_TEST_ARGS and GO_BENCHMARK_ARGS are arguments passed to "go test" command
-# when running tests and benchmarks, respectively.
-GO_TEST_ARGS      ?=
-GO_BENCHMARK_ARGS ?=
+# when running tests and benchmarks, respectively. GO_TEST_COVERAGE_ARGS
+# contains arguments passed to "go test" only when generating coverage reports.
+GO_TEST_ARGS          ?=
+GO_TEST_COVERAGE_ARGS ?=
+GO_BENCHMARK_ARGS     ?=
 
 # GO_DEBUG_ARGS and GO_RELEASE_ARGS are arguments passed to "go build" for the
 # "debug" and "release" targets, respectively.
@@ -258,7 +260,7 @@ artifacts/coverage/index.html: artifacts/coverage/cover.out
 .PHONY: artifacts/coverage/cover.out # always rebuild
 artifacts/coverage/cover.out: $$(GENERATED_FILES) $(GO_TEST_REQ)
 	@mkdir -p $(@D)
-	go test $(GO_TEST_ARGS) -covermode=atomic -coverprofile=$@ ./...
+	go test $(GO_TEST_ARGS) -covermode=atomic -coverprofile=$@ $(GO_TEST_COVERAGE_ARGS) ./...
 	$(MF_ROOT)/pkg/go/v1/bin/filter-coverage-report $@ $(GENERATED_FILES)
 
 artifacts/build/%: $(GO_BUILD_REQ) $(GO_SOURCE_FILES) $$(GENERATED_FILES) $(GO_EMBEDDED_FILES)
