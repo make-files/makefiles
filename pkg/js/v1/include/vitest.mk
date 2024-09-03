@@ -9,7 +9,11 @@ JS_VITEST_REQ +=
 _JS_VITEST_REQ += artifacts/link-dependencies.touch $(GENERATED_FILES)
 
 # _JS_VITEST_ARGS is a set of arguments to use for every execution of Vitest.
+ifneq ($(JS_VITEST_WORKSPACE_FILE),)
+_JS_VITEST_ARGS := --workspace "$(JS_VITEST_WORKSPACE_FILE)"
+else
 _JS_VITEST_ARGS := --config "$(JS_VITEST_CONFIG_FILE)"
+endif
 
 ################################################################################
 

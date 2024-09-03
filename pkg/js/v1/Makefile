@@ -31,6 +31,9 @@ JS_TYPEDOC_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file typedo
 # JS_VITEST_CONFIG_FILE is the path to any existing Vitest configuration.
 JS_VITEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file vitest.config.*)
 
+# JS_VITEST_WORKSPACE_FILE is the path to any existing Vitest workspace configuration.
+JS_VITEST_WORKSPACE_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file vitest.workspace.* vitest.projects.*)
+
 # JS_WEBPACK_CONFIG_FILE is the path to any existing Webpack configuration.
 JS_WEBPACK_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file webpack.config.*)
 
@@ -110,7 +113,7 @@ ifneq ($(JS_JEST_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/jest.mk
 endif
 
-ifneq ($(JS_VITEST_CONFIG_FILE),)
+ifneq ($(JS_VITEST_CONFIG_FILE)$(JS_VITEST_WORKSPACE_FILE),)
 -include .makefiles/pkg/js/v1/include/vitest.mk
 endif
 
