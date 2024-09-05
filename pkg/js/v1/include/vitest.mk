@@ -2,12 +2,7 @@
 # Vitest tests.
 JS_VITEST_REQ ?=
 
-# JS_VITEST_DEFAULT_PROJECTS is a space separated list of Vitest projects to
-# run by default.
-JS_VITEST_DEFAULT_PROJECTS ?=
-
-# JS_VITEST_PROJECTS is a space separated list of Vitest projects to run. This
-# overrides JS_VITEST_DEFAULT_PROJECTS when used.
+# JS_VITEST_PROJECTS is a space separated list of Vitest projects to run.
 JS_VITEST_PROJECTS ?=
 
 ################################################################################
@@ -19,27 +14,10 @@ _JS_VITEST_REQ += artifacts/link-dependencies.touch artifacts/vitest/browser/pub
 # _JS_VITEST_ARGS is a set of arguments to use for every execution of Vitest.
 _JS_VITEST_ARGS := --run
 ifneq ($(JS_VITEST_CONFIG_FILE),)
-_JS_VITEST_ARGS += --config "$(JS_VITEST_CONFIG_FILE)"
+_JS_VITEST_ARGS += --config="$(JS_VITEST_CONFIG_FILE)"
 endif
 ifneq ($(JS_VITEST_WORKSPACE_FILE),)
-_JS_VITEST_ARGS += --workspace "$(JS_VITEST_WORKSPACE_FILE)"
-endif
-
-# _JS_VITEST_PROJECT_ARGS_DEFAULT is a set of arguments that will make Vitest
-# run the projects specified in JS_VITEST_PROJECTS, or fall back to
-# JS_VITEST_DEFAULT_PROJECTS.
-ifeq ($(JS_VITEST_PROJECTS),)
-_JS_VITEST_PROJECT_ARGS_DEFAULT := $(addprefix --project=,$(JS_VITEST_DEFAULT_PROJECTS))
-else
-_JS_VITEST_PROJECT_ARGS_DEFAULT := $(addprefix --project=,$(JS_VITEST_PROJECTS))
-endif
-
-# _JS_VITEST_PROJECT_ARGS_ALL is a set of arguments that will make Vitest run
-# the projects specified in JS_VITEST_PROJECTS, or fall back to all projects.
-ifeq ($(JS_VITEST_PROJECTS),)
-_JS_VITEST_PROJECT_ARGS_ALL :=
-else
-_JS_VITEST_PROJECT_ARGS_ALL := $(addprefix --project=,$(JS_VITEST_PROJECTS))
+_JS_VITEST_ARGS += --workspace="$(JS_VITEST_WORKSPACE_FILE)"
 endif
 
 ################################################################################
@@ -58,7 +36,7 @@ coverage-open:: vitest-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: vitest-all-projects-strict
+precommit:: vitest-strict
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
@@ -66,26 +44,15 @@ ci:: vitest-coverage-lcov
 
 ################################################################################
 
-# vitest --- Executes all Vitest tests in the default project(s).
+# vitest --- Executes all Vitest tests.
 .PHONY: vitest
 vitest: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_DEFAULT)
-
-# vitest-all-projects --- Executes all Vitest tests in all projects.
-.PHONY: vitest-all-projects
-vitest-all-projects: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_ALL)
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS))
 
 # vitest-strict --- Same as vitest, but disallows .only
 .PHONY: vitest-strict
 vitest-strict: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_DEFAULT) --allowOnly=false
-
-# vitest-all-projects-strict --- Same as vitest-all-projects, but disallows
-#                                .only
-.PHONY: vitest-all-projects-strict
-vitest-all-projects-strict: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_ALL) --allowOnly=false
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) --allowOnly=false
 
 # vitest-coverage --- Produces a Vitest HTML coverage report.
 .PHONY: vitest-coverage
@@ -104,7 +71,7 @@ vitest-coverage-lcov: artifacts/coverage/vitest/lcov.info
 
 .PHONY: artifacts/coverage/vitest/index.html # always rebuild
 artifacts/coverage/vitest/index.html: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_ALL) \
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
 		--coverage.enabled \
 		--coverage.reportsDirectory="$(@D)" \
 		--coverage.reporter=text \
@@ -112,7 +79,7 @@ artifacts/coverage/vitest/index.html: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
 
 .PHONY: artifacts/coverage/vitest/lcov.info # always rebuild
 artifacts/coverage/vitest/lcov.info: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(_JS_VITEST_PROJECT_ARGS_ALL) \
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
 		--coverage.enabled \
 		--coverage.reportsDirectory="$(@D)" \
 		--coverage.reporter=text \
