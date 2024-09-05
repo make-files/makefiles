@@ -3,7 +3,7 @@
 JS_VITEST_REQ ?=
 
 # JS_VITEST_PROJECTS is a space separated list of Vitest projects to run.
-JS_VITEST_PROJECTS ?=
+# (left undefined so it can be overridden by individual targets)
 
 ################################################################################
 
