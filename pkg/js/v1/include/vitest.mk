@@ -14,7 +14,7 @@ JS_VITEST_PROJECTS ?=
 
 # _JS_VITEST_REQ is a space separated list of automatically detected
 # prerequisites needed to run the Vitest tests.
-_JS_VITEST_REQ += artifacts/link-dependencies.touch $(GENERATED_FILES)
+_JS_VITEST_REQ += artifacts/link-dependencies.touch artifacts/vitest/browser/public $(GENERATED_FILES)
 
 # _JS_VITEST_ARGS is a set of arguments to use for every execution of Vitest.
 _JS_VITEST_ARGS := --run
@@ -117,3 +117,6 @@ artifacts/coverage/vitest/lcov.info: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
 		--coverage.reportsDirectory="$(@D)" \
 		--coverage.reporter=text \
 		--coverage.reporter=lcovonly
+
+artifacts/vitest/browser/public::
+	@mkdir -p "$@"
