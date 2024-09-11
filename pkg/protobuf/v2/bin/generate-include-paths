@@ -12,6 +12,6 @@ do
     if [[ $proto_file_count -gt 0 ]]; then
        # Print the protobuf include path to the standard output
        # if the Go module directory contains *.proto files.
-       echo "--proto_path=$path=$dir"
+       echo "--proto_path=$path=$(realpath "$dir")"
     fi
 done
