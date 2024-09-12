@@ -1,8 +1,12 @@
+# JS_VITEST_PROJECTS is a space separated list of Vitest projects to run.
+# (left undefined so it can be overridden by individual targets)
+
 # JS_VITEST_REQ is a space separated list of prerequisites needed to run the
 # Vitest tests.
 JS_VITEST_REQ ?=
 
-# JS_VITEST_PROJECTS is a space separated list of Vitest projects to run.
+# JS_VITEST_FORBID_ONLY will forbid the use of .only in tests when set to a
+# non-empty value.
 # (left undefined so it can be overridden by individual targets)
 
 ################################################################################
@@ -36,10 +40,12 @@ coverage-open:: vitest-coverage-open
 
 # precommit --- Perform tasks that need to be executed before committing.
 .PHONY: precommit
-precommit:: vitest-strict
+precommit:: JS_VITEST_FORBID_ONLY ?= true
+precommit:: vitest
 
 # ci --- Perform tasks that should be run as part of continuous integration.
 .PHONY: ci
+ci:: JS_VITEST_FORBID_ONLY ?= true
 ci:: vitest-coverage-lcov
 
 ################################################################################
@@ -47,12 +53,7 @@ ci:: vitest-coverage-lcov
 # vitest --- Executes all Vitest tests.
 .PHONY: vitest
 vitest: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS))
-
-# vitest-strict --- Same as vitest, but disallows .only
-.PHONY: vitest-strict
-vitest-strict: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) --allowOnly=false
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) $(addprefix --project=,$(JS_VITEST_PROJECTS))
 
 # vitest-coverage --- Produces a Vitest HTML coverage report.
 .PHONY: vitest-coverage
@@ -71,7 +72,7 @@ vitest-coverage-lcov: artifacts/coverage/vitest/lcov.info
 
 .PHONY: artifacts/coverage/vitest/index.html # always rebuild
 artifacts/coverage/vitest/index.html: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
 		--coverage.enabled \
 		--coverage.reportsDirectory="$(@D)" \
 		--coverage.reporter=text \
@@ -79,7 +80,7 @@ artifacts/coverage/vitest/index.html: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
 
 .PHONY: artifacts/coverage/vitest/lcov.info # always rebuild
 artifacts/coverage/vitest/lcov.info: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) $(addprefix --project=,$(JS_VITEST_PROJECTS)) \
 		--coverage.enabled \
 		--coverage.reportsDirectory="$(@D)" \
 		--coverage.reporter=text \
