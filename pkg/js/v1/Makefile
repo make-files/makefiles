@@ -18,6 +18,9 @@ JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.conf
 # JS_NEXT_CONFIG_FILE is the path to any existing Next.js configuration.
 JS_NEXT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file next.config.js next.config.mjs)
 
+# JS_PLAYWRIGHT_TEST_CONFIG_FILE is the path to any existing Playwright Test configuration.
+JS_PLAYWRIGHT_TEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file playwright.config.*)
+
 # JS_PRETTIER_CONFIG_FILE is the path to any existing Prettier configuration.
 JS_PRETTIER_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .prettierrc .prettierrc.* prettier.config.*)
 
@@ -115,6 +118,10 @@ endif
 
 ifneq ($(JS_VITEST_CONFIG_FILE)$(JS_VITEST_WORKSPACE_FILE),)
 -include .makefiles/pkg/js/v1/include/vitest.mk
+endif
+
+ifneq ($(JS_PLAYWRIGHT_TEST_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/playwright-test.mk
 endif
 
 # Lint tools
