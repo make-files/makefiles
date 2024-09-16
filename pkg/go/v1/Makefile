@@ -204,7 +204,7 @@ coverage-open:: artifacts/coverage/index.html
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
-precommit:: debug release # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+precommit:: debug release
 	go fmt ./...
 	go mod tidy
 	make test
@@ -212,7 +212,7 @@ precommit:: debug release # artifacts/go/lint/golangci-lint.touch # Removed beca
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
 .PHONY: ci
-ci:: debug release artifacts/coverage/cover.out benchmark # artifacts/go/lint/golangci-lint.touch # Removed because of https://github.com/golangci/golangci-lint/issues/2374
+ci:: debug release artifacts/coverage/cover.out benchmark
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
@@ -291,12 +291,3 @@ artifacts/archives/%.sha256: artifacts/archives/%
 
 artifacts/archives/sums.sha256: $(filter %.sha256,$(GO_ARCHIVE_SUMS))
 	cat $^ | sort -k 2 > $@
-
-artifacts/go/bin/golangci-lint:
-	$(MF_ROOT)/pkg/go/v1/bin/install-golangci-lint "$(MF_PROJECT_ROOT)/$(@D)"
-
-artifacts/go/lint/golangci-lint.touch: artifacts/go/bin/golangci-lint $(GO_SOURCE_FILES)
-	artifacts/go/bin/golangci-lint run --config $(MF_ROOT)/pkg/go/v1/etc/.golangci.yml ./...
-
-	@mkdir -p "$(@D)"
-	@touch "$@"
