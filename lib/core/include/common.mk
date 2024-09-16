@@ -10,6 +10,8 @@ export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
 export PATH := $(MF_ROOT)/lib/core/bin:$(PATH)
 
+_MF_FRESH_INSTALL := $(if $(wildcard $(MF_ROOT)),,true)
+
 # MF_OS is the name of the operating system.
 # MF_BROWSER is the command to run to open the default browser.
 _UNAME_S = $(shell uname -s)
@@ -114,10 +116,15 @@ include $(MF_ROOT)/lib/core/include/lib.mk
 
 # makefiles --- Installs or updates makefiles.dev. Useful to run before make -j
 # in order to avoid concurrency issues while installing.
+ifeq ($(_MF_FRESH_INSTALL),true)
+.PHONY: makefiles
+makefiles: makefiles-banner
+else
 .PHONY: makefiles
 makefiles:
 	@rm -rf -- "$(MF_ROOT)"
 	@$(MAKE) --no-print-directory makefiles-banner
+endif
 
 # makefiles-banner --- Outputs a banner with the makefiles.dev URL.
 .PHONY: makefiles-banner
