@@ -212,7 +212,7 @@ precommit:: debug release
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
 .PHONY: ci
-ci:: debug release artifacts/coverage/cover.out benchmark
+ci:: debug release artifacts/coverage/cover.out
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.

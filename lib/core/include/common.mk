@@ -109,6 +109,10 @@ else
 SEMVER ?= 0.0.0+$(SEMVER_DEV_BUILD)
 endif
 
+# CI_RUN_BENCHMARKS is a boolean that determines whether benchmarks should be
+# run in the CI environment.
+CI_RUN_BENCHMARKS ?= true
+
 # Include any Makefiles that are provided by the currently installed libraries.
 include $(MF_ROOT)/lib/core/include/lib.mk
 
@@ -206,4 +210,8 @@ ifneq ($(CI_VERIFY_GENERATED_FILES),)
 	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
 else
 	@PATH="$(PATH)" verify-generated-files $(_CI_VERIFY_GENERATED_FILES_ALWAYS)
+endif
+
+ifeq ($(CI_RUN_BENCHMARKS),true)
+ci:: benchmark
 endif
