@@ -112,10 +112,16 @@ endif
 # Include any Makefiles that are provided by the currently installed libraries.
 include $(MF_ROOT)/lib/core/include/lib.mk
 
-# makefiles --- Installs makefiles.dev. Useful to run before make -j in order to
-# avoid concurrency issues while installing.
+# makefiles --- Installs or updates makefiles.dev. Useful to run before make -j
+# in order to avoid concurrency issues while installing.
 .PHONY: makefiles
 makefiles:
+	@rm -rf -- "$(MF_ROOT)"
+	@$(MAKE) --no-print-directory makefiles-banner
+
+# makefiles-banner --- Outputs a banner with the makefiles.dev URL.
+.PHONY: makefiles-banner
+makefiles-banner:
 	@echo Powered by https://makefiles.dev/
 
 # clean --- Removes all generated and ignored files. Individual language
