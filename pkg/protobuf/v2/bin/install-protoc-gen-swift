@@ -8,12 +8,10 @@ GRPC_SWIFT_VERSION=$(cat Package.swift | grep grpc-swift.git | sed -nr 's/^.+fro
 echo "Installing protoc-gen-grpc-swift ${GRPC_SWIFT_VERSION}"
 
 case "$(uname -s)" in
-"Darwin")
-  IS_LINUX=false
-  ;;
-*)
-  IS_LINUX=true
-  ;;
+    "Darwin")
+        IS_LINUX=false;;
+    *)
+        IS_LINUX=true;;
 esac
 QUERY=".[] | select(.tag_name | contains(${GRPC_SWIFT_VERSION})) | .assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
 URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases | jq -r "${QUERY}")
