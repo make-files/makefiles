@@ -3,19 +3,29 @@ set -euo pipefail
 
 PROTOC_ROOT="${1}"
 
-case "$(uname -s)" in
-    "Darwin")
-      IS_LINUX=false;;
-    *)
-      IS_LINUX=true;;
-esac
+GRPC_SWIFT_VERSION=$(cat Package.swift | grep grpc-swift.git | sed -nr 's/^.+from: (\".+\").+$/\1/p')
 
-QUERY=".assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
-URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases/latest | jq -r "${QUERY}")
+echo "Installing protoc-gen-grpc-swift ${GRPC_SWIFT_VERSION}"
+
+case "$(uname -s)" in
+"Darwin")
+  IS_LINUX=false
+  ;;
+*)
+  IS_LINUX=true
+  ;;
+esac
+QUERY=".[] | select(.tag_name | contains(${GRPC_SWIFT_VERSION})) | .assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
+URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases | jq -r "${QUERY}")
 ARCHIVE="protoc-gen-swift.zip"
+
+echo "Downloading protoc-gen-grpc-swift from ${URL}"
 
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
 curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
 unzip -oj "${ARCHIVE}"
+
+./protoc-gen-swift --version
+./protoc-gen-grpc-swift --version
 popd
