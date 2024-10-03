@@ -4,7 +4,6 @@ set -euo pipefail
 PROTOC_ROOT="${1}"
 
 GRPC_SWIFT_VERSION=$(cat Package.swift | grep grpc-swift.git | sed -nr 's/^.+from: (\".+\").+$/\1/p')
-
 echo "Installing protoc-gen-grpc-swift ${GRPC_SWIFT_VERSION}"
 
 case "$(uname -s)" in
@@ -18,17 +17,11 @@ URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases | jq -r "${QUER
 ARCHIVE="protoc-gen-swift.zip"
 
 echo "Downloading protoc-gen-grpc-swift from ${URL}"
-
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
-
 curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
 unzip -oj "${ARCHIVE}"
-
-echo "After expanding the archive, the contents of ${PROTOC_ROOT} are:"
-echo "$(ls -l ${PROTOC_ROOT})"
-
-./protoc-gen-swift --version
-./protoc-gen-grpc-swift --version
-
 popd
+
+${PROTOC_ROOT}/protoc-gen-swift --version
+${PROTOC_ROOT}/protoc-gen-grpc-swift --version
