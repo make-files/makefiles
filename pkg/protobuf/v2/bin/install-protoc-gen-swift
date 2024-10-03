@@ -21,9 +21,14 @@ echo "Downloading protoc-gen-grpc-swift from ${URL}"
 
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
+
 curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
 unzip -oj "${ARCHIVE}"
 
+echo "After expanding the archive, the contents of ${PROTOC_ROOT} are:"
+echo "$(ls -l ${PROTOC_ROOT})"
+
 ./protoc-gen-swift --version
 ./protoc-gen-grpc-swift --version
+
 popd
