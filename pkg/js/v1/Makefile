@@ -10,7 +10,7 @@ JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)
 JS_TEST_FILES += $(shell PATH="$(PATH)" git-find test)
 
 # JS_ESLINT_CONFIG_FILE is the path to any existing ESLint configuration.
-JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file .eslintrc.* .eslintrc)
+JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file eslint.config.* .eslintrc.* .eslintrc)
 
 # JS_JEST_CONFIG_FILE is the path to any existing Jest configuration.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.*)
