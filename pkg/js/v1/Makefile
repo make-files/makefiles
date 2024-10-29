@@ -16,7 +16,7 @@ JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file eslint.
 JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.config.*)
 
 # JS_NEXT_CONFIG_FILE is the path to any existing Next.js configuration.
-JS_NEXT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file next.config.js next.config.mjs)
+JS_NEXT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file next.config.ts next.config.js next.config.mjs)
 
 # JS_PLAYWRIGHT_TEST_CONFIG_FILE is the path to any existing Playwright Test configuration.
 JS_PLAYWRIGHT_TEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file playwright.config.*)
