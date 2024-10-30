@@ -30,6 +30,9 @@ JS_PLAYWRIGHT_TEST_REQ ?=
 # JS_PLAYWRIGHT_TEST_WORKERS sets the number of workers.
 # (left undefined so it can be overridden by individual targets)
 
+# JS_PLAYWRIGHT_TEST_TRACE will enable tracing when set to a non-empty value.
+JS_PLAYWRIGHT_TEST_TRACE ?=
+
 ################################################################################
 
 # _JS_PLAYWRIGHT_TEST_REQ is a space separated list of automatically detected
@@ -39,6 +42,9 @@ _JS_PLAYWRIGHT_TEST_REQ += artifacts/link-dependencies.touch $(GENERATED_FILES)
 # _JS_PLAYWRIGHT_TEST_ARGS is a set of arguments to use for every execution of Playwright.
 ifneq ($(JS_PLAYWRIGHT_TEST_CONFIG_FILE),)
 _JS_PLAYWRIGHT_TEST_ARGS += --config="$(JS_PLAYWRIGHT_TEST_CONFIG_FILE)"
+endif
+ifneq ($(JS_PLAYWRIGHT_TEST_TRACE),)
+_JS_PLAYWRIGHT_TEST_ARGS += --trace=on
 endif
 
 ################################################################################
