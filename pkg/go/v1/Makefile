@@ -177,7 +177,7 @@ GO_ARCHIVE_SUMS ?= $(addsuffix .sha256,$(GO_ARCHIVES))
 # test --- Executes all go tests in this module.
 .PHONY: test
 test:: $$(GENERATED_FILES) $(GO_TEST_REQ)
-	go test $(GO_TEST_ARGS) ./...
+	go test -failfast $(GO_TEST_ARGS) ./...
 
 # test-until-failure --- Execute all go tests in this module until they fail.
 .PHONY: test-until-failure
