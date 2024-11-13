@@ -80,7 +80,11 @@ playwright-test: $(JS_PLAYWRIGHT_TEST_REQ) $(_JS_PLAYWRIGHT_TEST_REQ)
 playwright-test-ui: $(JS_PLAYWRIGHT_TEST_REQ) $(_JS_PLAYWRIGHT_TEST_REQ)
 	$(JS_EXEC) playwright test $(_JS_PLAYWRIGHT_TEST_ARGS) --output=artifacts/playwright/output$(if $(JS_PLAYWRIGHT_TEST_WORKERS), --workers=$(JS_PLAYWRIGHT_TEST_WORKERS))$(if $(JS_PLAYWRIGHT_TEST_RETRIES), --retries=$(JS_PLAYWRIGHT_TEST_RETRIES))$(if $(JS_PLAYWRIGHT_TEST_FORBID_ONLY), --forbid-only) $(addprefix --reporter=,$(JS_PLAYWRIGHT_TEST_REPORTERS)) --ui $(addprefix --project=,$(JS_PLAYWRIGHT_TEST_PROJECTS))
 
-# playwright-test-show-report --- Serves the Playwright test report.
-.PHONY: playwright-test-show-report
-playwright-test-show-report:
+# playwright-show-report --- Serves the Playwright report.
+.PHONY: playwright-show-report
+playwright-show-report:
 	$(JS_EXEC) playwright show-report
+
+# playwright-test-show-report --- Alias for playwright-show-report.
+.PHONY: playwright-test-show-report
+playwright-test-show-report: playwright-show-report
