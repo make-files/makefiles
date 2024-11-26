@@ -20,7 +20,7 @@ PROTO_INCLUDE_PATHS ?=
 # the latest version of protoc is installed for the host operating system.
 PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 
-# PROTO_PROTOC_PATH is the path the script file that includes
+# PROTO_PROTOC_PATH is the path to the script file that includes
 # $(MF_PROJECT_ROOT)/artifacts/protobuf/bin directory in the PATH environment
 # variable when the script is executed.
 PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
@@ -35,7 +35,7 @@ $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
 
 artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND)
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND) "$@"
 
 artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
@@ -45,8 +45,7 @@ artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-s
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
-	echo "--proto_path=$(dir $(PROTOC_COMMAND))../include" > "$@"
-	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > "$@"
 
 # This Makefile provides the recipes used to build each language's source files
 # from the .proto files, but it does NOT automatically add these source files to
