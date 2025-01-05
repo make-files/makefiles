@@ -11,7 +11,7 @@ case "$(uname -s)" in
 esac
 
 QUERY=".assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
-URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases/latest | jq -r "${QUERY}")
+URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases/184697892 | jq -r "${QUERY}")
 ARCHIVE="protoc-gen-swift.zip"
 
 mkdir -p "${PROTOC_ROOT}"
