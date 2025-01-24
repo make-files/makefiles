@@ -53,7 +53,7 @@ ci:: vitest-coverage-lcov
 # vitest --- Executes all Vitest tests.
 .PHONY: vitest
 vitest: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) $(addprefix --project=,$(JS_VITEST_PROJECTS))
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) $(shell for p in $(JS_VITEST_PROJECTS); do echo --project='"'"$$p"'"'; done)
 
 # vitest-coverage --- Produces a Vitest HTML coverage report.
 .PHONY: vitest-coverage
@@ -72,11 +72,11 @@ vitest-coverage-lcov: artifacts/coverage/vitest/lcov.info
 
 .PHONY: artifacts/coverage/vitest/index.html # always rebuild
 artifacts/coverage/vitest/index.html: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) --coverage.enabled --coverage.reportsDirectory="$(@D)" --coverage.reporter=text --coverage.reporter=html $(addprefix --project=,$(JS_VITEST_PROJECTS))
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) --coverage.enabled --coverage.reportsDirectory="$(@D)" --coverage.reporter=text --coverage.reporter=html $(shell for p in $(JS_VITEST_PROJECTS); do echo --project='"'"$$p"'"'; done)
 
 .PHONY: artifacts/coverage/vitest/lcov.info # always rebuild
 artifacts/coverage/vitest/lcov.info: $(JS_VITEST_REQ) $(_JS_VITEST_REQ)
-	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) --coverage.enabled --coverage.reportsDirectory="$(@D)" --coverage.reporter=text --coverage.reporter=lcovonly $(addprefix --project=,$(JS_VITEST_PROJECTS))
+	$(JS_EXEC) vitest $(_JS_VITEST_ARGS)$(if $(JS_VITEST_FORBID_ONLY), --allowOnly=false) --coverage.enabled --coverage.reportsDirectory="$(@D)" --coverage.reporter=text --coverage.reporter=lcovonly $(shell for p in $(JS_VITEST_PROJECTS); do echo --project='"'"$$p"'"'; done)
 
 artifacts/vitest/browser/public::
 	@mkdir -p "$@"
