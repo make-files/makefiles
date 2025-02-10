@@ -5,7 +5,7 @@ PROTO_FILES += $(shell PATH="$(PATH)" git-find . -type f -name '*.proto' -not -r
 
 # PROTO_GRPC_FILES is the subset of PROTO_FILES that contain gRPC service
 # definitions.
-PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_FILES))
+PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v3/bin/filter-grpc $(PROTO_FILES))
 
 # PROTO_INCLUDE_PATHS is a space separated list of include paths to use when
 # building the .proto files from this repository.
@@ -32,16 +32,16 @@ PROTO_SWIFT_OUT ?= .
 ################################################################################
 
 $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
 
 artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND) "$@"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/generate-run-protoc $(PROTOC_COMMAND) "$@"
 
 artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
 
 artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-swift:
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-swift "$(MF_PROJECT_ROOT)/artifacts/protobuf/bin"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/install-protoc-gen-swift "$(MF_PROJECT_ROOT)/artifacts/protobuf/bin"
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
@@ -103,7 +103,7 @@ artifacts/protobuf/args/go: go.mod
 	@mkdir -p "$(@D)"
 	echo "--go_opt=module=$$(go list -m)" > "$@"
 	echo "--go_out=:." >> "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/generate-include-paths >> "$@"
 
 artifacts/protobuf/args/go-grpc: go.mod
 	go mod download all
@@ -111,7 +111,7 @@ artifacts/protobuf/args/go-grpc: go.mod
 	echo "--go-grpc_opt=module=$$(go list -m)" > "$@"
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
+	$(MF_ROOT)/pkg/protobuf/v3/bin/generate-include-paths >> "$@"
 
 # SWIFT ########################################################################
 
