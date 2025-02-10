@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+protoc_path=$1
+run_protoc_path=$2
+run_protoc_dir=$(dirname "${run_protoc_path}")
+
+$(cat <<EOF > "$run_protoc_path"
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configure PATH so that the protoc plugins installed by the Makefiles take
+# precedence.
+PATH="${run_protoc_dir}:\$PATH" "$protoc_path" "\${@}"
+EOF
+)
+
+chmod +x "$run_protoc_path"

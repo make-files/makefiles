@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script accepts .proto filenames as arguments and prints the names of any
+# of those files that contain at least one gRPC service definition.
+
+if [ $# -ne 0 ]; then
+    egrep --files-with-match '\bservice\s+\w+\s+{' "$@" || true
+fi

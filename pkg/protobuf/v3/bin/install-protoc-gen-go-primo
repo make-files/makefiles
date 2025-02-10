@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Find the version of google.golang.org/protobuf in go.mod so we can install the
+# same version of the protoc-gen-go tool.
+if version="$(go list -f '{{.Version}}' -m "github.com/dogmatiq/primo" 2> /dev/null)"; then
+    echo "found github.com/dogmatiq/primo@$version in go.mod"
+
+# Otherwise, install the latest version.
+else
+    version=latest
+    echo "did not find github.com/dogmatiq/primo in go.mod, defaulting to latest version"
+fi
+
+export GOBIN="$1"
+mkdir -p "$GOBIN"
+cd "$GOBIN"
+
+# Create a go mod just for this binaries, to avoid messing with the project's
+# own go.mod. We ignore
+if [ ! -f go.mod ]; then
+    go mod init bin
+fi
+
+# Install the code generators into this "bin" module.
+go install "github.com/dogmatiq/primo/cmd/protoc-gen-go-primo@$version"
+
+# Touch the go.mod file so that it is no longer considered out of date by make,
+# even if nothing actually changed.
+touch go.mod
