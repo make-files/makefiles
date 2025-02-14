@@ -1,3 +1,8 @@
+# JS_TSC_REQ is a space separated list of prerequisites needed to run tsc.
+JS_TSC_REQ +=
+
+################################################################################
+
 # JS_TSC_TYPECHECK_SKIP_LIB is "true" if checking library types should be
 # skipped.
 JS_TSC_TYPECHECK_SKIP_LIB ?=
@@ -6,7 +11,7 @@ JS_TSC_TYPECHECK_SKIP_LIB ?=
 
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
 .PHONY: tsc-typecheck
-tsc-typecheck: artifacts/link-dependencies.touch
+tsc-typecheck: artifacts/link-dependencies.touch $(JS_TSC_REQ)
 ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
 	$(JS_EXEC) tsc --noEmit --skipLibCheck
 else
