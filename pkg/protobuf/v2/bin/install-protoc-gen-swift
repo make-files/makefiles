@@ -2,20 +2,31 @@
 set -euo pipefail
 
 PROTOC_ROOT="${1}"
+PROTO_SWIFT_OUT="${2}"
 
-case "$(uname -s)" in
-    "Darwin")
-      IS_LINUX=false;;
-    *)
-      IS_LINUX=true;;
-esac
+SWIFT_TARGET_EMPTY=${! find "${PROTO_SWIFT_OUT}" -type f -name "*.swift" | grep -q .}
 
-QUERY=".assets[] | select(.name | contains(\"linux-x86_64\") == ${IS_LINUX}) | .browser_download_url"
-URL=$(curl https://api.github.com/repos/grpc/grpc-swift/releases/184697892 | jq -r "${QUERY}")
-ARCHIVE="protoc-gen-swift.zip"
+if SWIFT_TARGET_EMPTY; then
+  echo "No Swift files found in the target directory. Adding an empty.swift"
+
+  mkdir -p "${PROTO_SWIFT_OUT}"
+
+  echo "// This file is generated to workaround using SPM with a temporarily empty target.\n" \
+    "// Track discussion on [this issue](https://github.com/swiftlang/swift-package-manager/issues/8061)." \
+    >>"${PROTO_SWIFT_OUT}/empty.swift"
+fi
+
+swift build -c release --product protoc-gen-swift
+swift build -c release --product protoc-gen-grpc-swift
+
+PROTOC_SWIFT="$(swift build -c release --product protoc-gen-swift --show-bin-path)/protoc-gen-swift"
+PROTOC_GRPC_SWIFT="$(swift build -c release --product protoc-gen-grpc-swift --show-bin-path)/protoc-gen-grpc-swift"
 
 mkdir -p "${PROTOC_ROOT}"
 pushd "${PROTOC_ROOT}"
-curl --fail --silent --show-error --location --output "${ARCHIVE}" "${URL}"
-unzip -oj "${ARCHIVE}"
+cp $PROTOC_SWIFT $PROTOC_GRPC_SWIFT .
 popd
+
+if SWIFT_TARGET_EMPTY; then
+  rm -f "${PROTO_SWIFT_OUT}/empty.swift"
+fi
