@@ -6,7 +6,7 @@ PROTO_SWIFT_OUT="${2}"
 
 SWIFT_TARGET_EMPTY=${! find "${PROTO_SWIFT_OUT}" -type f -name "*.swift" | grep -q .}
 
-if SWIFT_TARGET_EMPTY; then
+if $SWIFT_TARGET_EMPTY; then
   echo "No Swift files found in the target directory. Adding an empty.swift"
 
   mkdir -p "${PROTO_SWIFT_OUT}"
@@ -27,6 +27,6 @@ pushd "${PROTOC_ROOT}"
 cp $PROTOC_SWIFT $PROTOC_GRPC_SWIFT .
 popd
 
-if SWIFT_TARGET_EMPTY; then
+if $SWIFT_TARGET_EMPTY; then
   rm -f "${PROTO_SWIFT_OUT}/empty.swift"
 fi
