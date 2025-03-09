@@ -4,12 +4,12 @@ set -euo pipefail
 PROTOC_ROOT="${1}"
 PROTO_SWIFT_OUT="${2}"
 
-SWIFT_TARGET_EMPTY=${! find "${PROTO_SWIFT_OUT}" -type f -name "*.swift" | grep -q .}
+mkdir -p "${PROTO_SWIFT_OUT}"
 
-if $SWIFT_TARGET_EMPTY; then
+SWIFT_TARGET_FILES=$(find "${PROTO_SWIFT_OUT}" -type f -name "*.swift")
+
+if [ -z "$SWIFT_TARGET_FILES" ]; then
   echo "No Swift files found in the target directory. Adding an empty.swift"
-
-  mkdir -p "${PROTO_SWIFT_OUT}"
 
   echo "// This file is generated to workaround using SPM with a temporarily empty target.\n" \
     "// Track discussion on [this issue](https://github.com/swiftlang/swift-package-manager/issues/8061)." \
@@ -27,6 +27,7 @@ pushd "${PROTOC_ROOT}"
 cp $PROTOC_SWIFT $PROTOC_GRPC_SWIFT .
 popd
 
-if $SWIFT_TARGET_EMPTY; then
-  rm -f "${PROTO_SWIFT_OUT}/empty.swift"
+if [ -z "$SWIFT_TARGET_FILES" ]; then
+  echo "Cleaning up empty.swift"
+  rm "${PROTO_SWIFT_OUT}/empty.swift"
 fi
