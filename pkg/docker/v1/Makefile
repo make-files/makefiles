@@ -43,6 +43,7 @@ _DOCKER_PLATFORM_FLAG = --platform $(shell echo $(DOCKER_PLATFORMS) | tr ' ' ','
 docker: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
 		$(_DOCKER_TAG_FLAGS) \
+		$(_DOCKER_PLATFORM_FLAG) \
 		$(DOCKER_BUILD_ARGS) --build-arg "VERSION=$(SEMVER)" \
 		--pull \
 		--load \
