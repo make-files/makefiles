@@ -84,7 +84,7 @@ ifeq ($(GO_RACE_DETECTION),true)
 #
 # The Makefile doesn't exlicitly set CGO_ENABLED when running tests.
 ifneq ($(shell go env CGO_ENABLED),0)
-GO_TEST_ARGS  += -race
+GO_TEST_ARGS += -race
 endif
 
 # Enable the race detector in debug builds only if the user has explicitly
@@ -187,10 +187,18 @@ test-until-failure:
 		echo "--- test run $$counter succeeded"; \
 	done; echo "--- failed after $$counter successful run(s)"
 
+# Only add to benchmark:: if the module actually contains benchmarks; otherwise
+# the go test command will stil run, producing no useful output. We want to
+# avoid this so it is never the trigger for compilation.
+_GO_BENCHMARK_FILES = $(shell PATH="$(PATH)" git-find . -name '*_test.go' -not -regex '^_.*' -not -regex '.*\/_.*' -exec grep -l 'func Benchmark' {} +)
+ifneq ($(_GO_BENCHMARK_FILES),)
+
 # benchmark --- Executes all go benchmarks (but not tests) in this module.
 .PHONY: benchmark
 benchmark:: $$(GENERATED_FILES) $(GO_TEST_REQ)
 	go test $(GO_BENCHMARK_ARGS) -bench=. -benchmem -run=^$$ ./...
+
+endif
 
 # coverage --- Produces an HTML coverage report.
 .PHONY: coverage
