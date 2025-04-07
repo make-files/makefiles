@@ -188,8 +188,8 @@ test-until-failure:
 	done; echo "--- failed after $$counter successful run(s)"
 
 # Only add to benchmark:: if the module actually contains benchmarks; otherwise
-# the go test command will stil run, producing no useful output. We want to
-# avoid this so it is never the trigger for compilation.
+# the go test command be run producing no useful output. We want to avoid this
+# so it is never the trigger for compilation.
 _GO_BENCHMARK_FILES = $(shell PATH="$(PATH)" git-find . -name '*_test.go' -not -regex '^_.*' -not -regex '.*\/_.*' -exec grep -l 'func Benchmark' {} +)
 ifneq ($(_GO_BENCHMARK_FILES),)
 
