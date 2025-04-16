@@ -52,15 +52,6 @@ PROJECT_NAME ?= $(notdir $(MF_PROJECT_ROOT))
 # the Makefile and are intended to be committed to the repository.
 GENERATED_FILES +=
 
-# CI_VERIFY_GENERATED_FILES, if non-empty, causes the "ci" target to check that
-# the files in GENERATED_FILES are up-to-date.
-CI_VERIFY_GENERATED_FILES ?=
-
-# _CI_VERIFY_GENERATED_FILES_ALWAYS is a subset of GENERATED_FILES that should
-# always be verified by the "ci" target, even if CI_VERIFY_GENERATED_FILES is
-# empty.
-_CI_VERIFY_GENERATED_FILES_ALWAYS +=
-
 # CLEAN_EXCLUSIONS is a space separated list of gitignore patterns to exclude
 # from being removed by "make clean".
 CLEAN_EXCLUSIONS +=
@@ -206,11 +197,7 @@ precommit:: $$(GENERATED_FILES)
 # recipies for this target.
 .PHONY: ci
 ci::
-ifneq ($(CI_VERIFY_GENERATED_FILES),)
 	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
-else
-	@PATH="$(PATH)" verify-generated-files $(_CI_VERIFY_GENERATED_FILES_ALWAYS)
-endif
 
 ifeq ($(CI_RUN_BENCHMARKS),true)
 ci:: benchmark
