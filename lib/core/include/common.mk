@@ -168,6 +168,12 @@ try-regenerate::
 verify-generated:
 	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
 
+# list-generated --- Lists all files in the GENERATED_FILES list that are
+# tracked by git.
+.PHONY: list-generated
+list-generated:
+	@git ls-files $(GENERATED_FILES)
+
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipies for this
 # target.
