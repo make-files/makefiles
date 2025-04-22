@@ -172,7 +172,7 @@ verify-generated:
 # tracked by git.
 .PHONY: list-generated
 list-generated:
-	@if [[ -n "$(GENERATED_FILES)" ]]; then git ls-files $(GENERATED_FILES); else true; fi
+	@if [ -n "$(GENERATED_FILES)" ]; then git ls-files $(GENERATED_FILES); else true; fi
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipies for this
