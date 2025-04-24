@@ -40,7 +40,7 @@ artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
 artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
 
-artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-swift:
+artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-swift: Package.swift
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-swift "$(MF_PROJECT_ROOT)/artifacts/protobuf/bin" $(PROTO_SWIFT_OUT)
 
 artifacts/protobuf/args/common:
