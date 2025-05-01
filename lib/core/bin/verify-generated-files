@@ -2,11 +2,12 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 
-if [[ $# = 0 ]]; then
+files="$(make list-generated --no-print-directory)"
+if [[ -z "$files" ]]; then
     exit 0
 fi
 
 log "checking for out-of-date generated files"
-rm -f -- "$@"
-make --no-print-directory "$@"
-git diff --exit-code -- "$@"
+echo "$files" | xargs rm -f
+echo "$files" | xargs make --no-print-directory
+echo "$files" | xargs git diff --exit-code
