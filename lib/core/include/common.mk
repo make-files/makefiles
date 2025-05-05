@@ -166,7 +166,7 @@ try-regenerate::
 # differences are detected.
 .PHONY: verify-generated
 verify-generated:
-	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
+	@PATH="$(PATH)" verify-generated-files
 
 # list-generated --- Lists all files in the GENERATED_FILES list that are
 # tracked by git.
@@ -203,7 +203,7 @@ precommit:: $$(GENERATED_FILES)
 # recipies for this target.
 .PHONY: ci
 ci::
-	@PATH="$(PATH)" verify-generated-files $(GENERATED_FILES)
+	@PATH="$(PATH)" verify-generated-files
 
 ifeq ($(CI_RUN_BENCHMARKS),true)
 ci:: benchmark
