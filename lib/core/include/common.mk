@@ -175,8 +175,7 @@ try-regenerate:
 verify-generated: regenerate
 	@$(foreach f,$(GENERATED_FILES),git diff --exit-code -- $f;)
 
-# list-generated --- Lists all files in the GENERATED_FILES list that are
-# tracked by git.
+# list-generated --- Lists all files in the GENERATED_FILES list.
 .PHONY: list-generated
 list-generated:
 	@$(foreach f,$(GENERATED_FILES),echo $f;)
