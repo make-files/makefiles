@@ -3,7 +3,7 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 
 files="$(make --no-print-directory list-generated)"
-if [[ -z "$files" ]]; then
+if [[ ! "$files" ]]; then
     exit 0
 fi
 
