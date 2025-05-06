@@ -175,32 +175,32 @@ list-generated:
 	@if [ -n "$(GENERATED_FILES)" ]; then git ls-files $(GENERATED_FILES); else true; fi
 
 # test --- Executes all tests.
-# Individual language Makefiles are expected to add additional recipies for this
+# Individual language Makefiles are expected to add additional recipes for this
 # target.
 .PHONY: test
 test::
 
 # benchmark --- Execute all benchmarks.
-# Individual language Makefiles are expected to add additional recipies for this
+# Individual language Makefiles are expected to add additional recipes for this
 # target.
 .PHONY: test
 benchmark::
 
 # lint --- Check for syntax, configuration, code style and/or formatting issues.
-# Individual language Makefiles are expected to add additional recipies for this
+# Individual language Makefiles are expected to add additional recipes for this
 # target.
 .PHONY: lint
 lint::
 
 # precommit --- Perform tasks that need to be executed before committing.
-# Individual language Makefiles are expected to add additional recipies for this
+# Individual language Makefiles are expected to add additional recipes for this
 # target.
 .PHONY: precommit
 precommit:: $$(GENERATED_FILES)
 
 # ci --- Perform tasks that need to be executed within a continuous integration
 # environment. Individual language Makefiles are expected to add additional
-# recipies for this target.
+# recipes for this target.
 .PHONY: ci
 ci::
 	@PATH="$(PATH)" verify-generated-files
