@@ -172,7 +172,7 @@ try-regenerate:
 # list and checks for differences to the committed files. The target fails if
 # differences are detected.
 .PHONY: verify-generated
-verify-generated: Regenerate
+verify-generated: regenerate
 	@$(foreach f,$(GENERATED_FILES),git diff --exit-code -- $f;)
 
 # list-generated --- Lists all files in the GENERATED_FILES list that are
