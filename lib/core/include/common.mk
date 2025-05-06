@@ -178,6 +178,7 @@ verify-generated: regenerate
 # list-generated --- Lists all files in the GENERATED_FILES list.
 .PHONY: list-generated
 list-generated:
+	@true
 	@$(foreach f,$(GENERATED_FILES),echo $f;)
 
 # test --- Executes all tests.
