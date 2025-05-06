@@ -172,7 +172,7 @@ verify-generated:
 # tracked by git.
 .PHONY: list-generated
 list-generated:
-	@echo "$(GENERATED_FILES)" | xargs git ls-files --
+	@echo "$(GENERATED_FILES)" | xargs --no-run-if-empty git ls-files --
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipes for this
