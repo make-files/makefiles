@@ -134,31 +134,31 @@ clean:
 
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
-clean-generated::
+clean-generated:
 	rm -f -- $(GENERATED_FILES)
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
 # global ignore configurations.
 .PHONY: clean-ignored
-clean-ignored::
+clean-ignored:
 	$(eval _EXCLUSION_ARGS := $(foreach EXCLUSION,$(CLEAN_EXCLUSIONS),--exclude "!$(EXCLUSION)"))
 	git -c core.excludesfile= clean -dX --force $(_EXCLUSION_ARGS)
 
 # generate --- Builds any out-of-date files in the GENERATED_FILES list.
 .PHONY: generate
-generate:: $$(GENERATED_FILES)
+generate: $$(GENERATED_FILES)
 
 # regenerate --- Removes and regenerates all files in the GENERATED_FILES list.
 .PHONY: regenerate
-regenerate::
+regenerate:
 	@$(MAKE) --no-print-directory clean-generated
 	@$(MAKE) --no-print-directory generate
 
 # try-regenerate --- Removes and regenerates all files in the GENERATED_FILES
 # list, but restores them if the generation fails.
 .PHONY: try-regenerate
-try-regenerate::
+try-regenerate:
 	@$(MAKE) --no-print-directory regenerate || (echo 'Regenerate failed, restoring files...'; git restore $(shell git ls-files $(GENERATED_FILES)))
 
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
