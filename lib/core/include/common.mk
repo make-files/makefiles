@@ -137,9 +137,7 @@ clean:
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated:
-	@if [ -n "$(GENERATED_FILES)" ]; then \
-		echo "$(GENERATED_FILES)" | xargs rm -f --; \
-	fi
+	$(foreach f,$(GENERATED_FILES),rm -f -- $f;)
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
@@ -163,36 +161,25 @@ regenerate:
 # list, but restores them if the generation fails.
 .PHONY: try-regenerate
 try-regenerate:
-	$(eval _GENERATED_FILE_COUNT := $(words $(GENERATED_FILES)))
-	$(eval _GIT_GENERATED_FILES := $(shell echo "$(GENERATED_FILES)" | xargs git ls-files --))
-	$(eval _GIT_GENERATED_FILE_COUNT := $(words $(_GIT_GENERATED_FILES)))
-	@if $(MAKE) --no-print-directory regenerate; then \
-		echo "$(_GENERATED_FILE_COUNT) generated file(s) regenerated"; \
-	else \
-		echo "Regenerate failed, restoring $(_GIT_GENERATED_FILE_COUNT) files..."; \
-		echo "$(_GIT_GENERATED_FILES)" | xargs git restore --; \
+	@if ! $(MAKE) --no-print-directory regenerate; then \
+		echo "Regenerate failed, restoring files..."; \
+		$(MAKE) --no-print-directory list-generated \
+			| xargs --no-run-if-empty git ls-files -- \
+			| xargs --no-run-if-empty git restore --; \
 	fi
 
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
 # list and checks for differences to the committed files. The target fails if
 # differences are detected.
 .PHONY: verify-generated
-verify-generated:
-	$(eval _GIT_GENERATED_FILES := $(shell echo "$(GENERATED_FILES)" | xargs git ls-files --))
-	$(eval _GIT_GENERATED_FILE_COUNT := $(words $(_GIT_GENERATED_FILES)))
-	@if [ -n "$(GENERATED_FILES)" ]; then \
-		$(MAKE) --no-print-directory regenerate; \
-		echo "$(_GIT_GENERATED_FILES)" | xargs git diff --exit-code -- && \
-			echo "$(_GIT_GENERATED_FILE_COUNT) generated file(s) verified"; \
-	fi
+verify-generated: Regenerate
+	@$(foreach f,$(GENERATED_FILES),git diff --exit-code -- $f;)
 
 # list-generated --- Lists all files in the GENERATED_FILES list that are
 # tracked by git.
 .PHONY: list-generated
 list-generated:
-	@if [ -n "$(GENERATED_FILES)" ]; then \
-		echo "$(GENERATED_FILES)" | xargs git ls-files --; \
-	fi
+	@$(foreach f,$(GENERATED_FILES),echo $f;)
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipes for this
