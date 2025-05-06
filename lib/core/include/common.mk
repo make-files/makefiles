@@ -137,7 +137,7 @@ clean:
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated:
-	$(foreach f,$(GENERATED_FILES),rm -f -- $f;)
+	$(MAKE) --no-print-directory list-generated | xargs --no-run-if-empty rm -f --
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
@@ -173,7 +173,7 @@ try-regenerate:
 # differences are detected.
 .PHONY: verify-generated
 verify-generated: regenerate
-	@$(foreach f,$(GENERATED_FILES),git diff --exit-code -- $f;)
+	@$(MAKE) --no-print-directory list-generated | xargs --no-run-if-empty git diff --exit-code --
 
 # list-generated --- Lists all files in the GENERATED_FILES list.
 .PHONY: list-generated
