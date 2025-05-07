@@ -182,6 +182,10 @@ verify-generated: regenerate
 	@$(MAKE) --no-print-directory list-generated | xargs --no-run-if-empty git diff --exit-code --
 
 # list-generated --- Lists all files in the GENERATED_FILES list.
+#
+# TODO: The current implementation of this target is quite slow. It might be
+# possible to speed it up by using $(file), however at the time of writing,
+# macOS has GNU Make 3.81, and $(file) is not supported until 4.0.
 .PHONY: list-generated
 list-generated:
 	@true
