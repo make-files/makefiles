@@ -6,6 +6,12 @@
 # See https://www.gnu.org/software/make/manual/html_node/Catalogue-of-Rules.html
 MAKEFLAGS += --no-builtin-rules
 
+# MF_NL is a newline character. The two newlines here are deliberate.
+define MF_NL
+
+
+endef
+
 export MF_PROJECT_ROOT := $(realpath $(dir $(word 1,$(MAKEFILE_LIST))))
 export MF_ROOT := $(MF_PROJECT_ROOT)/.makefiles
 export PATH := $(MF_ROOT)/lib/core/bin:$(PATH)
@@ -179,7 +185,7 @@ verify-generated: regenerate
 .PHONY: list-generated
 list-generated:
 	@true
-	@$(foreach f,$(GENERATED_FILES),echo $f;)
+	$(foreach f,$(GENERATED_FILES),@echo $f$(MF_NL))
 
 # test --- Executes all tests.
 # Individual language Makefiles are expected to add additional recipes for this
