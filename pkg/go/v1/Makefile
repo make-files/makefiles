@@ -35,7 +35,7 @@ GO_APP_VERSION ?= $(SEMVER)
 # GO_TEST_ARGS and GO_BENCHMARK_ARGS are arguments passed to "go test" command
 # when running tests and benchmarks, respectively. GO_TEST_COVERAGE_ARGS
 # contains arguments passed to "go test" only when generating coverage reports.
-GO_TEST_ARGS          ?=
+GO_TEST_ARGS          ?= -failfast
 GO_TEST_COVERAGE_ARGS ?=
 GO_BENCHMARK_ARGS     ?=
 
@@ -61,10 +61,10 @@ GO_DEBUG_DIR=artifacts/build/debug/$(GOHOSTOS)/$(GOHOSTARCH)
 
 # GO_BUILDREQ is a space separated list of prerequisites needed to build the Go
 # binaries.
-GO_BUILD_REQ += go.mod
+GO_BUILD_REQ += go.sum
 
 # GO_TEST_REQ is a space separated list of prerequisites needed to run tests.
-GO_TEST_REQ += go.mod
+GO_TEST_REQ += go.sum
 
 # GO_BUILD_BEFORE_TEST indicates whether debug binaries should be built before
 # running the tests.
@@ -177,18 +177,18 @@ GO_ARCHIVE_SUMS ?= $(addsuffix .sha256,$(GO_ARCHIVES))
 # test --- Executes all go tests in this module.
 .PHONY: test
 test:: $$(GENERATED_FILES) $(GO_TEST_REQ)
-	go test -failfast $(GO_TEST_ARGS) ./...
+	go test $(GO_TEST_ARGS) ./...
 
 # test-until-failure --- Execute all go tests in this module until they fail.
 .PHONY: test-until-failure
 test-until-failure:
-	@counter=0; while go test -failfast -count=1 $(GO_TEST_ARGS) ./...; do \
+	@counter=0; while go test $(GO_TEST_ARGS) -failfast -count=1 ./...; do \
 		counter=$$(expr $$counter + 1); \
 		echo "--- test run $$counter succeeded"; \
 	done; echo "--- failed after $$counter successful run(s)"
 
 # Only add to benchmark:: if the module actually contains benchmarks; otherwise
-# the go test command be run producing no useful output. We want to avoid this
+# the go test command is run producing no useful output. We want to avoid this
 # so that a no-op benchmark run is never the trigger for compilation.
 _GO_BENCHMARK_FILES = $(shell PATH="$(PATH)" git-find . -name '*_test.go' -not -regex '^_.*' -not -regex '.*\/_.*' -exec grep -l 'func Benchmark' {} +)
 ifneq ($(_GO_BENCHMARK_FILES),)
@@ -212,10 +212,8 @@ coverage-open:: artifacts/coverage/index.html
 # precommit --- Perform tasks that need to be executed before committing. Stacks
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
-precommit:: debug release
+precommit:: debug release test
 	go fmt ./...
-	go mod tidy
-	make test
 
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
@@ -253,14 +251,10 @@ archives: $(GO_ARCHIVES)
 .PHONY: archive-sums
 archive-sums: artifacts/archives/sums.sha256
 
-# pre-intercept --- Removes the debug binaries for the current architecture
-# before starting a Telepresence intercept, forcing them to be rebuild with
-# CGO_ENABLED within the intercept.
-.PHONY: pre-intercept
-pre-intercept::
-	rm -f $(_GO_DEBUG_TARGETS_HOST)
-
 ################################################################################
+
+go.sum: go.mod
+	go mod tidy
 
 artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"
