@@ -213,6 +213,7 @@ coverage-open:: artifacts/coverage/index.html
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
 precommit:: debug release test
+	go fmt ./...
 
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
