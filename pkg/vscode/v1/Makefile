@@ -36,4 +36,4 @@ ifneq ($(filter proto,$(MF_LANGUAGES)),)
 endif
 
 $(_VSCODE_SETTINGS_GITIGNORE_FILE):
-	@echo "$(_VSCODE_SETTINGS_FILE)" > $@
+	@echo "$(basename $(_VSCODE_SETTINGS_FILE))" > $@
