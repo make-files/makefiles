@@ -11,6 +11,7 @@ _VSCODE_SETTINGS_FILE = .vscode/settings.json
 
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
 GENERATED_FILES += $(_VSCODE_SETTINGS_FILE)
+GENERATED_FILES += .vscode/.gitignore
 endif
 
 # VSCODE_SETTINGS_REQ is a space separated list of prerequisites requred to
@@ -31,3 +32,6 @@ $(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
 	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(PROTO_PROTOC_PATH)" $^
 endif
+
+.vscode/.gitignore:
+	@echo "$(_VSCODE_SETTINGS_FILE)" > $@
