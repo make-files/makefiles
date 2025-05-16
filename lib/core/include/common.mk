@@ -143,7 +143,7 @@ clean:
 # clean-generated --- Removes all files in the GENERATED_FILES list.
 .PHONY: clean-generated
 clean-generated:
-	$(MAKE) --no-print-directory list-generated | xargs --no-run-if-empty rm -f --
+	$(MAKE) --no-print-directory list-generated | xargs -r rm -f --
 
 # clean-ignored --- Removes all files ignored by .gitignore files within the
 # repository. It does not remove any files that are ignored due to rules in
@@ -170,8 +170,8 @@ try-regenerate:
 	@if ! $(MAKE) --no-print-directory regenerate; then \
 		echo "Regenerate failed, restoring files..."; \
 		$(MAKE) --no-print-directory list-generated \
-			| xargs --no-run-if-empty git ls-files -- \
-			| xargs --no-run-if-empty git restore --; \
+			| xargs -r git ls-files -- \
+			| xargs -r git restore --; \
 	fi
 
 # verify-generated --- Removes and regenerates all files in the GENERATED_FILES
@@ -179,7 +179,7 @@ try-regenerate:
 # differences are detected.
 .PHONY: verify-generated
 verify-generated: regenerate
-	@$(MAKE) --no-print-directory list-generated | xargs --no-run-if-empty git diff --exit-code --
+	@$(MAKE) --no-print-directory list-generated | xargs -r git diff --exit-code --
 
 # list-generated --- Lists all files in the GENERATED_FILES list.
 #
