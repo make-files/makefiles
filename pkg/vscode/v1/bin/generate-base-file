@@ -2,16 +2,19 @@
 set -euo pipefail
 
 if [[ "$#" -ne 1 ]]; then
-	echo "this script needs exactly 1 argument"
+	echo "usage: $0 [file]"
     exit 1
 fi
 
-settings_file="${1}"
+file=$1
 
-# If VSCode settings file does not exist, create a VSCode workspace directory if
-# required and load an empty JSON object to the settings file.
-if [ ! -f "${settings_file}" ]
-then
-    mkdir -p $(dirname "${settings_file}")
-    echo "{}" > "${settings_file}"
+# If no settings file exists, write an empty JSON object.
+if [[ ! -f "${file}" ]]; then
+    mkdir -p $(dirname "${file}")
+    echo "{}" > "${file}"
+fi
+
+# Ensure the file is ignored by this project's .gitignore file.
+if [ ! git check-ignore --verbose | grep --quiet "^.gitignore:" ]; then
+    echo "${file}" >> .gitignore
 fi

@@ -9,11 +9,8 @@ GENERATE_VSCODE_SETTINGS ?= true
 # https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 _VSCODE_SETTINGS_FILE = .vscode/settings.json
 
-_VSCODE_SETTINGS_GITIGNORE_FILE = $(dir $(_VSCODE_SETTINGS_FILE))/.gitignore
-
 ifeq ($(GENERATE_VSCODE_SETTINGS),true)
 GENERATED_FILES += $(_VSCODE_SETTINGS_FILE)
-GENERATED_FILES += $(_VSCODE_SETTINGS_GITIGNORE_FILE)
 endif
 
 # VSCODE_SETTINGS_REQ is a space separated list of prerequisites requred to
@@ -34,6 +31,3 @@ $(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
 	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(PROTO_PROTOC_PATH)" $^
 endif
-
-$(_VSCODE_SETTINGS_GITIGNORE_FILE):
-	@echo "$(basename $(_VSCODE_SETTINGS_FILE))" > $@
