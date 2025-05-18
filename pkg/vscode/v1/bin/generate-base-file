@@ -14,7 +14,7 @@ if [[ ! -f "$file" ]]; then
     echo "{}" > "$file"
 fi
 
-# Ensure the file is ignored by this project's .gitignore file.
-if [[ ! (git check-ignore --verbose "$file" | grep --quiet "^.gitignore:") ]]; then
+# # Ensure the file is ignored by this project's .gitignore file.
+if ! git check-ignore --verbose "$file" | grep --quiet '^.gitignore:'; then
     echo "$file" >> .gitignore
 fi
