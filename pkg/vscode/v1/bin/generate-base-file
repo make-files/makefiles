@@ -6,15 +6,15 @@ if [[ "$#" -ne 1 ]]; then
     exit 1
 fi
 
-file=$1
+file="$1"
 
 # If no settings file exists, write an empty JSON object.
-if [[ ! -f "${file}" ]]; then
-    mkdir -p $(dirname "${file}")
-    echo "{}" > "${file}"
+if [[ ! -f "$file" ]]; then
+    mkdir -p $(dirname "$file")
+    echo "{}" > "$file"
 fi
 
 # Ensure the file is ignored by this project's .gitignore file.
-if [[ ! (git check-ignore --verbose | grep --quiet "^.gitignore:") ]]; then
-    echo "${file}" >> .gitignore
+if [[ ! (git check-ignore --verbose "$file" | grep --quiet "^.gitignore:") ]]; then
+    echo "$file" >> .gitignore
 fi
