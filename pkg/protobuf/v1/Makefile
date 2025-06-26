@@ -59,7 +59,7 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 	PATH="$(MF_PROJECT_ROOT)/artifacts/protobuf/bin:$$PATH" $(PROTOC_COMMAND) \
 		--proto_path="$(dir $(PROTOC_COMMAND))../include" \
 		--go_out=plugins=grpc:. \
-		--go_opt=module=$$(go list -m) \
+		--go_opt=module=$$(go list -m | head -n 1) \
 		$$(cat artifacts/protobuf/go.proto_paths) \
 		$(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) \
 		"$(MF_PROJECT_ROOT)/$(@D)"/*.proto

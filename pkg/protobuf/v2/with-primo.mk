@@ -12,6 +12,6 @@ artifacts/protobuf/args/go-primo: go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
 	echo "--plugin protoc-gen-go-primo=artifacts/protobuf/bin/protoc-gen-go-primo" > "$@"
-	echo "--go-primo_opt=module=$$(go list -m)" >> "$@"
+	echo "--go-primo_opt=module=$$(go list -m | head -n 1)" >> "$@"
 	echo "--go-primo_out=." >> "$@"
 	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"

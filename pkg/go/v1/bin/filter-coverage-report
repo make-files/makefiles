@@ -3,7 +3,7 @@ set -euo pipefail
 
 coverage_file=$1
 filtered_files=${@:2}
-module=$(go list -m)
+module=$(go list -m | head -n 1)
 
 if [ ! -f "$coverage_file" ]; then
     echo "coverage file $coverage_file does not exist"
