@@ -18,6 +18,9 @@ JS_JEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file jest.conf
 # JS_NEXT_CONFIG_FILE is the path to any existing Next.js configuration.
 JS_NEXT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file next.config.ts next.config.js next.config.mjs)
 
+# JS_VITE_CONFIG_FILE is the path to any existing Vite configuration.
+JS_VITE_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file vite.config.ts vite.config.js vite.config.mjs)
+
 # JS_PLAYWRIGHT_TEST_CONFIG_FILE is the path to any existing Playwright Test configuration.
 JS_PLAYWRIGHT_TEST_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file playwright.config.*)
 
@@ -104,6 +107,10 @@ node_modules: artifacts/link-dependencies.touch
 
 ifneq ($(JS_NEXT_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/next.mk
+endif
+
+ifneq ($(JS_VITE_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/vite.mk
 endif
 
 ifneq ($(JS_WEBPACK_CONFIG_FILE),)
