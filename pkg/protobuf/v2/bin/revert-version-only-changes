@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for file in "$@"; do
+    # This diff command exits with a non-zero exit code if all changes to $file
+    # are version comments. Therefore, if the exit code is 0, there are more
+    # substantial changes.
+    #
+    # We use "X" as the new/old indicator to make it easier to ignore the
+    # +++/--- lines in the diff header; we simply remove any lines that don't
+    # begin with X.
+    #
+    # The --unified=0 flag removes any context lines, such that all lines are
+    # either part of the diff header, a location indicator (@@ syntax), or an
+    # addition/removal.
+    #
+    # Finally, we look for the presence of any additions/removals that are not a
+    # version comment.
+    if git diff \
+        --text \
+        --unified=0 \
+        --output-indicator-new='X' \
+        --output-indicator-old='X' \
+        -- "$file" \
+        | egrep '^X' \
+        | egrep --quiet --invert-match '^X//\s+proto.+\s+v[A-Za-z0-9.-]+$'; then
+        continue
+    fi
+
+    echo "reverting version comment changes in $file, there are no other changes"
+    echo git restore -- "$file"
+done
