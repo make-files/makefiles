@@ -27,6 +27,5 @@ for file in "$@"; do
         continue
     fi
 
-    echo "reverting version comment changes in $file, there are no other changes"
-    echo git restore -- "$file"
+    git restore -- "$file"
 done
