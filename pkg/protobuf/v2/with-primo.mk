@@ -7,6 +7,7 @@ artifacts/protobuf/bin/protoc-gen-go-primo: go.mod
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go-primo) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
 artifacts/protobuf/args/go-primo: go.mod
 	go mod download all

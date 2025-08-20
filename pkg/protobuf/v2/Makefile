@@ -92,11 +92,13 @@ artifacts/protobuf/args/common:
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
 %_grpc.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go-grpc artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc
 	$(PROTO_PROTOC_PATH) \
 		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc) \
 		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
 artifacts/protobuf/args/go: go.mod
 	go mod download all
