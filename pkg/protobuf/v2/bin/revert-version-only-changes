@@ -23,7 +23,7 @@ for file in "$@"; do
         --output-indicator-old='X' \
         -- "$file" \
         | egrep '^X' \
-        | egrep --quiet --invert-match '^X//\s+protoc(-[a-z-]+)?\s+v[A-Za-z0-9.-]+$'; then
+        | egrep --quiet --invert-match '^X//\s+(-\s+)?protoc(-[a-z-]+)?\s+v[A-Za-z0-9.-]+$'; then
         continue
     fi
 
