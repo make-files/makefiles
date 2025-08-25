@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-for file in "$@"; do
+# Bail if no files are specified.
+if [[ $# -eq 0 ]]; then
+    exit 0
+fi
+
+# Limit files to those tracked by Git.
+files=$(git ls-files "$@")
+
+# Bail if none of the specified files are tracked by Git.
+if [[ -z "$files" ]]; then
+    exit 0
+fi
+
+for file in "$files"; do
     # This diff command exits with a non-zero exit code if all changes to $file
     # are version comments. Therefore, if the exit code is 0, there are more
     # substantial changes.
