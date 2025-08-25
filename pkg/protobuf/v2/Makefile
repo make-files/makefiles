@@ -91,57 +91,57 @@ endif
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
 
-%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go
-	$(PROTO_PROTOC_PATH) \
-		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go) \
-		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/go
+	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/go) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-%_grpc.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go-grpc artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc
-	$(PROTO_PROTOC_PATH) \
-		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/go-grpc) \
-		$(MF_PROJECT_ROOT)/$(@D)/*.proto
+%_grpc.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go-grpc artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/go-grpc
+	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/go-grpc) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-artifacts/protobuf/args/go: go.mod
+artifacts/protobuf/args/go-common: artifacts/protobuf/args/common go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
-	echo "--go_opt=module=$$(go list -m | head -n 1)" > "$@"
+	cp "$<" "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-go-include-paths | tee "$@"
+
+artifacts/protobuf/args/go: artifacts/protobuf/args/go-common
+	@mkdir -p "$(@D)"
+	cp "$<" "$@"
+	echo "--go_opt=module=$$(go list -m | head -n 1)" >> "$@"
 	echo "--go_out=:." >> "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
 
-artifacts/protobuf/args/go-grpc: go.mod
-	go mod download all
+artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 	@mkdir -p "$(@D)"
-	echo "--go-grpc_opt=module=$$(go list -m | head -n 1)" > "$@"
+	cp "$<" "$@"
+	echo "--go-grpc_opt=module=$$(go list -m | head -n 1)" >> "$@"
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-include-paths >> "$@"
 
 # SWIFT ########################################################################
 
-$(PROTO_SWIFT_OUT)/%.pb.swift: %.proto artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift
+$(PROTO_SWIFT_OUT)/%.pb.swift: %.proto artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/swift
 	@mkdir -p "$(PROTO_SWIFT_OUT)"
-	$(PROTO_PROTOC_PATH) \
-		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift) \
-		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
+	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/swift) $(MF_PROJECT_ROOT)/$<
+	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-$(PROTO_SWIFT_OUT)/%.grpc.swift: %.proto artifacts/protobuf/bin/protoc-gen-grpc-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc
+$(PROTO_SWIFT_OUT)/%.grpc.swift: %.proto artifacts/protobuf/bin/protoc-gen-grpc-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/swift-grpc
 	@mkdir -p "$(PROTO_SWIFT_OUT)"
-	$(PROTO_PROTOC_PATH) \
-		$$(cat artifacts/protobuf/args/common artifacts/protobuf/args/swift-grpc) \
-		$(MF_PROJECT_ROOT)/$(dir $<)*.proto
+	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/swift-grpc) $(MF_PROJECT_ROOT)/$<
+	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-artifacts/protobuf/args/swift:
+artifacts/protobuf/args/swift: artifacts/protobuf/args/common
 	@mkdir -p "$(@D)"
-	echo "--proto_path=$(MF_PROJECT_ROOT)" > "$@"
+	cp "$<" "$@"
+	echo "--proto_path=$(MF_PROJECT_ROOT)" >> "$@"
 	echo "--plugin=$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/proto-gen-swift" >> "$@"
 	echo "--swift_opt=Visibility=Public" >> "$@"
 	echo "--swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
 
-artifacts/protobuf/args/swift-grpc:
+artifacts/protobuf/args/swift-grpc: artifacts/protobuf/args/common
 	@mkdir -p "$(@D)"
-	echo "--proto_path=$(MF_PROJECT_ROOT)" > "$@"
+	cp "$<" "$@"
+	echo "--proto_path=$(MF_PROJECT_ROOT)" >> "$@"
 	echo "--plugin=$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/proto-gen-grpc-swift" >> "$@"
 	echo "--grpc-swift_opt=Visibility=Public" >> "$@"
 	echo "--grpc-swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
