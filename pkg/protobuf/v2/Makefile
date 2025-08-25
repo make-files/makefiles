@@ -45,7 +45,10 @@ artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-s
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
-	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) > "$@"
+	@touch "$@"
+ifneq ($(PROTO_INCLUDE_PATHS),)
+	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
+endif
 
 # This Makefile provides the recipes used to build each language's source files
 # from the .proto files, but it does NOT automatically add these source files to
