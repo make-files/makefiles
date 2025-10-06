@@ -200,7 +200,7 @@ test::
 # benchmark --- Execute all benchmarks.
 # Individual language Makefiles are expected to add additional recipes for this
 # target.
-.PHONY: test
+.PHONY: benchmark
 benchmark::
 
 # lint --- Check for syntax, configuration, code style and/or formatting issues.

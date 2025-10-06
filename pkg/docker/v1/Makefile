@@ -50,7 +50,7 @@ docker: $(_DOCKER_BUILD_REQ)
 
 # docker-test --- Builds docker images for each target platform then
 # discards the result.
-.PHONY: docker
+.PHONY: docker-test
 docker-test: $(_DOCKER_BUILD_REQ)
 	docker buildx build \
 		$(_DOCKER_TAG_FLAGS) \
