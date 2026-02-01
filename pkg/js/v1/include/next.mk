@@ -4,6 +4,14 @@ JS_NEXT_PORT ?= 3000
 # JS_NEXT_REQ is a space separated list of prerequisites needed to run Next.js.
 JS_NEXT_REQ +=
 
+# JS_NEXT_DEV_ARGS is a space separated list of arguments to pass to Next.js
+# when running in development mode.
+JS_NEXT_DEV_ARGS +=
+
+# JS_NEXT_BUILD_ARGS is a space separated list of arguments to pass to Next.js
+# when building for production deployment.
+JS_NEXT_BUILD_ARGS +=
+
 ################################################################################
 
 # _JS_NEXT_REQ is a space separated list of automatically detected prerequisites
@@ -29,13 +37,13 @@ next-build: artifacts/next/dist/BUILD_ID
 # next-dev --- Start the Next.js application in development mode.
 .PHONY: next-dev
 next-dev: artifacts/link-dependencies.touch
-	NODE_ENV=development $(JS_EXEC) next dev --port $(JS_NEXT_PORT)
+	NODE_ENV=development $(JS_EXEC) next dev --port $(JS_NEXT_PORT) $(JS_NEXT_DEV_ARGS)
 
 ################################################################################
 
 artifacts/next/dist/BUILD_ID: $(JS_NEXT_REQ) $(_JS_NEXT_REQ)
 	@rm -rf "$@"
-	$(JS_EXEC) next build
+	$(JS_EXEC) next build $(JS_NEXT_BUILD_ARGS)
 
 artifacts/next/dist/analyze/client.html: $(JS_NEXT_REQ) $(_JS_NEXT_REQ)
-	ANALYZE=true $(JS_EXEC) next build
+	ANALYZE=true $(JS_EXEC) next build $(JS_NEXT_BUILD_ARGS)
