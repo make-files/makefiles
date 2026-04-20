@@ -214,11 +214,13 @@ coverage-open:: artifacts/coverage/index.html
 .PHONY: precommit
 precommit:: debug release test
 	go fmt ./...
+	go fix ./...
 
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
 .PHONY: ci
 ci:: debug release artifacts/coverage/cover.out
+	output=$$(go fix -diff ./... 2>&1); if [ -n "$$output" ]; then echo "$$output"; exit 1; fi
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
