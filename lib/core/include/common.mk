@@ -224,3 +224,8 @@ ci:: verify-generated
 ifeq ($(CI_RUN_BENCHMARKS),true)
 ci:: benchmark
 endif
+
+# Always disable Ryuk (the test containers reaper process) under CI, as it tends
+# to cause contains to get shutdown while they're still in use, and everything
+# is automatically cleaned up after the CI job completes anyway.
+ci:: TESTCONTAINERS_RYUK_DISABLED ?= true
