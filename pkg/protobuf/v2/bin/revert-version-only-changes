@@ -29,16 +29,24 @@ for file in "$files"; do
     #
     # Finally, we look for the presence of any additions/removals that are not a
     # version comment.
-    if git diff \
+    #
+    # We store the diff lines in a variable rather than piping directly to avoid
+    # SIGPIPE issues; --quiet causes egrep to exit early, which can SIGPIPE the
+    # upstream process and produce a non-zero pipeline status under pipefail.
+    diff=$(git diff \
         --text \
         --unified=0 \
         --output-indicator-new='X' \
         --output-indicator-old='X' \
-        -- "$file" \
-        | egrep '^X' \
-        | egrep --quiet --invert-match '^X//\s+(-\s+)?protoc(-[a-z-]+)?\s+v[A-Za-z0-9.-]+$'; then
+        -- "$file")
+
+    # Skip files with no additions or removals.
+    if ! diff=$(egrep '^X' <<< "$diff"); then
         continue
     fi
 
-    git restore -- "$file"
+    # Revert if all additions/removals are version comments.
+    if ! egrep --quiet --invert-match '^X//\s+(-\s+)?protoc(-[a-z-]+)?\s+v[A-Za-z0-9.-]+$' <<< "$diff"; then
+        git restore -- "$file"
+    fi
 done
