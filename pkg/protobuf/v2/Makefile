@@ -50,6 +50,22 @@ ifneq ($(PROTO_INCLUDE_PATHS),)
 	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
 endif
 
+# .clang-format --- Creates the default clang-format style used to format
+# .proto files. It is intended to be committed to the project; it is
+# authoritative and is overwritten by "regenerate"/"verify-generated" to keep
+# it in sync with the canonical style, the same as any other generated file.
+GENERATED_FILES += .clang-format
+.clang-format:
+	echo 'BasedOnStyle: Google' > "$@"
+	echo 'AlignConsecutiveDeclarations: true' >> "$@"
+	echo 'AlignConsecutiveAssignments: true' >> "$@"
+
+# precommit --- Formats .proto files with clang-format. Stacks with the
+# "precommit" target from the common makefile.
+.PHONY: precommit
+precommit:: .clang-format
+	git-find . -name '*.proto' -exec clang-format --style=file --fallback-style=Google -i {} +
+
 # This Makefile provides the recipes used to build each language's source files
 # from the .proto files, but it does NOT automatically add these source files to
 # the GENERATED_FILES list. This is the responsibility of each language-specific
