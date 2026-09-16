@@ -76,6 +76,12 @@ GO_BUILD_BEFORE_TEST ?=
 # GO_RACE_DETECTION enables race detection in tests and debug builds.
 GO_RACE_DETECTION ?= true
 
+# _GO_FIX_SUPPORTS_DIFF is non-empty if the installed "go" command's "fix"
+# subcommand supports the "-diff" flag. This flag was introduced by the Go
+# 1.26 rewrite of "go fix" into an analysis-based modernizer; older "go fix"
+# implementations only apply legacy API-migration fixers and do not accept it.
+_GO_FIX_SUPPORTS_DIFF := $(shell go help fix 2>/dev/null | grep -q -- -diff && echo true)
+
 ################################################################################
 
 ifeq ($(GO_RACE_DETECTION),true)
@@ -213,12 +219,14 @@ coverage-open:: artifacts/coverage/index.html
 # with the "precommit" target form the common makefile.
 .PHONY: precommit
 precommit:: debug release test
+	$(if $(_GO_FIX_SUPPORTS_DIFF),go fix ./...)
 	go fmt ./...
 
 # ci --- Builds all binaries and a machine-readable coverage report. Stacks with
 # the "ci" target from the common makefile.
 .PHONY: ci
 ci:: debug release artifacts/coverage/cover.out
+	$(if $(_GO_FIX_SUPPORTS_DIFF),go fix -diff ./...)
 
 # _clean --- Clears the Go test cache. Invoked by the "clean" target from the
 # common makefile before the makefiles themselves are removed.
