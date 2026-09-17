@@ -29,5 +29,5 @@ endif
 $(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
 ifneq ($(filter proto,$(MF_LANGUAGES)),)
-	$(MF_ROOT)/pkg/vscode/v1/bin/merge-vscode-proto3-settings "$@" "$(PROTO_PROTOC_PATH)" $^
+	$(MF_ROOT)/pkg/vscode/v1/bin/merge-protobuf-vsc-settings "$@" $^
 endif

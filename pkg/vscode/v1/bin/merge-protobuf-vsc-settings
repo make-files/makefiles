@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script merges the protobuf.includes and protobuf.protoc.compileOnSave
+# settings (used by the DrBlury.protobuf-vsc extension) into a VSCode
+# settings file, deriving the include paths from the --proto_path= options
+# in one or more protoc argument files.
+
+if ! hash jq 2>/dev/null; then
+    echo "no jq binary is installed in the executable path, protobuf-vsc settings will not be merged"
+    exit 0
+fi
+
+if [[ "$#" -lt 2 ]]; then
+    echo "usage: $0 <settings-file> <arg-file>..."
+    exit 1
+fi
+
+settings_file="${1}"
+arg_files="${@:2}"
+
+includes=()
+for option in $(cat ${arg_files}); do
+    if [[ "${option}" == --proto_path=* ]]; then
+        includes+=("${option#--proto_path=}")
+    fi
+done
+
+# bash 3.2 (macOS's default) treats "${includes[@]}" as unbound under -u
+# when the array is empty, so that case is handled separately.
+if [[ ${#includes[@]} -eq 0 ]]; then
+    out=$(cat ${settings_file} | jq '. * {"protobuf":{"includes":[], "protoc":{"compileOnSave":false}}}')
+else
+    out=$(cat ${settings_file} | jq --args '. * {"protobuf":{"includes":$ARGS.positional, "protoc":{"compileOnSave":false}}}' "${includes[@]}")
+fi
+
+echo $out | jq > ${settings_file}
