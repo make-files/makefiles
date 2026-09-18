@@ -29,9 +29,9 @@ done
 # bash 3.2 (macOS's default) treats "${includes[@]}" as unbound under -u
 # when the array is empty, so that case is handled separately.
 if [[ ${#includes[@]} -eq 0 ]]; then
-    out=$(cat ${settings_file} | jq '. * {"protobuf":{"includes":[], "protoc":{"compileOnSave":false}}}')
+    out=$(cat ${settings_file} | jq '. * {"protobuf.includes":[], "protobuf.protoc.compileOnSave":false}')
 else
-    out=$(cat ${settings_file} | jq --args '. * {"protobuf":{"includes":$ARGS.positional, "protoc":{"compileOnSave":false}}}' "${includes[@]}")
+    out=$(cat ${settings_file} | jq --args '. * {"protobuf.includes":$ARGS.positional, "protobuf.protoc.compileOnSave":false}' "${includes[@]}")
 fi
 
 echo $out | jq > ${settings_file}
