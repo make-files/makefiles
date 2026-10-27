@@ -20,7 +20,7 @@ JS_AUSTENITE_REQ += artifacts/link-dependencies.touch
 
 ################################################################################
 
-GENERATED_FILES += $(JS_AUSTENITE_MARKDOWN_FILE)
+GENERATED_BYPRODUCT_FILES += $(JS_AUSTENITE_MARKDOWN_FILE)
 
 $(JS_AUSTENITE_MARKDOWN_FILE): $(JS_AUSTENITE_REQ)
 	AUSTENITE_MODE=usage/markdown AUSTENITE_APP="$(JS_AUSTENITE_APP_NAME)" $(JS_AUSTENITE_APP_CMD) > "$@"

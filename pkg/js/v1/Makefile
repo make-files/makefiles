@@ -1,7 +1,8 @@
 MF_LANGUAGES += js
 
-# Always run tests by default, even if other makefiles are included beforehand.
-.DEFAULT_GOAL := test
+# Always use the "default" target by default, even if other makefiles are
+# included beforehand.
+.DEFAULT_GOAL := default
 
 # JS_SOURCE_FILES is a space separated list of all files in the src directory.
 JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)

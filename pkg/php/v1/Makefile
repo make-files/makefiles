@@ -1,7 +1,8 @@
 MF_LANGUAGES += php
 
-# Always run tests by default, even if other makefiles are included beforehand.
-.DEFAULT_GOAL := test
+# Always use the "default" target by default, even if other makefiles are
+# included beforehand.
+.DEFAULT_GOAL := default
 
 # PHP_SOURCE_FILES is a space separated list of source files in the repo.
 PHP_SOURCE_FILES += $(shell PATH="$(PATH)" git-find . -name '*.php')
