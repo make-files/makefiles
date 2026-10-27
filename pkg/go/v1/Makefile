@@ -1,7 +1,8 @@
 MF_LANGUAGES += go
 
-# Always run tests by default, even if other makefiles are included beforehand.
-.DEFAULT_GOAL := test
+# Always use the "default" target by default, even if other makefiles are
+# included beforehand.
+.DEFAULT_GOAL := default
 
 # Build Go source files from protocol buffers definitions.
 #
