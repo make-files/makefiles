@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$#" -lt 1 || "$#" -gt 2 ]]; then
+    echo "usage: $0 [file] [unreleased-url]"
+    exit 1
+fi
+
+file="$1"
+unreleased_url="${2:-}"
+
+cat > "$file" <<'EOF'
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog], and this project adheres to
+[Semantic Versioning].
+
+<!-- references -->
+
+[keep a changelog]: https://keepachangelog.com/en/1.1.0/
+[semantic versioning]: https://semver.org/spec/v2.0.0.html
+
+## [Unreleased]
+
+- Initial release
+
+<!-- references -->
+EOF
+
+# Only add the [Unreleased] link reference if its URL is known.
+if [[ -n "$unreleased_url" ]]; then
+    echo >> "$file"
+    echo "[unreleased]: $unreleased_url" >> "$file"
+fi

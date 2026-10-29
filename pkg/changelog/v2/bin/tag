@@ -1,0 +1,293 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script releases a new version by moving the [Unreleased] section of
+# CHANGELOG.md under a version heading, committing CHANGELOG.md, then creating
+# an annotated tag containing that section. It never pushes.
+#
+# If CHANGELOG_VERSION is set, the [Unreleased] section is used as-is. Otherwise
+# the section is opened in an editor so that the version can be chosen and the
+# release notes adjusted. Any changes to the notes are written to CHANGELOG.md.
+
+CHANGELOG_FILE="CHANGELOG.md"
+CHANGELOG_TAG_PREFIX="${CHANGELOG_TAG_PREFIX-v}"
+CHANGELOG_TAG_URL_PREFIX="${CHANGELOG_TAG_URL_PREFIX:-}"
+CHANGELOG_VERSION="${CHANGELOG_VERSION:-}"
+
+# WORK_DIR contains the files used to build the release.
+WORK_DIR="artifacts/changelog/tag"
+
+# MESSAGE_FILE is the file edited by the user to choose the version and adjust
+# the release notes.
+MESSAGE_FILE="$WORK_DIR/message.md"
+
+# NOTES_FILE contains the body of the release notes.
+NOTES_FILE="$WORK_DIR/notes.md"
+
+# SECTION_FILE contains the new version section to add to CHANGELOG.md.
+SECTION_FILE="$WORK_DIR/section.md"
+
+# BACKUP_FILE is a copy of CHANGELOG.md, used to restore it if the release fails.
+BACKUP_FILE="$WORK_DIR/original.md"
+
+# REWRITE_FILE is used to rewrite CHANGELOG.md.
+REWRITE_FILE="$WORK_DIR/rewrite.md"
+
+# PLACEHOLDER_VERSION is the version in the editor that the user must replace.
+PLACEHOLDER_VERSION="X.Y.Z"
+
+# SEMVER_PATTERN matches a semantic version without any prefix.
+SEMVER_PATTERN='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$'
+
+# SCISSORS marks the start of the part of the message that is ignored.
+SCISSORS="# ------------------------ >8 ------------------------"
+
+function die {
+    >&2 echo "!!! $*"
+    exit 1
+}
+
+# scan_changelog prints the line numbers of the "## [Unreleased]" heading, the
+# line after the end of its section, the first version heading, and the
+# "<!-- references -->" comment that starts the footer. Each is 0 if absent.
+function scan_changelog {
+    awk '
+        /^## / {
+            if (first == 0) first = NR
+            if (inside) { end = NR; inside = 0 }
+            if ($0 ~ /^## \[[Uu]nreleased\]/) { unreleased = NR; inside = 1 }
+            else if (version == 0) version = NR
+        }
+        /^<!-- references -->[[:space:]]*$/ {
+            refs[++count] = NR
+            if (inside) { end = NR; inside = 0 }
+        }
+        END {
+            if (inside) end = NR + 1
+            # The footer is the last references comment after the first heading.
+            # Without headings, a lone references comment belongs to the preamble.
+            for (i = count; i >= 1; i--) {
+                if (first ? refs[i] > first : count >= 2) { footer = refs[i]; break }
+            }
+            print unreleased + 0, end + 0, version + 0, footer + 0
+        }
+    ' "$1"
+}
+
+# trim_blank_lines removes leading and trailing blank lines.
+function trim_blank_lines {
+    awk '
+        { lines[NR] = $0 }
+        /[^[:space:]]/ { if (!first) first = NR; last = NR }
+        END { for (i = first; first && i <= last; i++) print lines[i] }
+    '
+}
+
+# has_content succeeds if the notes contain something other than headings.
+function has_content {
+    grep -q -v -E '^[[:space:]]*(#.*)?$' "$1"
+}
+
+# ------------------------------------------------------------------------------
+
+[ -f "$CHANGELOG_FILE" ] || die "$CHANGELOG_FILE does not exist."
+
+if [ -n "$(git status --porcelain --untracked-files=no -- . ":!$CHANGELOG_FILE")" ]; then
+    die "There are uncommitted changes to files other than $CHANGELOG_FILE."
+fi
+
+if [ -z "$CHANGELOG_TAG_URL_PREFIX" ]; then
+    die "CHANGELOG_TAG_URL_PREFIX must be defined in the project's Makefile."
+fi
+
+mkdir -p "$WORK_DIR"
+cp "$CHANGELOG_FILE" "$BACKUP_FILE"
+
+read -r unreleased_start unreleased_end version_heading footer < <(scan_changelog "$CHANGELOG_FILE")
+
+if [ "$unreleased_start" -gt 0 ]; then
+    sed -n "$((unreleased_start + 1)),$((unreleased_end - 1))p" "$CHANGELOG_FILE" | trim_blank_lines > "$NOTES_FILE"
+else
+    : > "$NOTES_FILE"
+fi
+
+if [ -n "$CHANGELOG_VERSION" ]; then
+    [ "$unreleased_start" -gt 0 ] || die "$CHANGELOG_FILE has no [Unreleased] section."
+    version="$CHANGELOG_VERSION"
+else
+    if [ -n "${MF_NON_INTERACTIVE:-}" ]; then
+        die "Set CHANGELOG_VERSION to tag without an interactive editor, e.g. make tag CHANGELOG_VERSION=1.2.3"
+    fi
+
+    previous_tag="$(git describe --tags --abbrev=0 --match "${CHANGELOG_TAG_PREFIX}*" 2> /dev/null || true)"
+
+    {
+        echo "Version $PLACEHOLDER_VERSION"
+        echo
+        if [ -s "$NOTES_FILE" ]; then
+            cat "$NOTES_FILE"
+            echo
+        fi
+        echo "$SCISSORS"
+        echo "# Replace $PLACEHOLDER_VERSION with the new version. Everything below this line is ignored."
+        echo "# Previous tag: ${previous_tag:-(none)}"
+        echo "#"
+        if [ -n "$previous_tag" ]; then
+            echo "# Commits since $previous_tag:"
+            echo "#"
+            git log --first-parent --pretty='tformat:# - %s' "$previous_tag..HEAD"
+        else
+            echo "# Commits:"
+            echo "#"
+            git log --first-parent --pretty='tformat:# - %s'
+        fi
+    } > "$MESSAGE_FILE"
+
+    editor="$(git var GIT_EDITOR)"
+    sh -c "$editor \"\$@\"" "$editor" "$MESSAGE_FILE" || die "Editor exited with an error, aborting."
+
+    first_line="$(head -n 1 "$MESSAGE_FILE" | sed 's/[[:space:]]*$//')"
+    if [ "$first_line" = "Version $PLACEHOLDER_VERSION" ]; then
+        die "The version was not changed from $PLACEHOLDER_VERSION, aborting."
+    fi
+    if [[ ! "$first_line" =~ ^Version[[:space:]]+(.+)$ ]]; then
+        die "The first line must be \"Version <version>\", aborting. The message is in $MESSAGE_FILE."
+    fi
+    version="${BASH_REMATCH[1]}"
+
+    sed -e '1d' -e "/^$SCISSORS\$/,\$d" "$MESSAGE_FILE" | trim_blank_lines > "$NOTES_FILE"
+fi
+
+[[ "$version" =~ $SEMVER_PATTERN ]] || die "\"$version\" is not a valid semantic version (do not include a prefix such as \"v\")."
+
+tag="$CHANGELOG_TAG_PREFIX$version"
+
+if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null; then
+    die "Tag $tag already exists."
+fi
+if grep -q -F "## [$version]" "$CHANGELOG_FILE"; then
+    die "$CHANGELOG_FILE already contains a section for $version."
+fi
+if ! has_content "$NOTES_FILE"; then
+    die "The release notes for $version are empty, aborting."
+fi
+
+# Replace the [Unreleased] section with the new version section, or add it
+# above the latest version if there is no [Unreleased] section.
+{
+    echo "## [$version] - $(date '+%F')"
+    echo
+    cat "$NOTES_FILE"
+    echo
+} > "$SECTION_FILE"
+
+awk \
+    -v unreleased_start="$unreleased_start" \
+    -v unreleased_end="$unreleased_end" \
+    -v version_heading="$version_heading" \
+    -v footer="$footer" \
+    -v section="$SECTION_FILE" '
+    function emit_section(  line) {
+        while ((getline line < section) > 0) print line
+        close(section)
+    }
+    unreleased_start {
+        if (NR == unreleased_start) emit_section()
+        if (NR >= unreleased_start && NR < unreleased_end) next
+        print
+        next
+    }
+    NR == version_heading || (!version_heading && NR == footer) { emit_section() }
+    { print; last = $0 }
+    END {
+        if (!unreleased_start && !version_heading && !footer) {
+            if (last ~ /[^[:space:]]/) print ""
+            emit_section()
+        }
+    }
+' "$BACKUP_FILE" > "$CHANGELOG_FILE"
+
+# Add the link reference for the new version to the footer, keeping the version
+# links in ascending order.
+link="[$version]: $CHANGELOG_TAG_URL_PREFIX$tag"
+read -r _ _ _ footer < <(scan_changelog "$CHANGELOG_FILE")
+
+if [ "$footer" -eq 0 ]; then
+    {
+        [ -z "$(tail -n 1 "$CHANGELOG_FILE" | tr -d '[:space:]')" ] || echo
+        echo "<!-- references -->"
+        echo
+        echo "$link"
+    } >> "$CHANGELOG_FILE"
+else
+    awk -v footer="$footer" -v version="$version" -v link="$link" '
+        # compare returns a negative, zero or positive number if semantic
+        # version a is less than, equal to, or greater than b.
+        function compare(a, b,  pa, pb, ca, cb, na, nb, i) {
+            sub(/\+.*/, "", a); sub(/\+.*/, "", b)
+            pa = index(a, "-") ? substr(a, index(a, "-") + 1) : ""
+            pb = index(b, "-") ? substr(b, index(b, "-") + 1) : ""
+            sub(/-.*/, "", a); sub(/-.*/, "", b)
+            split(a, ca, "."); split(b, cb, ".")
+            for (i = 1; i <= 3; i++) {
+                if (ca[i] + 0 != cb[i] + 0) return ca[i] - cb[i]
+            }
+            if (pa == pb) return 0
+            if (pa == "") return 1
+            if (pb == "") return -1
+            return pa < pb ? -1 : 1
+        }
+        NR == footer { print; state = "blank"; next }
+        state == "blank" && /^[[:space:]]*$/ { print; blank = 1; next }
+        state == "blank" { state = "links" }
+        state == "links" {
+            if ($0 ~ /^\[[^]]+\]: /) {
+                if ($0 ~ /^\[[0-9]+\.[0-9]+\.[0-9]+[^]]*\]: /) {
+                    v = substr($0, 2, index($0, "]") - 2)
+                    if (compare(v, version) > 0) { print link; state = "done" }
+                }
+                links++
+                print
+                next
+            }
+            print link
+            if (!links && $0 ~ /[^[:space:]]/) print ""
+            state = "done"
+        }
+        { print }
+        END {
+            if (state == "blank" && !blank) print ""
+            if (state == "blank" || state == "links") print link
+        }
+    ' "$CHANGELOG_FILE" > "$REWRITE_FILE"
+    mv "$REWRITE_FILE" "$CHANGELOG_FILE"
+fi
+
+# Tag messages are kept with --cleanup=whitespace so that markdown headings,
+# which begin with "#", are not stripped as comments.
+{
+    echo "Version $version"
+    echo
+    cat "$NOTES_FILE"
+} > "$MESSAGE_FILE"
+
+function restore_changelog {
+    cp "$BACKUP_FILE" "$CHANGELOG_FILE"
+}
+
+git add "$CHANGELOG_FILE"
+if ! git commit --quiet --message "Bump version to $version"; then
+    git reset --quiet -- "$CHANGELOG_FILE"
+    restore_changelog
+    die "Unable to commit $CHANGELOG_FILE, it has been restored. The tag message is in $MESSAGE_FILE."
+fi
+
+if ! git tag --annotate --cleanup=whitespace --file "$MESSAGE_FILE" "$tag"; then
+    git reset --quiet HEAD~1
+    restore_changelog
+    die "Unable to create tag $tag, the commit has been undone and $CHANGELOG_FILE restored. The tag message is in $MESSAGE_FILE."
+fi
+
+echo "Created tag $tag. To publish it, run:"
+echo
+echo "    git push origin HEAD $tag"
