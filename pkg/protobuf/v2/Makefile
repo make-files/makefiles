@@ -41,10 +41,6 @@ PROTO_JS_OPT ?= import_extension=js
 # generates for each .proto file, based on PROTO_JS_TARGET.
 _PROTO_JS_SUFFIXES = $(foreach t,$(subst +, ,$(PROTO_JS_TARGET)),$(if $(filter ts,$t),_pb.ts)$(if $(filter js,$t),_pb.js)$(if $(filter dts,$t),_pb.d.ts))
 
-# PROTO_SWIFT_OUT is the relative path to the directory into which generated
-# Swift files are placed.
-PROTO_SWIFT_OUT ?= .
-
 ################################################################################
 
 $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
@@ -55,9 +51,6 @@ artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
 
 artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
-
-artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/protoc-gen-grpc-swift: Package.swift
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-swift "$(MF_PROJECT_ROOT)/artifacts/protobuf/bin" $(PROTO_SWIFT_OUT)
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
@@ -182,31 +175,3 @@ ifneq ($(PROTO_JS_OPT),)
 	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
 endif
 	echo "--es_out=artifacts/protobuf/js" >> "$@"
-
-# SWIFT ########################################################################
-
-$(PROTO_SWIFT_OUT)/%.pb.swift: %.proto artifacts/protobuf/bin/protoc-gen-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/swift
-	@mkdir -p "$(PROTO_SWIFT_OUT)"
-	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/swift) $(MF_PROJECT_ROOT)/$<
-	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
-
-$(PROTO_SWIFT_OUT)/%.grpc.swift: %.proto artifacts/protobuf/bin/protoc-gen-grpc-swift artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/swift-grpc
-	@mkdir -p "$(PROTO_SWIFT_OUT)"
-	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/swift-grpc) $(MF_PROJECT_ROOT)/$<
-	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
-
-artifacts/protobuf/args/swift: artifacts/protobuf/args/common
-	@mkdir -p "$(@D)"
-	cp "$<" "$@"
-	echo "--proto_path=$(MF_PROJECT_ROOT)" >> "$@"
-	echo "--plugin=$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/proto-gen-swift" >> "$@"
-	echo "--swift_opt=Visibility=Public" >> "$@"
-	echo "--swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
-
-artifacts/protobuf/args/swift-grpc: artifacts/protobuf/args/common
-	@mkdir -p "$(@D)"
-	cp "$<" "$@"
-	echo "--proto_path=$(MF_PROJECT_ROOT)" >> "$@"
-	echo "--plugin=$(MF_PROJECT_ROOT)/artifacts/protobuf/bin/proto-gen-grpc-swift" >> "$@"
-	echo "--grpc-swift_opt=Visibility=Public" >> "$@"
-	echo "--grpc-swift_out=$(PROTO_SWIFT_OUT)" >> "$@"
