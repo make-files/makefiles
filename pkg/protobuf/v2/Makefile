@@ -25,11 +25,21 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # variable when the script is executed.
 PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
+# PROTO_JS_TARGET is the "target" option passed to protoc-gen-es. It is one or
+# more of "ts", "js" and "dts", separated by "+". The default, "ts", generates
+# TypeScript source files (_pb.ts) that are compiled along with the rest of the
+# project. Use "js+dts" to generate JavaScript code and TypeScript declarations
+# (_pb.js and _pb.d.ts) instead.
+PROTO_JS_TARGET ?= ts
+
 # PROTO_JS_OPT is a comma separated list of additional options passed to
-# protoc-gen-es. The "target" option is always "js+dts". By default, relative
-# imports between generated files use a ".js" extension, which is required for
-# ES modules in Node.js.
+# protoc-gen-es. By default, relative imports between generated files use a
+# ".js" extension, which is required for ES modules in Node.js.
 PROTO_JS_OPT ?= import_extension=js
+
+# _PROTO_JS_SUFFIXES is the list of file name suffixes that protoc-gen-es
+# generates for each .proto file, based on PROTO_JS_TARGET.
+_PROTO_JS_SUFFIXES = $(foreach t,$(subst +, ,$(PROTO_JS_TARGET)),$(if $(filter ts,$t),_pb.ts)$(if $(filter js,$t),_pb.js)$(if $(filter dts,$t),_pb.d.ts))
 
 ################################################################################
 
@@ -135,9 +145,9 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 
 # JS ###########################################################################
 
-# The recipes below generate JavaScript code and TypeScript declarations using
-# protoc-gen-es, the code generator for the protobuf-es runtime. The project
-# must depend on the @bufbuild/protoc-gen-es package.
+# The recipes below generate TypeScript or JavaScript code using protoc-gen-es,
+# the code generator for the protobuf-es runtime. The project must depend on
+# the @bufbuild/protoc-gen-es package.
 #
 # protoc is run via $(JS_EXEC) so that the project's locally installed
 # protoc-gen-es plugin is on the PATH, regardless of the package manager.
@@ -149,18 +159,18 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
 # to a staging directory and the files are moved alongside the .proto file.
 
-%_pb.js %_pb.d.ts: %.proto artifacts/link-dependencies.touch artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/js
+$(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/js
 	@mkdir -p artifacts/protobuf/js
 	$(JS_EXEC) $(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/js) $(MF_PROJECT_ROOT)/$<
-	mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*_pb.js" "$*_pb.js"
-	mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*_pb.d.ts" "$*_pb.d.ts"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*_pb.js"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*_pb.d.ts"
+	for suffix in $(_PROTO_JS_SUFFIXES); do \
+		mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*$$suffix" "$*$$suffix" || exit 1; \
+		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \
+	done
 
 artifacts/protobuf/args/js: artifacts/protobuf/args/go-common
 	@mkdir -p "$(@D)"
 	cp "$<" "$@"
-	echo "--es_opt=target=js+dts" >> "$@"
+	echo "--es_opt=target=$(PROTO_JS_TARGET)" >> "$@"
 ifneq ($(PROTO_JS_OPT),)
 	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
 endif
