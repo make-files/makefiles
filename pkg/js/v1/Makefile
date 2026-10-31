@@ -4,6 +4,15 @@ MF_LANGUAGES += js
 # included beforehand.
 .DEFAULT_GOAL := default
 
+# Build JavaScript code and TypeScript declarations from protocol buffers
+# definitions.
+#
+# Any files in underscore-prefixed directory names are ignored, as per the Go
+# convention of using underscores to exclude files and directories from the
+# build.
+GENERATED_FILES += $(foreach f,$(PROTO_FILES:.proto=_pb.js),$(if $(findstring /_,/$f),,$f))
+GENERATED_FILES += $(foreach f,$(PROTO_FILES:.proto=_pb.d.ts),$(if $(findstring /_,/$f),,$f))
+
 # JS_SOURCE_FILES is a space separated list of all files in the src directory.
 JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)
 
