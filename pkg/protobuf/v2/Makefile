@@ -25,11 +25,11 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # variable when the script is executed.
 PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
 
-# PROTO_ES_OPT is a comma separated list of additional options passed to
+# PROTO_JS_OPT is a comma separated list of additional options passed to
 # protoc-gen-es. The "target" option is always "js+dts". By default, relative
 # imports between generated files use a ".js" extension, which is required for
 # ES modules in Node.js.
-PROTO_ES_OPT ?= import_extension=js
+PROTO_JS_OPT ?= import_extension=js
 
 # PROTO_SWIFT_OUT is the relative path to the directory into which generated
 # Swift files are placed.
@@ -140,7 +140,7 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 	echo "--go-grpc_out=." >> "$@"
 	echo "--go-grpc_opt=require_unimplemented_servers=false" >> "$@"
 
-# ES ###########################################################################
+# JS ###########################################################################
 
 # The recipes below generate JavaScript code and TypeScript declarations using
 # protoc-gen-es, the code generator for the protobuf-es runtime. The project
@@ -156,22 +156,22 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
 # to a staging directory and the files are moved alongside the .proto file.
 
-%_pb.js %_pb.d.ts: %.proto artifacts/link-dependencies.touch artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/es
-	@mkdir -p artifacts/protobuf/es
-	$(JS_EXEC) $(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/es) $(MF_PROJECT_ROOT)/$<
-	mv "artifacts/protobuf/es/$$(go list -m | head -n 1)/$*_pb.js" "$*_pb.js"
-	mv "artifacts/protobuf/es/$$(go list -m | head -n 1)/$*_pb.d.ts" "$*_pb.d.ts"
+%_pb.js %_pb.d.ts: %.proto artifacts/link-dependencies.touch artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/js
+	@mkdir -p artifacts/protobuf/js
+	$(JS_EXEC) $(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/js) $(MF_PROJECT_ROOT)/$<
+	mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*_pb.js" "$*_pb.js"
+	mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*_pb.d.ts" "$*_pb.d.ts"
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*_pb.js"
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*_pb.d.ts"
 
-artifacts/protobuf/args/es: artifacts/protobuf/args/go-common
+artifacts/protobuf/args/js: artifacts/protobuf/args/go-common
 	@mkdir -p "$(@D)"
 	cp "$<" "$@"
 	echo "--es_opt=target=js+dts" >> "$@"
-ifneq ($(PROTO_ES_OPT),)
-	echo "--es_opt=$(PROTO_ES_OPT)" >> "$@"
+ifneq ($(PROTO_JS_OPT),)
+	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
 endif
-	echo "--es_out=artifacts/protobuf/es" >> "$@"
+	echo "--es_out=artifacts/protobuf/js" >> "$@"
 
 # SWIFT ########################################################################
 
