@@ -128,19 +128,25 @@ else
             cat "$NOTES_FILE"
             echo
         fi
+        # The text below the scissors is ignored, so it is wrapped in an HTML
+        # comment to prevent markdown formatters from treating it as content.
         echo "$SCISSORS"
-        echo "# Replace $PLACEHOLDER_VERSION with the new version. Everything below this line is ignored."
-        echo "# Previous tag: ${previous_tag:-(none)}"
-        echo "#"
+        echo
+        echo "<!--"
+        echo "Replace $PLACEHOLDER_VERSION with the new version. Everything from the line above is ignored."
+        echo
+        echo "Previous tag: ${previous_tag:-(none)}"
+        echo
         if [ -n "$previous_tag" ]; then
-            echo "# Commits since $previous_tag:"
-            echo "#"
-            git log --first-parent --pretty='tformat:# - %s' "$previous_tag..HEAD"
+            echo "Commits since $previous_tag:"
+            echo
+            git log --first-parent --pretty='tformat:- %s' "$previous_tag..HEAD"
         else
-            echo "# Commits:"
-            echo "#"
-            git log --first-parent --pretty='tformat:# - %s'
+            echo "Commits:"
+            echo
+            git log --first-parent --pretty='tformat:- %s'
         fi
+        echo "-->"
     } > "$MESSAGE_FILE"
 
     editor="$(git var GIT_EDITOR)"
