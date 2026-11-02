@@ -3,14 +3,6 @@ JS_TSC_REQ +=
 
 ################################################################################
 
-# _JS_TSC_REQ is a space separated list of automatically detected prerequisites
-# needed to run tsc. It includes GENERATED_FILES, so that generated sources,
-# such as TypeScript generated from protocol buffers definitions, exist before
-# they're type-checked or compiled.
-_JS_TSC_REQ += artifacts/link-dependencies.touch $$(GENERATED_FILES)
-
-################################################################################
-
 # JS_TSC_TYPECHECK_SKIP_LIB is "true" if checking library types should be
 # skipped.
 JS_TSC_TYPECHECK_SKIP_LIB ?=
@@ -18,8 +10,11 @@ JS_TSC_TYPECHECK_SKIP_LIB ?=
 ################################################################################
 
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
+#
+# It depends on GENERATED_FILES, so that generated sources, such as TypeScript
+# generated from protocol buffers definitions, exist before they're checked.
 .PHONY: tsc-typecheck
-tsc-typecheck: $(JS_TSC_REQ) $(_JS_TSC_REQ)
+tsc-typecheck: artifacts/link-dependencies.touch $$(GENERATED_FILES) $(JS_TSC_REQ)
 ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
 	$(JS_EXEC) tsc --noEmit --skipLibCheck
 else
@@ -44,7 +39,7 @@ ifneq ($(wildcard tsconfig.build.json),)
 JS_PACKAGE_REQ ?= artifacts/dist
 
 # artifacts/dist --- Build the project using tsc.
-artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) $(JS_SOURCE_FILES) $(JS_TSC_REQ) $(_JS_TSC_REQ)
+artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) artifacts/link-dependencies.touch $(JS_SOURCE_FILES) $$(GENERATED_FILES) $(JS_TSC_REQ)
 	@rm -rf "$@"
 	$(JS_EXEC) tsc -p "$<"
 	@touch "$@"
