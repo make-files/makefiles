@@ -14,7 +14,7 @@ _JS_ARETHETYPESWRONG_REQ += artifacts/link-dependencies.touch
 #                      Wrong?".
 .PHONY: arethetypeswrong
 arethetypeswrong: $(JS_ARETHETYPESWRONG_REQ) $(_JS_ARETHETYPESWRONG_REQ)
-	$(JS_EXEC) @arethetypeswrong/cli --pack
+	$(JS_EXEC) attw --pack
 
 ################################################################################
 
