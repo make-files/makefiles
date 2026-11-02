@@ -6,7 +6,7 @@ JS_ARETHETYPESWRONG_REQ +=
 
 # _JS_ARETHETYPESWRONG_REQ is a space separated list of automatically detected
 # prerequisites needed to run "Are The Types Wrong?".
-_JS_ARETHETYPESWRONG_REQ += artifacts/link-dependencies.touch
+_JS_ARETHETYPESWRONG_REQ += artifacts/link-dependencies.touch $$(JS_PACKAGE_REQ)
 
 ################################################################################
 

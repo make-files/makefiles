@@ -11,7 +11,7 @@ JS_TSC_TYPECHECK_SKIP_LIB ?=
 
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
 .PHONY: tsc-typecheck
-tsc-typecheck: artifacts/link-dependencies.touch $(JS_TSC_REQ)
+tsc-typecheck: artifacts/link-dependencies.touch $$(GENERATED_FILES) $(JS_TSC_REQ)
 ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
 	$(JS_EXEC) tsc --noEmit --skipLibCheck
 else
@@ -23,16 +23,14 @@ endif
 # If the project has a "tsconfig.build.json" file, it is used to build the
 # project into the "artifacts/dist" directory. Its "outDir" option must be set
 # to "artifacts/dist".
-#
-# Nothing depends on this target by default. Typically, it's added to the
-# prerequisites of tools that check the built package, for example:
-#
-#   JS_ARETHETYPESWRONG_REQ += artifacts/dist
-#   JS_PUBLINT_REQ += artifacts/dist
 ifneq ($(wildcard tsconfig.build.json),)
 
+# JS_PACKAGE_REQ is a space separated list of prerequisites needed before the
+# built package is checked.
+JS_PACKAGE_REQ ?= artifacts/dist
+
 # artifacts/dist --- Build the project using tsc.
-artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) artifacts/link-dependencies.touch $(JS_SOURCE_FILES) $(JS_TSC_REQ)
+artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) artifacts/link-dependencies.touch $(JS_SOURCE_FILES) $$(GENERATED_FILES) $(JS_TSC_REQ)
 	@rm -rf "$@"
 	$(JS_EXEC) tsc -p "$<"
 	@touch "$@"
