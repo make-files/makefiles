@@ -8,6 +8,9 @@ JS_SKYPACK_PACKAGE_CHECK_REQ +=
 # detected prerequisites needed to run @skypack/package-check.
 _JS_SKYPACK_PACKAGE_CHECK_REQ += artifacts/link-dependencies.touch
 
+# If with-tsc.mk builds the project into artifacts/dist, check the built package.
+_JS_SKYPACK_PACKAGE_CHECK_REQ += $$(_JS_TSC_DIST)
+
 ################################################################################
 
 # skypack-package-check --- Check for NPM package publishing issues using

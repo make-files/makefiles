@@ -8,6 +8,9 @@ JS_ARETHETYPESWRONG_REQ +=
 # prerequisites needed to run "Are The Types Wrong?".
 _JS_ARETHETYPESWRONG_REQ += artifacts/link-dependencies.touch
 
+# If with-tsc.mk builds the project into artifacts/dist, check the built package.
+_JS_ARETHETYPESWRONG_REQ += $$(_JS_TSC_DIST)
+
 ################################################################################
 
 # arethetypeswrong --- Check for TypeScript type issues using "Are The Types

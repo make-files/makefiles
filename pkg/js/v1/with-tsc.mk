@@ -3,6 +3,14 @@ JS_TSC_REQ +=
 
 ################################################################################
 
+# _JS_TSC_REQ is a space separated list of automatically detected prerequisites
+# needed to run tsc. It includes GENERATED_FILES, so that generated sources,
+# such as TypeScript generated from protocol buffers definitions, exist before
+# they're type-checked or compiled.
+_JS_TSC_REQ += artifacts/link-dependencies.touch $$(GENERATED_FILES)
+
+################################################################################
+
 # JS_TSC_TYPECHECK_SKIP_LIB is "true" if checking library types should be
 # skipped.
 JS_TSC_TYPECHECK_SKIP_LIB ?=
@@ -11,7 +19,7 @@ JS_TSC_TYPECHECK_SKIP_LIB ?=
 
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
 .PHONY: tsc-typecheck
-tsc-typecheck: artifacts/link-dependencies.touch $(JS_TSC_REQ)
+tsc-typecheck: $(JS_TSC_REQ) $(_JS_TSC_REQ)
 ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
 	$(JS_EXEC) tsc --noEmit --skipLibCheck
 else
@@ -24,15 +32,17 @@ endif
 # project into the "artifacts/dist" directory. Its "outDir" option must be set
 # to "artifacts/dist".
 #
-# Nothing depends on this target by default. Typically, it's added to the
-# prerequisites of tools that check the built package, for example:
-#
-#   JS_ARETHETYPESWRONG_REQ += artifacts/dist
-#   JS_PUBLINT_REQ += artifacts/dist
+# The tools that check the built package, such as publint, arethetypeswrong and
+# @skypack/package-check, build it first. Nothing else depends on it.
 ifneq ($(wildcard tsconfig.build.json),)
 
+# _JS_TSC_DIST is the directory that the project is built into. The makefiles
+# for tools that check the built package depend on it, using second expansion
+# so that it doesn't matter whether they're included before this file.
+_JS_TSC_DIST = artifacts/dist
+
 # artifacts/dist --- Build the project using tsc.
-artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) artifacts/link-dependencies.touch $(JS_SOURCE_FILES) $(JS_TSC_REQ)
+artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) $(JS_SOURCE_FILES) $(JS_TSC_REQ) $(_JS_TSC_REQ)
 	@rm -rf "$@"
 	$(JS_EXEC) tsc -p "$<"
 	@touch "$@"
