@@ -1,0 +1,3 @@
+# This file is intentionally empty. The tool-exec script uses it in place of
+# mise's global and system configuration, so that only the project's own
+# mise.toml is used.

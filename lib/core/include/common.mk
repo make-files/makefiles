@@ -42,6 +42,17 @@ else
 export MF_NON_INTERACTIVE ?= true
 endif
 
+# MF_TOOL_CONFIG_FILES is a space separated list of the files in which the
+# project declares the versions of its tools, if it has a tool manager. See
+# lib/core/bin/tool-exec.
+MF_TOOL_CONFIG_FILES := $(shell PATH="$(PATH)" tool-exec --config-files)
+
+# MF_TOOL_REQ is a prerequisite of any target that runs a tool via tool-exec. It
+# installs the project's tools, and is rebuilt whenever the files that declare
+# them change, so that targets that produce files using a tool are rebuilt when
+# the tool's version changes. It is empty if the project has no tool manager.
+MF_TOOL_REQ := $(if $(MF_TOOL_CONFIG_FILES),artifacts/tools.touch)
+
 # Use the "default" target by default unless the project's main Makefile has
 # already defined a default goal.
 ifeq ($(.DEFAULT_GOAL),)
@@ -126,6 +137,11 @@ CI_RUN_BENCHMARKS ?= true
 
 # Include any Makefiles that are provided by the currently installed libraries.
 include $(MF_ROOT)/lib/core/include/lib.mk
+
+artifacts/tools.touch: $(MF_TOOL_CONFIG_FILES)
+	$(MF_ROOT)/lib/core/bin/tool-exec --install
+	@mkdir -p "$(@D)"
+	@touch "$@"
 
 # makefiles --- Installs or updates makefiles.dev. Useful to run before make -j
 # in order to avoid concurrency issues while installing.
