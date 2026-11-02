@@ -24,6 +24,12 @@ GO_SOURCE_FILES += $(shell PATH="$(PATH)" git-find . -name '*.go' -not -regex '^
 # the Go binary using the standard "embed" package.
 GO_EMBEDDED_FILES +=
 
+# GO_TOOLS is a space separated list of the packages of the Go tools used by the
+# Makefiles, which are run using "go tool", at the versions in go.mod. Targets
+# that run a Go tool must depend on artifacts/go/tools.touch as an order-only
+# prerequisite, which adds any missing "tool" directives to go.mod.
+GO_TOOLS +=
+
 # Disable CGO by default.
 # See https://golang.org/cmd/cgo
 CGO_ENABLED ?= 0
@@ -264,6 +270,19 @@ archive-sums: artifacts/archives/sums.sha256
 
 go.sum: go.mod
 	go mod tidy
+
+# artifacts/go/tools.touch adds any missing "tool" directives for GO_TOOLS to
+# go.mod. It is a single target so that go.mod is not modified concurrently. It
+# is rebuilt when the project's Makefile changes, as that is where the makefiles
+# that add to GO_TOOLS are included.
+#
+# Targets should depend on it as an order-only prerequisite, so that it does not
+# cause them to be rebuilt. Targets that produce files using a Go tool should
+# depend on go.mod instead, so that changing the tool's version rebuilds them.
+artifacts/go/tools.touch: go.mod $(firstword $(MAKEFILE_LIST))
+	$(MF_ROOT)/pkg/go/v1/bin/require-go-tools $(GO_TOOLS)
+	@mkdir -p "$(@D)"
+	@touch "$@"
 
 artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"

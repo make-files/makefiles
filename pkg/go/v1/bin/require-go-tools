@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage: require-go-tools <package>...
+#
+# Adds a "tool" directive to go.mod for each <package> that does not already
+# have one, at the latest version. The tools are run using "go tool", at the
+# versions in go.mod.
+
+tool_list="$(go tool)"
+
+# Depending on the Go version, "go tool" lists each tool either as its package
+# path, or as its name followed by its package path in parentheses.
+for package in "$@"; do
+    if grep -qxF "$package" <<< "$tool_list" || [[ "$tool_list" == *"($package)"* ]]; then
+        echo "found $package in go.mod"
+    else
+        echo "did not find $package in go.mod, defaulting to latest version"
+        go get -tool "$package"
+    fi
+done
