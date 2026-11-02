@@ -33,13 +33,15 @@ endif
 # to "artifacts/dist".
 #
 # The tools that check the built package, such as publint, arethetypeswrong and
-# @skypack/package-check, build it first. Nothing else depends on it.
+# @skypack/package-check, build it first, by way of JS_PACKAGE_REQ. Nothing else
+# depends on it.
 ifneq ($(wildcard tsconfig.build.json),)
 
-# _JS_TSC_DIST is the directory that the project is built into. The makefiles
-# for tools that check the built package depend on it, using second expansion
-# so that it doesn't matter whether they're included before this file.
-_JS_TSC_DIST = artifacts/dist
+# JS_PACKAGE_REQ is a space separated list of prerequisites needed before tools
+# that check the built package are run. It defaults to building the project into
+# artifacts/dist. Set it to an empty value to check the package without building
+# it first, or to another target to build the package differently.
+JS_PACKAGE_REQ ?= artifacts/dist
 
 # artifacts/dist --- Build the project using tsc.
 artifacts/dist: tsconfig.build.json $(wildcard tsconfig.json) $(JS_SOURCE_FILES) $(JS_TSC_REQ) $(_JS_TSC_REQ)

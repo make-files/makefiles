@@ -8,8 +8,10 @@ JS_ARETHETYPESWRONG_REQ +=
 # prerequisites needed to run "Are The Types Wrong?".
 _JS_ARETHETYPESWRONG_REQ += artifacts/link-dependencies.touch
 
-# If with-tsc.mk builds the project into artifacts/dist, check the built package.
-_JS_ARETHETYPESWRONG_REQ += $$(_JS_TSC_DIST)
+# Build the package before checking it. JS_PACKAGE_REQ defaults to building the
+# project into artifacts/dist, if with-tsc.mk is included. It's expanded when the
+# prerequisites are needed, so it can be set before or after this file.
+_JS_ARETHETYPESWRONG_REQ += $$(JS_PACKAGE_REQ)
 
 ################################################################################
 
