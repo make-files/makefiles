@@ -10,9 +10,6 @@ JS_TSC_TYPECHECK_SKIP_LIB ?=
 ################################################################################
 
 # tsc-typecheck --- Use tsc to check for TypeScript errors.
-#
-# It depends on GENERATED_FILES, so that generated sources, such as TypeScript
-# generated from protocol buffers definitions, exist before they're checked.
 .PHONY: tsc-typecheck
 tsc-typecheck: artifacts/link-dependencies.touch $$(GENERATED_FILES) $(JS_TSC_REQ)
 ifeq ($(JS_TSC_TYPECHECK_SKIP_LIB),true)
@@ -26,16 +23,10 @@ endif
 # If the project has a "tsconfig.build.json" file, it is used to build the
 # project into the "artifacts/dist" directory. Its "outDir" option must be set
 # to "artifacts/dist".
-#
-# The tools that check the built package, such as publint, arethetypeswrong and
-# @skypack/package-check, build it first, by way of JS_PACKAGE_REQ. Nothing else
-# depends on it.
 ifneq ($(wildcard tsconfig.build.json),)
 
-# JS_PACKAGE_REQ is a space separated list of prerequisites needed before tools
-# that check the built package are run. It defaults to building the project into
-# artifacts/dist. Set it to an empty value to check the package without building
-# it first, or to another target to build the package differently.
+# JS_PACKAGE_REQ is a space separated list of prerequisites needed before the
+# built package is checked.
 JS_PACKAGE_REQ ?= artifacts/dist
 
 # artifacts/dist --- Build the project using tsc.
