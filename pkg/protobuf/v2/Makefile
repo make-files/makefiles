@@ -25,11 +25,6 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 # each recipe sets to the command that runs its plugin.
 _PROTO_EXEC_PLUGIN := $(MF_ROOT)/pkg/protobuf/v2/bin/exec-protoc-plugin
 
-# _PROTO_GEN_GO and _PROTO_GEN_GO_GRPC are the packages of the Go protoc
-# plugins, which are run using "go tool", at the versions in go.mod.
-_PROTO_GEN_GO := google.golang.org/protobuf/cmd/protoc-gen-go
-_PROTO_GEN_GO_GRPC := google.golang.org/grpc/cmd/protoc-gen-go-grpc
-
 # PROTO_JS_TARGET is the "target" option passed to protoc-gen-es. It is one or
 # more of "ts", "js" and "dts", separated by "+". The default, "ts", generates
 # TypeScript source files (_pb.ts) that are compiled along with the rest of the
@@ -114,13 +109,19 @@ precommit:: .clang-format
 #
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
+#
+# The protoc plugins are run using "go tool", at the versions in go.mod, so the
+# project must declare them as tools:
+#
+#   go get -tool google.golang.org/protobuf/cmd/protoc-gen-go
+#   go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
-%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go | artifacts/go/tools/$(_PROTO_GEN_GO).touch
-	PROTO_PLUGIN_COMMAND="go tool $(_PROTO_GEN_GO)" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go) --plugin protoc-gen-go=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
+%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go
+	PROTO_PLUGIN_COMMAND="go tool google.golang.org/protobuf/cmd/protoc-gen-go" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go) --plugin protoc-gen-go=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go-grpc | artifacts/go/tools/$(_PROTO_GEN_GO_GRPC).touch
-	PROTO_PLUGIN_COMMAND="go tool $(_PROTO_GEN_GO_GRPC)" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go-grpc) --plugin protoc-gen-go-grpc=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
+%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go-grpc
+	PROTO_PLUGIN_COMMAND="go tool google.golang.org/grpc/cmd/protoc-gen-go-grpc" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go-grpc) --plugin protoc-gen-go-grpc=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
 artifacts/protobuf/args/go-common: artifacts/protobuf/args/common go.mod

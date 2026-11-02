@@ -1,14 +1,12 @@
 GO_OPENAPI_FILES += $(shell PATH="$(PATH)" git-find . -name 'openapi.yml' -not -regex '^_.*' -not -regex '.*\/_.*')
 GENERATED_FILES += $(foreach f,$(GO_OPENAPI_FILES:.yml=.ogen.go),$(if $(findstring /_,/$f),,$f))
 
-# _GO_OGEN is the package of ogen, which is run using "go tool", at the version
-# in go.mod.
-_GO_OGEN := github.com/ogen-go/ogen/cmd/ogen
-
-%.ogen.go: %.yml go.mod | artifacts/go/tools/$(_GO_OGEN).touch
+# ogen is run using "go tool", at the version in go.mod, so the project must
+# declare it as a tool: go get -tool github.com/ogen-go/ogen/cmd/ogen
+%.ogen.go: %.yml go.mod
 	$(eval PACKAGE := $(notdir $(@D)))
 
-	go tool $(_GO_OGEN) \
+	go tool github.com/ogen-go/ogen/cmd/ogen \
 		-target $(@D) \
 		-package $(PACKAGE) \
 		-clean \

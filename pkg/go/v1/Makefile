@@ -265,20 +265,6 @@ archive-sums: artifacts/archives/sums.sha256
 go.sum: go.mod
 	go mod tidy
 
-# Go tools used by the Makefiles are run using "go tool", at the versions in
-# go.mod. A target that runs a Go tool must depend on
-# artifacts/go/tools/<package>.touch as an order-only prerequisite, where
-# <package> is the tool's package path. This adds a "tool" directive for the
-# tool to go.mod, if it does not already have one.
-#
-# Being order-only, it does not cause the target to be rebuilt. Targets that
-# produce files using a Go tool should depend on go.mod instead, so that
-# changing the tool's version rebuilds them.
-artifacts/go/tools/%.touch: go.mod
-	$(MF_ROOT)/pkg/go/v1/bin/require-go-tools $*
-	@mkdir -p "$(@D)"
-	@touch "$@"
-
 artifacts/coverage/index.html: artifacts/coverage/cover.out
 	go tool cover -html="$<" -o "$@"
 
