@@ -94,22 +94,29 @@ function mise_install() {
     mise install
 }
 
-# mise_exec replaces the current process with the binary named $1, run via
-# mise. It is an error if the binary is not provided by an installed tool, as
+# mise_exec replaces the current process with the binary named $1, as installed
+# by mise. It is an error if the binary is not provided by an installed tool, as
 # running whatever version is on the PATH would defeat the purpose of declaring
 # the project's tools.
 #
 # mise only knows which binaries a tool provides once it is installed, so a
 # binary that is declared but not yet installed can not be distinguished from
 # one that is not declared at all.
+#
+# The binary is run directly, rather than via "mise exec", so that it inherits
+# the PATH unchanged. "mise exec" rebuilds the PATH from the project's
+# configuration alone, which removes any other tools installed by mise, such as
+# pnpm when a protoc plugin is run via "pnpm exec".
 function mise_exec() {
     mise_env
 
-    if ! (cd "$MF_PROJECT_ROOT" && mise which "$1" >/dev/null 2>&1); then
+    local bin
+    if ! bin="$(cd "$MF_PROJECT_ROOT" && mise which "$1" 2>/dev/null)"; then
         die "$1 is required, but is not provided by any of the tools installed by mise, declare it in mise.toml using \`mise use <tool>@<version>\`, then run make or \`mise install\`"
     fi
 
-    exec mise exec -- "$@"
+    shift
+    exec "$bin" ${@+"$@"}
 }
 
 ################################################################################

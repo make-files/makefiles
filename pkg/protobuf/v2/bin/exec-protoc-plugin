@@ -4,4 +4,8 @@ set -euo pipefail
 # Runs the protoc plugin command given by the PROTO_PLUGIN_COMMAND environment
 # variable. protoc runs this script as the plugin, so that plugins can be run by
 # commands such as "go tool" or "pnpm exec", rather than from a fixed path.
-exec ${PROTO_PLUGIN_COMMAND} "${@}"
+#
+# protoc runs plugins without arguments. ${@+"$@"} expands to nothing in that
+# case, whereas "${@}" is an unbound variable error in bash 3.2, the version
+# that ships with macOS.
+exec ${PROTO_PLUGIN_COMMAND} ${@+"$@"}
