@@ -20,10 +20,10 @@ PROTO_INCLUDE_PATHS ?=
 # the latest version of protoc is installed for the host operating system.
 PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 
-# PROTO_PROTOC_PATH is the path to the script file that includes
-# $(MF_PROJECT_ROOT)/artifacts/protobuf/bin directory in the PATH environment
-# variable when the script is executed.
-PROTO_PROTOC_PATH = $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/run-protoc
+# _PROTO_EXEC_PLUGIN is the path to the script passed to protoc as each plugin.
+# It runs the command in the PROTO_PLUGIN_COMMAND environment variable, which
+# each recipe sets to the command that runs its plugin.
+_PROTO_EXEC_PLUGIN := $(MF_ROOT)/pkg/protobuf/v2/bin/exec-protoc-plugin
 
 # PROTO_JS_TARGET is the "target" option passed to protoc-gen-es. It is one or
 # more of "ts", "js" and "dts", separated by "+". The default, "ts", generates
@@ -45,12 +45,6 @@ _PROTO_JS_SUFFIXES = $(foreach t,$(subst +, ,$(PROTO_JS_TARGET)),$(if $(filter t
 
 $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc:
 	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc "$(MF_PROJECT_ROOT)/artifacts/protobuf"
-
-artifacts/protobuf/bin/run-protoc: $(PROTOC_COMMAND)
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-run-protoc $(PROTOC_COMMAND) "$@"
-
-artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/protoc-gen-go-grpc: go.mod
-	$(MF_ROOT)/pkg/protobuf/v2/bin/install-protoc-gen-go "$(MF_PROJECT_ROOT)/$(@D)"
 
 artifacts/protobuf/args/common:
 	@mkdir -p "$(@D)"
@@ -115,13 +109,19 @@ precommit:: .clang-format
 #
 # For more information follow this link:
 # https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation
+#
+# The protoc plugins are run using "go tool", at the versions in go.mod, so the
+# project must declare them as tools:
+#
+#   go get -tool google.golang.org/protobuf/cmd/protoc-gen-go
+#   go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
-%.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/go
-	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/go) $(MF_PROJECT_ROOT)/$<
+%.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go
+	PROTO_PLUGIN_COMMAND="go tool google.golang.org/protobuf/cmd/protoc-gen-go" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go) --plugin protoc-gen-go=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
-%_grpc.pb.go: %.proto artifacts/protobuf/bin/protoc-gen-go-grpc artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/go-grpc
-	$(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/go-grpc) $(MF_PROJECT_ROOT)/$<
+%_grpc.pb.go: %.proto $(PROTOC_COMMAND) artifacts/protobuf/args/go-grpc
+	PROTO_PLUGIN_COMMAND="go tool google.golang.org/grpc/cmd/protoc-gen-go-grpc" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/go-grpc) --plugin protoc-gen-go-grpc=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes $@
 
 artifacts/protobuf/args/go-common: artifacts/protobuf/args/common go.mod
@@ -149,8 +149,8 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # the code generator for the protobuf-es runtime. The project must depend on
 # the @bufbuild/protoc-gen-es package.
 #
-# protoc is run via $(JS_EXEC) so that the project's locally installed
-# protoc-gen-es plugin is on the PATH, regardless of the package manager.
+# protoc runs the project's locally installed protoc-gen-es plugin via
+# $(JS_EXEC), regardless of the package manager.
 #
 # Import paths are resolved from "go list -m all" in the same way as for Go, so
 # the project must also be a Go module.
@@ -159,9 +159,9 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
 # to a staging directory and the files are moved alongside the .proto file.
 
-$(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch artifacts/protobuf/bin/run-protoc artifacts/protobuf/args/js
+$(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch $(PROTOC_COMMAND) artifacts/protobuf/args/js
 	@mkdir -p artifacts/protobuf/js
-	$(JS_EXEC) $(PROTO_PROTOC_PATH) $$(cat artifacts/protobuf/args/js) $(MF_PROJECT_ROOT)/$<
+	PROTO_PLUGIN_COMMAND="$(JS_EXEC) protoc-gen-es" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/js) --plugin protoc-gen-es=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	for suffix in $(_PROTO_JS_SUFFIXES); do \
 		mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*$$suffix" "$*$$suffix" || exit 1; \
 		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \

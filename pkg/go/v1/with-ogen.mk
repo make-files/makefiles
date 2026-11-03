@@ -1,14 +1,12 @@
 GO_OPENAPI_FILES += $(shell PATH="$(PATH)" git-find . -name 'openapi.yml' -not -regex '^_.*' -not -regex '.*\/_.*')
 GENERATED_FILES += $(foreach f,$(GO_OPENAPI_FILES:.yml=.ogen.go),$(if $(findstring /_,/$f),,$f))
 
-artifacts/go/bin/ogen: go.mod
-	@mkdir -p "$(@D)"
-	GOBIN=$(MF_PROJECT_ROOT)/artifacts/go/bin go install -v github.com/ogen-go/ogen/cmd/ogen
-
-%.ogen.go: %.yml artifacts/go/bin/ogen
+# ogen is run using "go tool", at the version in go.mod, so the project must
+# declare it as a tool: go get -tool github.com/ogen-go/ogen/cmd/ogen
+%.ogen.go: %.yml go.mod
 	$(eval PACKAGE := $(notdir $(@D)))
 
-	artifacts/go/bin/ogen \
+	go tool github.com/ogen-go/ogen/cmd/ogen \
 		-target $(@D) \
 		-package $(PACKAGE) \
 		-clean \
