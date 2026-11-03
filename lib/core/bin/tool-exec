@@ -37,6 +37,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
 #
 # Binaries with stable interfaces (git, find, zip, curl, openssl) fail test 1
 # and are invoked directly.
+#
+# pnpm is a tool despite the "packageManager" field in package.json, as that
+# field only installs pnpm via Corepack, which Node.js no longer bundles.
 
 # tool_manager prints the name of the project's tool manager, if it has one.
 function tool_manager() {
