@@ -15,6 +15,7 @@ endif
 # _PRETTIER_REQ is a space separated list of automatically detected
 # prerequisites needed to run Prettier.
 _PRETTIER_REQ += $(PRETTIER_CONFIG_FILE)
+_PRETTIER_REQ += $(MF_TOOL_REQ)
 
 # _PRETTIER_ARGS is a space separated list of arguments to pass to Prettier.
 _PRETTIER_ARGS := --config "$(PRETTIER_CONFIG_FILE)"
@@ -38,12 +39,12 @@ ci:: prettier-check
 # prettier --- Automatically fix code style and formatting issues.
 .PHONY: prettier
 prettier: $(PRETTIER_REQ) $(_PRETTIER_REQ)
-	prettier $(_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
+	tool-exec prettier $(_PRETTIER_ARGS) --write "$(MF_PROJECT_ROOT)"
 
 # prettier-check --- Check for code style and formatting issues.
 .PHONY: prettier-check
 prettier-check: $(PRETTIER_REQ) $(_PRETTIER_REQ)
-	prettier $(_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"
+	tool-exec prettier $(_PRETTIER_ARGS) --check "$(MF_PROJECT_ROOT)"
 
 ################################################################################
 

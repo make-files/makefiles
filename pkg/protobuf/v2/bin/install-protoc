@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# DEPRECATED: Projects should declare protoc using their tool manager instead.
+# See lib/core/bin/tool-exec.
+
 PROTOC_ROOT="${1}"
 shift
 

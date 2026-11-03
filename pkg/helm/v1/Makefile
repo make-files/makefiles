@@ -27,7 +27,7 @@ ci:: helm-lint
 # correct.
 .PHONY: helm-lint
 helm-lint: $(HELM_CHART_PATH)/charts
-	helm lint --strict "$(HELM_CHART_PATH)"
+	tool-exec helm lint --strict "$(HELM_CHART_PATH)"
 
 # helm-template --- Render the Helm templates to an artifacts directory.
 .PHONY: helm-template
@@ -47,21 +47,21 @@ helm-push: $(_HELM_PACKAGE)
 ifndef HELM_REGISTRY
 	$(error "HELM_REGISTRY must be defined in order to push.")
 endif
-	helm push $(_HELM_PACKAGE) $(HELM_REGISTRY)
+	$(MF_ROOT)/lib/core/bin/tool-exec helm push $(_HELM_PACKAGE) $(HELM_REGISTRY)
 
 ################################################################################
 
-artifacts/helm/template: $(_HELM_FILES) $(HELM_CHART_PATH)/charts
+artifacts/helm/template: $(_HELM_FILES) $(HELM_CHART_PATH)/charts $(MF_TOOL_REQ)
 	@rm -rf "$@"
-	helm template --output-dir "$@" "$(HELM_CHART_PATH)"
+	tool-exec helm template --output-dir "$@" "$(HELM_CHART_PATH)"
 
-$(HELM_CHART_PATH)/charts: $(HELM_CHART_PATH)/Chart.yaml
+$(HELM_CHART_PATH)/charts: $(HELM_CHART_PATH)/Chart.yaml $(MF_TOOL_REQ)
 	@mkdir -p "$@"
-	if ! helm dependency build $(HELM_CHART_PATH); then rm -rf "$@"; exit 1; fi
+	if ! tool-exec helm dependency build $(HELM_CHART_PATH); then rm -rf "$@"; exit 1; fi
 	@touch "$@"
 
-$(_HELM_PACKAGE): $(_HELM_FILES) $(HELM_CHART_PATH)/charts
-	helm package \
+$(_HELM_PACKAGE): $(_HELM_FILES) $(HELM_CHART_PATH)/charts $(MF_TOOL_REQ)
+	tool-exec helm package \
 		"$(HELM_CHART_PATH)" \
 		--destination "$(@D)" \
 		--version "$(HELM_CHART_VERSION)" \

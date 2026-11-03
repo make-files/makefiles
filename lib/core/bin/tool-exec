@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
+
+# tool-exec runs a third-party "tool" at the version declared by the project's
+# tool manager. It is an error if the project has a tool manager that does not
+# declare the tool, or has not installed it. If the project has no tool manager,
+# the tool is run from the PATH.
+#
+# tool-exec never installs tools itself. Makefile targets that run a tool must
+# depend on $(MF_TOOL_REQ), which installs the project's tools using
+# "tool-exec --install" whenever the files that declare them change.
+#
+# With --config-files, it prints the paths of the files in which the project
+# declares its tools, if it has a tool manager.
+#
+# A "tool manager" installs tools at the versions declared by the project. The
+# only supported tool manager is mise, which is used when the project has a
+# mise.toml file.
+#
+# WHAT IS A TOOL?
+#
+# A makefile package must invoke a binary via tool-exec if, and only if, ALL of
+# the following are true:
+#
+#   1. Its version matters. A different version can change what the makefiles
+#      produce, or whether a check passes. For example: generated code,
+#      formatting, lint results or packaged artifacts.
+#
+#   2. It has no native pin. No ecosystem that the package already depends on
+#      can pin its version. For example, a Go package pins protoc-gen-go with a
+#      "tool" directive in go.mod, and a JS package pins tsc in package.json.
+#
+#   3. It is a standalone CLI. Language runtimes (go, node, php) are pinned by
+#      their own ecosystem's conventions, and system services (docker) are
+#      provided by the host.
+#
+# Binaries with stable interfaces (git, find, zip, curl, openssl) fail test 1
+# and are invoked directly.
+
+# tool_manager prints the name of the project's tool manager, if it has one.
+function tool_manager() {
+    if [[ -f "$MF_PROJECT_ROOT/mise.toml" ]]; then
+        echo mise
+    fi
+}
+
+# tool_config_files prints the paths of the files in which the project declares
+# its tools, if it has a tool manager.
+function tool_config_files() {
+    case "$(tool_manager)" in
+        mise) echo "$MF_PROJECT_ROOT/mise.toml" ;;
+    esac
+}
+
+# tool_install installs the tools declared by the project, if it has a tool
+# manager.
+function tool_install() {
+    case "$(tool_manager)" in
+        mise) mise_install ;;
+    esac
+}
+
+# tool_exec replaces the current process with the binary named $1, passing it
+# the remaining arguments. If the project has a tool manager, the binary must be
+# provided by one of the tools it has installed, otherwise it is found on the
+# PATH.
+function tool_exec() {
+    case "$(tool_manager)" in
+        mise) mise_exec "$@" ;;
+        *) exec "$@" ;;
+    esac
+}
+
+# MISE #########################################################################
+
+# mise_env configures the environment so that mise only reads the project's own
+# configuration, ignoring any global, system or parent directory configuration
+# that may differ between machines.
+function mise_env() {
+    if ! command -v mise >/dev/null; then
+        die "this project declares its tools in mise.toml, but mise is not installed, see https://mise.jdx.dev/installing-mise.html"
+    fi
+
+    export MISE_GLOBAL_CONFIG_FILE="$MF_ROOT/lib/core/etc/mise.toml"
+    export MISE_SYSTEM_CONFIG_FILE="$MF_ROOT/lib/core/etc/mise.toml"
+    export MISE_CEILING_PATHS="$(dirname "$MF_PROJECT_ROOT")"
+}
+
+# mise_install installs the tools declared in mise.toml.
+function mise_install() {
+    mise_env
+    cd "$MF_PROJECT_ROOT"
+    mise install
+}
+
+# mise_exec replaces the current process with the binary named $1, run via
+# mise. It is an error if the binary is not provided by an installed tool, as
+# running whatever version is on the PATH would defeat the purpose of declaring
+# the project's tools.
+#
+# mise only knows which binaries a tool provides once it is installed, so a
+# binary that is declared but not yet installed can not be distinguished from
+# one that is not declared at all.
+function mise_exec() {
+    mise_env
+
+    if ! (cd "$MF_PROJECT_ROOT" && mise which "$1" >/dev/null 2>&1); then
+        die "$1 is required, but is not provided by any of the tools installed by mise, declare it in mise.toml using \`mise use <tool>@<version>\`, then run make or \`mise install\`"
+    fi
+
+    exec mise exec -- "$@"
+}
+
+################################################################################
+
+if [[ "${1:-}" == --install && $# == 1 ]]; then
+    tool_install
+    exit 0
+fi
+
+if [[ "${1:-}" == --config-files && $# == 1 ]]; then
+    tool_config_files
+    exit 0
+fi
+
+if [[ $# < 1 || "$1" == --install || "$1" == --config-files ]]; then
+    echo "Usage: tool-exec bin [args...]"
+    echo "       tool-exec --install"
+    echo "       tool-exec --config-files"
+    echo
+    echo "  Runs a tool at the version declared by the project's tool manager,"
+    echo "  installs the project's tools, or prints the paths of the files in"
+    echo "  which the project declares its tools."
+    echo
+    exit 1
+fi
+
+tool_exec "$@"
