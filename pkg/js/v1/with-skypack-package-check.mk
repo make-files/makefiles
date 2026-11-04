@@ -6,7 +6,7 @@ JS_SKYPACK_PACKAGE_CHECK_REQ +=
 
 # _JS_SKYPACK_PACKAGE_CHECK_REQ is a space separated list of automatically
 # detected prerequisites needed to run @skypack/package-check.
-_JS_SKYPACK_PACKAGE_CHECK_REQ += artifacts/link-dependencies.touch
+_JS_SKYPACK_PACKAGE_CHECK_REQ += artifacts/link-dependencies.touch $$(JS_PACKAGE_REQ)
 
 ################################################################################
 

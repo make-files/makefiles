@@ -6,7 +6,7 @@ JS_PUBLINT_REQ +=
 
 # _JS_PUBLINT_REQ is a space separated list of automatically detected
 # prerequisites needed to run publint.
-_JS_PUBLINT_REQ += artifacts/link-dependencies.touch
+_JS_PUBLINT_REQ += artifacts/link-dependencies.touch $$(JS_PACKAGE_REQ)
 
 ################################################################################
 
