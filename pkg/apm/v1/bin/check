@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# check fails if the repository contains agent configuration that is, or could
+# be, committed, other than under .apm/.
+#
+# Agent configuration is authored under .apm/, and "apm install" deploys it to
+# the directories of the agents that each developer uses, such as .claude/. The
+# deployed files differ between developers, so they must not be committed.
+#
+# Untracked files are only reported if they are not ignored, so that developers
+# can keep their deployed configuration in their global gitignore.
+
+# list prints the files matching the given pathspecs that are tracked, or are
+# untracked and not ignored.
+function list() {
+    git ls-files --cached --others --exclude-standard -- "$@"
+}
+
+# markers is the list of files and directories from which apm detects which
+# agents are in use, such as CLAUDE.md or .claude/, when no target is
+# configured. If any of them were committed, apm would deploy to the agents that
+# the project uses, rather than the agents that each developer uses.
+#
+# apm reports one marker per agent, even if there are several. For example, if
+# both CLAUDE.md and .claude/ exist, it reports .claude/. A committed CLAUDE.md
+# is therefore only reported if .claude/ does not exist, as is the case under
+# CI.
+markers=()
+detected="$(tool-exec apm targets --json | jq -r '.[] | select(.status == "active") | .source')"
+
+while read -r marker; do
+    if [[ -n "$marker" ]]; then
+        markers+=("$marker")
+    fi
+done <<<"$detected"
+
+failed=false
+
+if [[ ${#markers[@]} -gt 0 ]]; then
+    files="$(list "${markers[@]}")"
+
+    if [[ -n "$files" ]]; then
+        >&2 echo "!!! agent configuration must not be committed, remove it from the repository, or add it to your global gitignore:"
+        >&2 echo "$files"
+        failed=true
+    fi
+fi
+
+# Skills authored under .apm/ are allowed. Skills within the markers, such as
+# .claude/skills/, are excluded because the check above has already reported
+# them, and would otherwise be reported twice.
+excludes=(":(exclude).apm")
+for marker in ${markers[@]+"${markers[@]}"}; do
+    excludes+=(":(exclude)$marker")
+done
+
+files="$(list '*SKILL.md' "${excludes[@]}")"
+
+if [[ -n "$files" ]]; then
+    >&2 echo "!!! agent skills must be authored under .apm/, not committed where apm deploys them:"
+    >&2 echo "$files"
+    failed=true
+fi
+
+if $failed; then
+    exit 1
+fi
