@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage: install <touch-file> [apm-install-args...]
+#
+# install installs the packages declared in apm.yml by running "apm install"
+# with the given arguments. It touches <touch-file> on success, so that make
+# only runs it again when apm.yml changes.
+#
+# apm deploys to the target configured using "apm config set target", or else
+# to the agents it detects from files such as CLAUDE.md or .claude/. It first
+# checks that none of those files are committed, so that apm only detects the
+# agents that the developer uses.
+#
+# If apm detects no agents, as is the case under CI, or for a developer who
+# doesn't use agents, there is nothing to deploy to, which counts as success.
+# A developer who starts using agents later can run "apm install" themselves,
+# or "make clean" to have make run it again.
+#
+# apm itself is required, as with any other tool, even if no target is
+# configured. See lib/core/bin/tool-exec.
+
+touch_file="$1"
+shift
+
+"$MF_ROOT/pkg/apm/v1/bin/check"
+
+# The output is captured so that the error apm reports when it detects no agents
+# can be suppressed.
+status=0
+output="$(tool-exec apm install ${@+"$@"} 2>&1)" || status=$?
+
+if [[ $status -eq 0 ]]; then
+    echo "$output"
+elif [[ "$output" == *"No harness detected"* ]]; then
+    >&2 echo "--- skipping apm install, no agents are configured or detected, run \`apm config set target <target>\` to deploy agent configuration"
+else
+    echo "$output"
+    exit $status
+fi
+
+touch "$touch_file"
