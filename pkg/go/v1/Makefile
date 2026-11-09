@@ -11,6 +11,7 @@ MF_LANGUAGES += go
 # build.
 GENERATED_FILES += $(foreach f,$(PROTO_FILES:.proto=.pb.go),$(if $(findstring /_,/$f),,$f))
 GENERATED_FILES += $(foreach f,$(PROTO_GRPC_FILES:.proto=_grpc.pb.go),$(if $(findstring /_,/$f),,$f))
+PROTOC_ARGS_FILES += artifacts/protobuf/args/go artifacts/protobuf/args/go-grpc
 
 # GO_ARCHIVE_FILES is a space separated list of additional files to include in
 # the release archives. The compiled binaries are included by default.

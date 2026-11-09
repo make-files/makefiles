@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script merges one or more JSON files into a VSCode settings file. Later
+# files take precedence over earlier ones, and over the settings file itself.
+
+if ! hash jq 2>/dev/null; then
+    echo "no jq binary is installed in the executable path, VSCode settings will not be merged"
+    exit 0
+fi
+
+if [[ "$#" -lt 2 ]]; then
+    echo "usage: $0 <settings-file> <json-file>..."
+    exit 1
+fi
+
+settings_file="${1}"
+
+out=$(jq --slurp 'reduce .[] as $settings ({}; . * $settings)' "$@")
+
+echo "$out" > "${settings_file}"

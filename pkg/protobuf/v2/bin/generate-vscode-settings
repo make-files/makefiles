@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script generates a VSCode settings file containing the protobuf.includes
+# and protobuf.protoc.compileOnSave settings (used by the DrBlury.protobuf-vsc
+# extension), deriving the include paths from the --proto_path= options in one
+# or more protoc argument files.
+
+if [[ "$#" -lt 2 ]]; then
+    echo "usage: $0 <output-file> <arg-file>..."
+    exit 1
+fi
+
+output_file="${1}"
+arg_files=("${@:2}")
+
+mkdir -p "$(dirname "${output_file}")"
+
+if ! hash jq 2>/dev/null; then
+    echo "no jq binary is installed in the executable path, protobuf-vsc settings will not be generated"
+    echo "{}" > "${output_file}"
+    exit 0
+fi
+
+includes=()
+for option in $(cat "${arg_files[@]}"); do
+    if [[ "${option}" == --proto_path=* ]]; then
+        includes+=("${option#--proto_path=}")
+    fi
+done
+
+# Duplicates are dropped, keeping the first occurrence. The project's own path
+# appears in both the Go and npm argument files when the project is both a Go
+# module and an npm package.
+#
+# bash 3.2 (macOS's default) treats "${includes[@]}" as unbound under -u
+# when the array is empty, so that case is handled separately.
+if [[ ${#includes[@]} -eq 0 ]]; then
+    jq --null-input '{"protobuf.includes": [], "protobuf.protoc.compileOnSave": false}' > "${output_file}"
+else
+    jq --null-input --args '{"protobuf.includes": ($ARGS.positional | reduce .[] as $p ([]; if index([$p]) then . else . + [$p] end)), "protobuf.protoc.compileOnSave": false}' "${includes[@]}" > "${output_file}"
+fi

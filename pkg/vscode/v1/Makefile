@@ -17,17 +17,12 @@ endif
 # generate the VSCode workspace settings file.
 VSCODE_SETTINGS_REQ ?=
 
-ifneq ($(filter proto,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += artifacts/protobuf/args/common
+# VSCODE_SETTINGS_FILES is a space separated list of JSON files that contain
+# settings to merge into the VSCode workspace settings file. Settings in later
+# files take precedence. Other packages add to this list, for example to
+# configure the editor to use the tools they run.
+VSCODE_SETTINGS_FILES +=
 
-ifneq ($(filter go,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += artifacts/protobuf/args/go
-endif
-
-endif
-
-$(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ)
+$(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ) $$(VSCODE_SETTINGS_FILES)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
-ifneq ($(filter proto,$(MF_LANGUAGES)),)
-	$(MF_ROOT)/pkg/vscode/v1/bin/merge-protobuf-vsc-settings "$@" $^
-endif
+	$(if $(VSCODE_SETTINGS_FILES),$(MF_ROOT)/pkg/vscode/v1/bin/merge-settings "$@" $(VSCODE_SETTINGS_FILES))
