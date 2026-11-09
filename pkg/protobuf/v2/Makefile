@@ -12,8 +12,8 @@ PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_F
 #
 # NOTE: Please avoid adding the current directory (.) in this variable as it may
 # cause a "type redefinition" error from the protobuf compiler. The absolute
-# path to the current repository is already added to the list of include paths
-# via the 'artifacts/protobuf/args/common' file.
+# path to the current repository is already added to the list of include paths,
+# under its import path.
 PROTO_INCLUDE_PATHS ?=
 
 # PROTOC_COMMAND is the command used to run protoc.
@@ -145,7 +145,7 @@ artifacts/protobuf/args/go-common: artifacts/protobuf/args/common go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
 	cp "$<" "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-go-include-paths | tee "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-go-include-paths | tee -a "$@"
 
 artifacts/protobuf/args/go: artifacts/protobuf/args/go-common
 	@mkdir -p "$(@D)"
@@ -169,26 +169,34 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # protoc runs the project's locally installed protoc-gen-es plugin via
 # $(JS_EXEC), regardless of the package manager.
 #
-# Import paths are resolved from "go list -m all" in the same way as for Go, so
-# the project must also be a Go module.
+# A package's .proto files are imported at the path declared in its
+# package.json, for example "github.com/foo/bar/dir/file.proto" given:
+#
+#   "makefiles.dev": { "protobuf": { "importPath": "github.com/foo/bar" } }
+#
+# Imports are resolved from this package, its dependencies that declare an
+# import path, and PROTO_INCLUDE_PATHS. Code generated for a dependency's .proto
+# files is imported from that package, so it must export its generated code at
+# the import path, for example as "./github.com/foo/bar/*_pb.js".
 #
 # protoc names the output files after the virtual import path of each .proto
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
 # to a staging directory and the files are moved alongside the .proto file.
 
+# _PROTO_JS_IMPORT_PATH is the import path of this package's .proto files.
+_PROTO_JS_IMPORT_PATH = $(shell jq -r '."makefiles.dev".protobuf.importPath // empty' package.json)
+
 $(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch $(_PROTO_PROTOC_REQ) artifacts/protobuf/args/js
+	$(if $(_PROTO_JS_IMPORT_PATH),,$(error package.json does not declare the import path of its .proto files in "makefiles.dev": {"protobuf": {"importPath": "..."}}))
 	@mkdir -p artifacts/protobuf/js
 	PROTO_PLUGIN_COMMAND="$(JS_EXEC) protoc-gen-es" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/js) --plugin protoc-gen-es=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
 	for suffix in $(_PROTO_JS_SUFFIXES); do \
-		mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*$$suffix" "$*$$suffix" || exit 1; \
+		mv "artifacts/protobuf/js/$(_PROTO_JS_IMPORT_PATH)/$*$$suffix" "$*$$suffix" || exit 1; \
 		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \
 	done
 
-artifacts/protobuf/args/js: artifacts/protobuf/args/go-common
+# artifacts/protobuf/args/js --- The protoc arguments for generating JS code.
+# See bin/generate-js-args.
+artifacts/protobuf/args/js: artifacts/protobuf/args/common package.json artifacts/link-dependencies.touch
 	@mkdir -p "$(@D)"
-	cp "$<" "$@"
-	echo "--es_opt=target=$(PROTO_JS_TARGET)" >> "$@"
-ifneq ($(PROTO_JS_OPT),)
-	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
-endif
-	echo "--es_out=artifacts/protobuf/js" >> "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-js-args "$<" "$(PROTO_JS_TARGET)" "$(PROTO_JS_OPT)" > "$@"

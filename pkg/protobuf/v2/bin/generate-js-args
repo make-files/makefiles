@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script prints the protoc arguments for generating JS code with
+# protoc-gen-es.
+#
+# The include paths are those in the given arguments file, followed by those of
+# this package and its dependencies that declare the import path of their .proto
+# files in package.json:
+#
+#   "makefiles.dev": { "protobuf": { "importPath": "github.com/foo/bar" } }
+#
+# Each dependency also gets a "map_imports" option, so that code generated for
+# its .proto files imports the package's generated code. The given options come
+# first, so that their "map_imports" take precedence.
+#
+# Dependencies are found in node_modules, so Yarn PnP is not supported.
+
+if [[ "$#" -ne 3 ]]; then
+    echo "usage: $0 <include-args-file> <target> <options>"
+    exit 1
+fi
+
+include_args_file="$1"
+target="$2"
+options="$3"
+
+# package_info prints the import path and npm name of the package in the given
+# directory, separated by a tab, or nothing if it doesn't declare an import
+# path.
+function package_info() {
+    jq -r 'select(."makefiles.dev".protobuf.importPath) | [."makefiles.dev".protobuf.importPath, .name] | @tsv' "$1/package.json" 2>/dev/null || true
+}
+
+cat "${include_args_file}"
+
+map_imports=()
+
+for dir in . node_modules/*/ node_modules/@*/*/; do
+    dir="${dir%/}"
+
+    if [[ ! -f "${dir}/package.json" ]]; then
+        continue
+    fi
+
+    info="$(package_info "${dir}")"
+
+    if [[ -z "${info}" ]]; then
+        continue
+    fi
+
+    IFS=$'\t' read -r import_path name <<< "${info}"
+    echo "--proto_path=${import_path}=$(cd "${dir}" && pwd -P)"
+
+    if [[ "${dir}" != "." ]]; then
+        map_imports+=("--es_opt=map_imports=${import_path}/:${name}")
+    fi
+done
+
+echo "--es_opt=target=${target}"
+
+if [[ -n "${options}" ]]; then
+    echo "--es_opt=${options}"
+fi
+
+# bash 3.2 (macOS's default) treats "${map_imports[@]}" as unbound under -u
+# when the array is empty, so that case is handled separately.
+if [[ ${#map_imports[@]} -gt 0 ]]; then
+    printf '%s\n' "${map_imports[@]}"
+fi
+
+echo "--es_out=artifacts/protobuf/js"
