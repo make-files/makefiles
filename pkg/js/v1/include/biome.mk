@@ -12,7 +12,7 @@ _JS_BIOME_ARGS := --config-path "$(JS_BIOME_CONFIG_FILE)"
 
 # Merge Biome's editor settings into the VSCode workspace settings file, if
 # the project uses the vscode package.
-VSCODE_SETTINGS_MERGE_FILES += $(MF_ROOT)/pkg/js/v1/etc/vscode-settings.biome.json
+VSCODE_SETTINGS_FILES += $(MF_ROOT)/pkg/js/v1/etc/vscode-settings.biome.json
 
 ################################################################################
 
