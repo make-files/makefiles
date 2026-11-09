@@ -171,9 +171,7 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # $(JS_EXEC), regardless of the package manager.
 #
 # Imports are resolved from PROTO_INCLUDE_PATHS and from the npm packages the
-# project depends on that publish .proto files. Go modules are not consulted,
-# even if the project is also a Go module, because a .proto file that is only
-# available as Go has no JS code for the generated code to import.
+# project depends on that publish .proto files.
 #
 # The project's own .proto files are imported at its import path, which is the
 # "makefiles.dev.protobuf.importPath" field in package.json. It is also the path
