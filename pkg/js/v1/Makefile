@@ -18,6 +18,9 @@ JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)
 # JS_TEST_FILES is a space separated list of all files in the test directory.
 JS_TEST_FILES += $(shell PATH="$(PATH)" git-find test)
 
+# JS_BIOME_CONFIG_FILE is the path to any existing Biome configuration.
+JS_BIOME_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file biome.json biome.jsonc)
+
 # JS_ESLINT_CONFIG_FILE is the path to any existing ESLint configuration.
 JS_ESLINT_CONFIG_FILE ?= $(shell PATH="$(PATH)" find-first-matching-file eslint.config.* .eslintrc.* .eslintrc)
 
@@ -141,6 +144,10 @@ ifneq ($(JS_PLAYWRIGHT_TEST_CONFIG_FILE),)
 endif
 
 # Lint tools
+
+ifneq ($(JS_BIOME_CONFIG_FILE),)
+-include .makefiles/pkg/js/v1/include/biome.mk
+endif
 
 ifneq ($(JS_ESLINT_CONFIG_FILE),)
 -include .makefiles/pkg/js/v1/include/eslint.mk
