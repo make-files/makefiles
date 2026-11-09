@@ -199,4 +199,4 @@ $(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch 
 # See bin/generate-js-args.
 artifacts/protobuf/args/js: artifacts/protobuf/args/common package.json artifacts/link-dependencies.touch
 	@mkdir -p "$(@D)"
-	$(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/generate-js-args "$<" "$(PROTO_JS_TARGET)" "$(PROTO_JS_OPT)" > "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-js-args "$<" "$(PROTO_JS_TARGET)" "$(PROTO_JS_OPT)" > "$@"
