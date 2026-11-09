@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # check fails if the repository contains agent configuration that is, or could
-# be, committed, other than under .apm/.
+# be, committed, other than under a .apm/ directory.
 #
 # Agent configuration is authored under .apm/, and "apm install" deploys it to
 # the directories of the agents that each developer uses, such as .claude/. The
@@ -47,10 +47,11 @@ if [[ ${#markers[@]} -gt 0 ]]; then
     fi
 fi
 
-# Skills authored under .apm/ are allowed. Skills within the markers, such as
-# .claude/skills/, are excluded because the check above has already reported
-# them, and would otherwise be reported twice.
-excludes=(":(exclude).apm")
+# Skills authored under a .apm/ directory are allowed, at any depth, because a
+# repository can contain several packages, such as internal/.apm/. Skills within
+# the markers, such as .claude/skills/, are excluded because the check above has
+# already reported them, and would otherwise be reported twice.
+excludes=(":(exclude,glob)**/.apm/**")
 for marker in ${markers[@]+"${markers[@]}"}; do
     excludes+=(":(exclude)$marker")
 done

@@ -21,8 +21,8 @@ ci:: apm-check
 
 ################################################################################
 
-# apm-check --- Fails if any agent configuration is committed outside of .apm/,
-# including the files apm uses to detect which agents are in use.
+# apm-check --- Fails if any agent configuration is committed outside of a .apm/
+# directory, including the files apm uses to detect which agents are in use.
 .PHONY: apm-check
 apm-check: $(MF_TOOL_REQ)
 	$(MF_ROOT)/pkg/apm/v1/bin/check
