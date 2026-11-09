@@ -170,12 +170,15 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # protoc runs the project's locally installed protoc-gen-es plugin via
 # $(JS_EXEC), regardless of the package manager.
 #
-# Imports are resolved from PROTO_INCLUDE_PATHS and from the npm packages the
-# project depends on that publish .proto files.
+# A package's .proto files are imported at the path declared in its
+# package.json, for example "github.com/foo/bar/dir/file.proto" given:
 #
-# The project's own .proto files are imported at its import path, which is the
-# "makefiles.dev.protobuf.importPath" field in package.json. It is also the path
-# at which a package that publishes .proto files must export its generated code.
+#   "makefiles.dev": { "protobuf": { "importPath": "github.com/foo/bar" } }
+#
+# Imports are resolved from this package, its dependencies that declare an
+# import path, and PROTO_INCLUDE_PATHS. Code generated for a dependency's .proto
+# files is imported from that package, so it must export its generated code at
+# the import path, for example as "./github.com/foo/bar/*_pb.js".
 #
 # protoc names the output files after the virtual import path of each .proto
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
@@ -195,11 +198,7 @@ $(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch 
 		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \
 	done
 
-# Code generated for .proto files that come from an npm package imports that
-# package's generated code, rather than a relative path that doesn't exist, via
-# protoc-gen-es's "map_imports" option. The package must export the generated
-# files at their import path, for example with an "exports" entry such as
-# "./github.com/foo/bar/*_pb.js". Any "map_imports" in PROTO_JS_OPT take
+# Each dependency gets a "map_imports" option. Any in PROTO_JS_OPT take
 # precedence, because protoc-gen-es uses the first matching pattern.
 artifacts/protobuf/args/js: artifacts/protobuf/args/common artifacts/protobuf/args/npm artifacts/protobuf/npm-packages
 	@mkdir -p "$(@D)"
@@ -211,15 +210,13 @@ endif
 	awk -F '\t' '$$1 == "dependency" { print "--es_opt=map_imports=" $$2 "/:" $$3 }' artifacts/protobuf/npm-packages >> "$@"
 	echo "--es_out=artifacts/protobuf/js" >> "$@"
 
-# artifacts/protobuf/npm-packages --- The npm packages that publish .proto
-# files: the project itself, and the installed packages it depends on. See
-# bin/list-npm-packages for the format.
+# artifacts/protobuf/npm-packages --- This package and its dependencies that
+# declare an import path. See bin/list-npm-packages.
 artifacts/protobuf/npm-packages: package.json artifacts/link-dependencies.touch
 	@mkdir -p "$(@D)"
 	$(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/list-npm-packages > "$@"
 
-# artifacts/protobuf/args/npm --- The include paths of the npm packages that
-# publish .proto files, each under its import path.
+# artifacts/protobuf/args/npm --- An include path for each of those packages.
 artifacts/protobuf/args/npm: artifacts/protobuf/npm-packages
 	@mkdir -p "$(@D)"
 	awk -F '\t' '{ print "--proto_path=" $$2 "=" $$4 }' "$<" > "$@"
