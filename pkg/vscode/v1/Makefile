@@ -23,18 +23,6 @@ VSCODE_SETTINGS_REQ ?=
 # configure the editor to use the tools they run.
 VSCODE_SETTINGS_FILES +=
 
-ifneq ($(filter proto,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += artifacts/protobuf/args/common
-
-ifneq ($(filter go,$(MF_LANGUAGES)),)
-VSCODE_SETTINGS_REQ += artifacts/protobuf/args/go
-endif
-
-endif
-
 $(_VSCODE_SETTINGS_FILE): $(VSCODE_SETTINGS_REQ) $$(VSCODE_SETTINGS_FILES)
 	$(MF_ROOT)/pkg/vscode/v1/bin/generate-base-file "$@"
-ifneq ($(filter proto,$(MF_LANGUAGES)),)
-	$(MF_ROOT)/pkg/vscode/v1/bin/merge-protobuf-vsc-settings "$@" $(filter-out $(VSCODE_SETTINGS_FILES),$^)
-endif
 	$(if $(VSCODE_SETTINGS_FILES),$(MF_ROOT)/pkg/vscode/v1/bin/merge-settings "$@" $(VSCODE_SETTINGS_FILES))

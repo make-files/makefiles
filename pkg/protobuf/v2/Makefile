@@ -70,6 +70,24 @@ ifneq ($(PROTO_INCLUDE_PATHS),)
 	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
 endif
 
+# _PROTO_INCLUDE_ARGS_FILES is the list of argument files that, together, hold
+# every --proto_path option used by any of the project's code generation:
+# PROTO_INCLUDE_PATHS, the include paths of the Go modules the project depends
+# on if it is a Go module, and the include paths of the npm packages it depends
+# on if it has a package.json. The editor needs all of them, since .proto files
+# for both Go and JS are edited.
+_PROTO_INCLUDE_ARGS_FILES := $(if $(wildcard go.mod),artifacts/protobuf/args/go-common,artifacts/protobuf/args/common)
+_PROTO_INCLUDE_ARGS_FILES += $(if $(wildcard package.json),artifacts/protobuf/args/npm)
+
+# Merge the protobuf-vsc extension's settings into the VSCode settings file, if
+# the project uses the vscode package.
+VSCODE_SETTINGS_FILES += artifacts/protobuf/vscode-settings.json
+
+# artifacts/protobuf/vscode-settings.json --- Generates the protobuf-vsc
+# extension's settings, with the include paths that protoc is given.
+artifacts/protobuf/vscode-settings.json: $(_PROTO_INCLUDE_ARGS_FILES)
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-vscode-settings "$@" $^
+
 # .clang-format --- Creates the default clang-format style used to format
 # .proto files. It is intended to be committed to the project; it is
 # authoritative and is overwritten by "regenerate"/"verify-generated" to keep
