@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Runs clang-format at the version declared by the project's tool manager, as
+# "make precommit" does. The VSCode settings use this script as the path to
+# clang-format, because the editor runs it directly, without the makefiles
+# setting up the PATH or the project's tools.
+#
+# ${@+"$@"} expands to nothing when there are no arguments, whereas "${@}" is an
+# unbound variable error in bash 3.2, the version that ships with macOS.
+exec "$(dirname "${BASH_SOURCE[0]}")/../../../../lib/core/bin/tool-exec" clang-format ${@+"$@"}

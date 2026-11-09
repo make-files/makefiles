@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script generates a VSCode settings file containing the protobuf.includes
-# and protobuf.protoc.compileOnSave settings (used by the DrBlury.protobuf-vsc
-# extension), deriving the include paths from the --proto_path= options in one
-# or more protoc argument files.
+# This script generates a VSCode settings file for the DrBlury.protobuf-vsc
+# extension. It derives the include paths from the --proto_path= options in one
+# or more protoc argument files, and has the extension format .proto files with
+# the project's clang-format.
 
 if [[ "$#" -lt 2 ]]; then
     echo "usage: $0 <output-file> <arg-file>..."
@@ -29,14 +29,22 @@ for option in $(cat "${arg_files[@]}"); do
     fi
 done
 
-# Duplicates are dropped, keeping the first occurrence. The project's own path
-# appears in both the Go and npm argument files when the project is both a Go
-# module and an npm package.
+# clang_format is the absolute path of the script that runs the project's
+# clang-format, which the extension runs to format .proto files the same way
+# that "make precommit" does.
+clang_format="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/exec-clang-format"
+
+# Duplicates are dropped, keeping the first occurrence, since the argument files
+# share most of their include paths.
 #
-# bash 3.2 (macOS's default) treats "${includes[@]}" as unbound under -u
-# when the array is empty, so that case is handled separately.
-if [[ ${#includes[@]} -eq 0 ]]; then
-    jq --null-input '{"protobuf.includes": [], "protobuf.protoc.compileOnSave": false}' > "${output_file}"
-else
-    jq --null-input --args '{"protobuf.includes": ($ARGS.positional | reduce .[] as $p ([]; if index([$p]) then . else . + [$p] end)), "protobuf.protoc.compileOnSave": false}' "${includes[@]}" > "${output_file}"
-fi
+# ${includes[@]+"${includes[@]}"} expands to nothing when the array is empty,
+# whereas "${includes[@]}" is an unbound variable error in bash 3.2, the version
+# that ships with macOS.
+jq --null-input --arg clang_format "${clang_format}" --args '{
+    "protobuf.includes": ($ARGS.positional | reduce .[] as $p ([]; if index([$p]) then . else . + [$p] end)),
+    "protobuf.protoc.compileOnSave": false,
+    "protobuf.clangFormat.enabled": true,
+    "protobuf.clangFormat.path": $clang_format,
+    "protobuf.clangFormat.style": "file",
+    "protobuf.clangFormat.fallbackStyle": "Google"
+}' ${includes[@]+"${includes[@]}"} > "${output_file}"
