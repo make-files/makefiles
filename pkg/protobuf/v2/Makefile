@@ -75,11 +75,12 @@ endif
 VSCODE_SETTINGS_FILES += artifacts/protobuf/vscode-settings.json
 
 # artifacts/protobuf/vscode-settings.json --- Generates the protobuf-vsc
-# extension's settings, with the include paths that protoc is given for Go and
-# for JS.
+# extension's settings, with the include paths that protoc is given for each
+# language the project uses. The prerequisites use secondary expansion, so that
+# MF_LANGUAGES includes every language package, wherever it is included.
 artifacts/protobuf/vscode-settings.json: \
-		$(if $(wildcard go.mod),artifacts/protobuf/args/go-common,artifacts/protobuf/args/common) \
-		$(if $(wildcard package.json),artifacts/protobuf/args/js)
+		$$(if $$(filter go,$$(MF_LANGUAGES)),artifacts/protobuf/args/go-common,artifacts/protobuf/args/common) \
+		$$(if $$(filter js,$$(MF_LANGUAGES)),artifacts/protobuf/args/js)
 	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-vscode-settings "$@" $^
 
 # .clang-format --- Creates the default clang-format style used to format
