@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Runs "tool-exec clang-format" with the given arguments.
+#
+# The VSCode settings use this script as the protobuf-vsc extension's path to
+# clang-format. The extension runs that path as a single executable, so it can't
+# be set to "tool-exec clang-format" itself.
+#
+# ${@+"$@"} expands to nothing when there are no arguments, whereas "${@}" is an
+# unbound variable error in bash 3.2, the version that ships with macOS.
+exec "$(dirname "${BASH_SOURCE[0]}")/../../../../lib/core/bin/tool-exec" clang-format ${@+"$@"}
