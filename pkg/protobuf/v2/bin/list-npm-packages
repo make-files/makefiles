@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script lists the npm packages that publish .proto files: the project
+# itself, and the packages installed in node_modules. A package declares the
+# virtual import path of its .proto files in package.json:
+#
+#   "makefiles.dev": {
+#     "protobuf": {
+#       "importPath": "github.com/foo/bar"
+#     }
+#   }
+#
+# The .proto files are then imported at that path, for example
+# "github.com/foo/bar/dir/file.proto", regardless of the package's npm name.
+#
+# Each line of output has four tab-separated fields: the kind of package ("self"
+# or "dependency"), its import path, its npm name and the real path of its
+# directory. Packages that don't declare an import path are omitted.
+#
+# Only the packages linked directly into node_modules are inspected. Package
+# managers that don't create node_modules, such as Yarn PnP, are not supported.
+#
+# It must be run in the project root with node on the PATH, for example via
+# $(JS_EXEC).
+
+exec node -e '
+    const fs = require("fs");
+    const path = require("path");
+
+    function print(kind, dir) {
+        let pkg;
+
+        try {
+            pkg = JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf8"));
+        } catch {
+            return;
+        }
+
+        const importPath = pkg["makefiles.dev"]?.protobuf?.importPath;
+
+        if (importPath) {
+            console.log([kind, importPath, pkg.name ?? "", fs.realpathSync(dir)].join("\t"));
+        }
+    }
+
+    function entries(dir) {
+        try {
+            return fs.readdirSync(dir).filter((name) => !name.startsWith(".")).sort();
+        } catch {
+            return [];
+        }
+    }
+
+    print("self", ".");
+
+    for (const name of entries("node_modules")) {
+        const dir = path.join("node_modules", name);
+
+        if (name.startsWith("@")) {
+            for (const scoped of entries(dir)) {
+                print("dependency", path.join(dir, scoped));
+            }
+        } else {
+            print("dependency", dir);
+        }
+    }
+'

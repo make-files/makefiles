@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script prints the virtual import path of the project's .proto files.
+#
+# If the project is a Go module, it is the module path. Otherwise it is the
+# "makefiles.dev.protobuf.importPath" field in package.json, which must be run
+# with node on the PATH, for example via $(JS_EXEC).
+
+if [[ -f go.mod ]]; then
+    go list -m | head -n 1
+    exit 0
+fi
+
+if [[ -f package.json ]]; then
+    path="$(node -e '
+        const fs = require("fs");
+        const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+        process.stdout.write(pkg["makefiles.dev"]?.protobuf?.importPath ?? "");
+    ')"
+
+    if [[ -n "$path" ]]; then
+        echo "$path"
+        exit 0
+    fi
+
+    echo "package.json does not declare the import path of the project's .proto files, add a \"makefiles.dev\": {\"protobuf\": {\"importPath\": \"...\"}} field" >&2
+    exit 1
+fi
+
+echo "the project has no go.mod or package.json from which to determine the import path of its .proto files" >&2
+exit 1

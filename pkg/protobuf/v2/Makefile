@@ -12,8 +12,9 @@ PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_F
 #
 # NOTE: Please avoid adding the current directory (.) in this variable as it may
 # cause a "type redefinition" error from the protobuf compiler. The absolute
-# path to the current repository is already added to the list of include paths
-# via the 'artifacts/protobuf/args/common' file.
+# path to the current repository is already added to the list of include paths,
+# under its import path, via the 'artifacts/protobuf/args/go-common' file for Go
+# modules, or the 'artifacts/protobuf/args/npm' file for npm packages.
 PROTO_INCLUDE_PATHS ?=
 
 # PROTOC_COMMAND is the command used to run protoc.
@@ -69,6 +70,13 @@ artifacts/protobuf/args/common:
 ifneq ($(PROTO_INCLUDE_PATHS),)
 	echo $(addprefix --proto_path=,$(PROTO_INCLUDE_PATHS)) >> "$@"
 endif
+
+# _PROTO_INCLUDE_ARGS_FILES is the list of argument files that, together, hold
+# every --proto_path option for the project: PROTO_INCLUDE_PATHS, the include
+# paths of the Go modules the project depends on if it is a Go module, and the
+# include paths of the npm packages it depends on if it has a package.json.
+_PROTO_INCLUDE_ARGS_FILES := $(if $(wildcard go.mod),artifacts/protobuf/args/go-common,artifacts/protobuf/args/common)
+_PROTO_INCLUDE_ARGS_FILES += $(if $(wildcard package.json),artifacts/protobuf/args/npm)
 
 # .clang-format --- Creates the default clang-format style used to format
 # .proto files. It is intended to be committed to the project; it is
@@ -169,8 +177,11 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # protoc runs the project's locally installed protoc-gen-es plugin via
 # $(JS_EXEC), regardless of the package manager.
 #
-# Import paths are resolved from "go list -m all" in the same way as for Go, so
-# the project must also be a Go module.
+# Imports are resolved from the Go modules the project depends on, if it is a Go
+# module, and from the npm packages it depends on that publish .proto files. The
+# project's own .proto files are imported at its import path, which is its Go
+# module path, or otherwise the "makefiles.dev.protobuf.importPath" field in
+# package.json (see bin/import-path).
 #
 # protoc names the output files after the virtual import path of each .proto
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
@@ -179,16 +190,43 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 $(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch $(_PROTO_PROTOC_REQ) artifacts/protobuf/args/js
 	@mkdir -p artifacts/protobuf/js
 	PROTO_PLUGIN_COMMAND="$(JS_EXEC) protoc-gen-es" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/js) --plugin protoc-gen-es=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
+	import_path="$$($(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/import-path)" || exit 1; \
 	for suffix in $(_PROTO_JS_SUFFIXES); do \
-		mv "artifacts/protobuf/js/$$(go list -m | head -n 1)/$*$$suffix" "$*$$suffix" || exit 1; \
+		mv "artifacts/protobuf/js/$$import_path/$*$$suffix" "$*$$suffix" || exit 1; \
 		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \
 	done
 
-artifacts/protobuf/args/js: artifacts/protobuf/args/go-common
+# The include paths are combined from the files in _PROTO_INCLUDE_ARGS_FILES,
+# dropping duplicates. The project's own path appears in both the Go and npm
+# files when the project is both a Go module and an npm package.
+#
+# Code generated for .proto files that come from an npm package imports that
+# package's generated code, rather than a relative path that doesn't exist, via
+# protoc-gen-es's "map_imports" option. The package must export the generated
+# files at their import path, for example with an "exports" entry such as
+# "./github.com/foo/bar/*_pb.js". Any "map_imports" in PROTO_JS_OPT take
+# precedence, because protoc-gen-es uses the first matching pattern.
+artifacts/protobuf/args/js: $(_PROTO_INCLUDE_ARGS_FILES) $(if $(wildcard package.json),artifacts/protobuf/npm-packages)
 	@mkdir -p "$(@D)"
-	cp "$<" "$@"
+	cat $(filter artifacts/protobuf/args/%,$^) | awk '!seen[$$0]++' > "$@"
 	echo "--es_opt=target=$(PROTO_JS_TARGET)" >> "$@"
 ifneq ($(PROTO_JS_OPT),)
 	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
 endif
+ifneq ($(wildcard package.json),)
+	awk -F '\t' '$$1 == "dependency" { print "--es_opt=map_imports=" $$2 "/:" $$3 }' artifacts/protobuf/npm-packages >> "$@"
+endif
 	echo "--es_out=artifacts/protobuf/js" >> "$@"
+
+# artifacts/protobuf/npm-packages --- The npm packages that publish .proto
+# files: the project itself, and the installed packages it depends on. See
+# bin/list-npm-packages for the format.
+artifacts/protobuf/npm-packages: package.json artifacts/link-dependencies.touch
+	@mkdir -p "$(@D)"
+	$(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/list-npm-packages > "$@"
+
+# artifacts/protobuf/args/npm --- The include paths of the npm packages that
+# publish .proto files, each under its import path.
+artifacts/protobuf/args/npm: artifacts/protobuf/npm-packages
+	@mkdir -p "$(@D)"
+	awk -F '\t' '{ print "--proto_path=" $$2 "=" $$4 }' "$<" > "$@"
