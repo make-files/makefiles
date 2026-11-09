@@ -11,6 +11,7 @@ MF_LANGUAGES += js
 # Any files in underscore-prefixed directory names are ignored, as per the
 # convention established by the protobuf makefiles.
 GENERATED_FILES += $(foreach s,$(_PROTO_JS_SUFFIXES),$(foreach f,$(PROTO_FILES:.proto=$s),$(if $(findstring /_,/$f),,$f)))
+PROTOC_ARGS_FILES += artifacts/protobuf/args/js
 
 # JS_SOURCE_FILES is a space separated list of all files in the src directory.
 JS_SOURCE_FILES += $(shell PATH="$(PATH)" git-find src)

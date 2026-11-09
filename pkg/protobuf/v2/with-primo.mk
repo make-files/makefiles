@@ -1,4 +1,5 @@
 GENERATED_FILES += $(foreach f,$(PROTO_FILES:.proto=_primo.pb.go),$(if $(findstring /_,/$f),,$f))
+PROTOC_ARGS_FILES += artifacts/protobuf/args/go-primo
 
 # The primo protoc plugin is run using "go tool", at the version in go.mod, so
 # the project must declare it as a tool:

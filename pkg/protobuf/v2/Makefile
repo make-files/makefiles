@@ -35,6 +35,11 @@ PROTOC_COMMAND ?= $(MF_PROJECT_ROOT)/artifacts/protobuf/bin/protoc
 _PROTO_PROTOC_REQ := $(PROTOC_COMMAND)
 endif
 
+# PROTOC_ARGS_FILES is a space separated list of the files containing the
+# arguments that protoc is run with, for each language the project generates
+# code for. Each language's package adds its own files.
+PROTOC_ARGS_FILES +=
+
 # _PROTO_EXEC_PLUGIN is the path to the script passed to protoc as each plugin.
 # It runs the command in the PROTO_PLUGIN_COMMAND environment variable, which
 # each recipe sets to the command that runs its plugin.
@@ -75,12 +80,10 @@ endif
 VSCODE_SETTINGS_FILES += artifacts/protobuf/vscode-settings.json
 
 # artifacts/protobuf/vscode-settings.json --- Generates the protobuf-vsc
-# extension's settings, with the include paths that protoc is given for each
-# language the project uses. The prerequisites use secondary expansion, so that
-# MF_LANGUAGES includes every language package, wherever it is included.
-artifacts/protobuf/vscode-settings.json: \
-		$$(if $$(filter go,$$(MF_LANGUAGES)),artifacts/protobuf/args/go-common,artifacts/protobuf/args/common) \
-		$$(if $$(filter js,$$(MF_LANGUAGES)),artifacts/protobuf/args/js)
+# extension's settings, with the include paths from PROTOC_ARGS_FILES. The
+# prerequisites use secondary expansion, because the language packages are
+# usually included after this one.
+artifacts/protobuf/vscode-settings.json: artifacts/protobuf/args/common $$(PROTOC_ARGS_FILES)
 	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-vscode-settings "$@" $^
 
 # .clang-format --- Creates the default clang-format style used to format
