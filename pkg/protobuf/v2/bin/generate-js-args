@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script prints the protoc arguments for generating JS code with
+# protoc-gen-es.
+#
+# The include paths are those in the given arguments file, followed by those of
+# this package and its dependencies that declare the import path of their .proto
+# files in package.json:
+#
+#   "makefiles.dev": { "protobuf": { "importPath": "github.com/foo/bar" } }
+#
+# Each dependency also gets a "map_imports" option, so that code generated for
+# its .proto files imports the package's generated code. The given options come
+# first, so that their "map_imports" take precedence.
+#
+# Dependencies are found in node_modules, so Yarn PnP is not supported. It must
+# be run in the project root with node on the PATH, for example via $(JS_EXEC).
+
+if [[ "$#" -ne 3 ]]; then
+    echo "usage: $0 <include-args-file> <target> <options>"
+    exit 1
+fi
+
+exec node -e '
+    const fs = require("fs");
+    const path = require("path");
+    const [includeArgsFile, target, options] = process.argv.slice(1);
+
+    function readPackage(dir) {
+        try {
+            const pkg = JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf8"));
+            return { name: pkg.name, importPath: pkg["makefiles.dev"]?.protobuf?.importPath, dir };
+        } catch {
+            return {};
+        }
+    }
+
+    function entries(dir) {
+        try {
+            return fs.readdirSync(dir).filter((name) => !name.startsWith(".")).sort();
+        } catch {
+            return [];
+        }
+    }
+
+    const self = readPackage(".");
+    const deps = entries("node_modules")
+        .flatMap((name) =>
+            name.startsWith("@")
+                ? entries(path.join("node_modules", name)).map((scoped) => path.join(name, scoped))
+                : [name],
+        )
+        .map((name) => readPackage(path.join("node_modules", name)))
+        .filter((dep) => dep.importPath);
+
+    const args = fs.readFileSync(includeArgsFile, "utf8").split(/\s+/).filter(Boolean);
+
+    for (const pkg of [self, ...deps].filter((pkg) => pkg.importPath)) {
+        args.push(`--proto_path=${pkg.importPath}=${fs.realpathSync(pkg.dir)}`);
+    }
+
+    args.push(`--es_opt=target=${target}`);
+
+    if (options) {
+        args.push(`--es_opt=${options}`);
+    }
+
+    for (const dep of deps) {
+        args.push(`--es_opt=map_imports=${dep.importPath}/:${dep.name}`);
+    }
+
+    args.push("--es_out=artifacts/protobuf/js");
+
+    console.log(args.join("\n"));
+' "$@"

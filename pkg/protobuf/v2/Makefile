@@ -184,39 +184,20 @@ artifacts/protobuf/args/go-grpc: artifacts/protobuf/args/go-common
 # file (for example, github.com/foo/bar/dir/file_pb.js), so the plugin writes
 # to a staging directory and the files are moved alongside the .proto file.
 
+# _PROTO_JS_IMPORT_PATH is the import path of this package's .proto files.
+_PROTO_JS_IMPORT_PATH = $(shell jq -r '."makefiles.dev".protobuf.importPath // empty' package.json)
+
 $(addprefix %,$(_PROTO_JS_SUFFIXES)): %.proto artifacts/link-dependencies.touch $(_PROTO_PROTOC_REQ) artifacts/protobuf/args/js
+	$(if $(_PROTO_JS_IMPORT_PATH),,$(error package.json does not declare the import path of its .proto files in "makefiles.dev": {"protobuf": {"importPath": "..."}}))
 	@mkdir -p artifacts/protobuf/js
-	@import_path="$$(awk -F '\t' '$$1 == "self" { print $$2 }' artifacts/protobuf/npm-packages)"; \
-	if [ -z "$$import_path" ]; then \
-		echo 'error: package.json must declare the import path of the project'"'"'s .proto files in a "makefiles.dev": {"protobuf": {"importPath": "..."}} field' >&2; \
-		exit 1; \
-	fi
 	PROTO_PLUGIN_COMMAND="$(JS_EXEC) protoc-gen-es" $(PROTOC_COMMAND) $$(cat artifacts/protobuf/args/js) --plugin protoc-gen-es=$(_PROTO_EXEC_PLUGIN) $(MF_PROJECT_ROOT)/$<
-	import_path="$$(awk -F '\t' '$$1 == "self" { print $$2 }' artifacts/protobuf/npm-packages)"; \
 	for suffix in $(_PROTO_JS_SUFFIXES); do \
-		mv "artifacts/protobuf/js/$$import_path/$*$$suffix" "$*$$suffix" || exit 1; \
+		mv "artifacts/protobuf/js/$(_PROTO_JS_IMPORT_PATH)/$*$$suffix" "$*$$suffix" || exit 1; \
 		$(MF_ROOT)/pkg/protobuf/v2/bin/revert-version-only-changes "$*$$suffix" || exit 1; \
 	done
 
-# Each dependency gets a "map_imports" option. Any in PROTO_JS_OPT take
-# precedence, because protoc-gen-es uses the first matching pattern.
-artifacts/protobuf/args/js: artifacts/protobuf/args/common artifacts/protobuf/args/npm artifacts/protobuf/npm-packages
+# artifacts/protobuf/args/js --- The protoc arguments for generating JS code.
+# See bin/generate-js-args.
+artifacts/protobuf/args/js: artifacts/protobuf/args/common package.json artifacts/link-dependencies.touch
 	@mkdir -p "$(@D)"
-	cat artifacts/protobuf/args/common artifacts/protobuf/args/npm > "$@"
-	echo "--es_opt=target=$(PROTO_JS_TARGET)" >> "$@"
-ifneq ($(PROTO_JS_OPT),)
-	echo "--es_opt=$(PROTO_JS_OPT)" >> "$@"
-endif
-	awk -F '\t' '$$1 == "dependency" { print "--es_opt=map_imports=" $$2 "/:" $$3 }' artifacts/protobuf/npm-packages >> "$@"
-	echo "--es_out=artifacts/protobuf/js" >> "$@"
-
-# artifacts/protobuf/npm-packages --- This package and its dependencies that
-# declare an import path. See bin/list-npm-packages.
-artifacts/protobuf/npm-packages: package.json artifacts/link-dependencies.touch
-	@mkdir -p "$(@D)"
-	$(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/list-npm-packages > "$@"
-
-# artifacts/protobuf/args/npm --- An include path for each of those packages.
-artifacts/protobuf/args/npm: artifacts/protobuf/npm-packages
-	@mkdir -p "$(@D)"
-	awk -F '\t' '{ print "--proto_path=" $$2 "=" $$4 }' "$<" > "$@"
+	$(JS_EXEC) $(MF_ROOT)/pkg/protobuf/v2/bin/generate-js-args "$<" "$(PROTO_JS_TARGET)" "$(PROTO_JS_OPT)" > "$@"
