@@ -13,8 +13,7 @@ PROTO_GRPC_FILES ?= $(shell $(MF_ROOT)/pkg/protobuf/v2/bin/filter-grpc $(PROTO_F
 # NOTE: Please avoid adding the current directory (.) in this variable as it may
 # cause a "type redefinition" error from the protobuf compiler. The absolute
 # path to the current repository is already added to the list of include paths,
-# under its import path, via the 'artifacts/protobuf/args/go-common' file for Go
-# modules, or the 'artifacts/protobuf/args/npm' file for npm packages.
+# under its import path.
 PROTO_INCLUDE_PATHS ?=
 
 # PROTOC_COMMAND is the command used to run protoc.
