@@ -10,6 +10,18 @@ _JS_BIOME_REQ += artifacts/link-dependencies.touch
 # _JS_BIOME_ARGS is a space separated list of arguments to pass to Biome.
 _JS_BIOME_ARGS := --config-path "$(JS_BIOME_CONFIG_FILE)"
 
+# Biome is included because this is a JavaScript project, so it only handles
+# the languages of a JavaScript project: JavaScript, TypeScript, JSX, JSON and
+# CSS, matching the editor settings below. By default Biome also formats and
+# lints other languages, so those are turned off here. Biome has no option to
+# list the languages it may touch, so a language it adds later must be added to
+# this list.
+_JS_BIOME_ARGS += --md-formatter-enabled=false --md-linter-enabled=false
+_JS_BIOME_ARGS += --yaml-formatter-enabled=false --yaml-linter-enabled=false
+_JS_BIOME_ARGS += --html-formatter-enabled=false --html-linter-enabled=false --html-assist-enabled=false
+_JS_BIOME_ARGS += --graphql-formatter-enabled=false --graphql-linter-enabled=false --graphql-assist-enabled=false
+_JS_BIOME_ARGS += --grit-formatter-enabled=false --grit-linter-enabled=false --grit-assist-enabled=false
+
 # Merge Biome's editor settings into the VSCode workspace settings file, if
 # the project uses the vscode package.
 VSCODE_SETTINGS_FILES += $(MF_ROOT)/pkg/js/v1/etc/vscode-settings.biome.json
