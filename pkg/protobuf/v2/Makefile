@@ -145,7 +145,7 @@ artifacts/protobuf/args/go-common: artifacts/protobuf/args/common go.mod
 	go mod download all
 	@mkdir -p "$(@D)"
 	cp "$<" "$@"
-	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-go-include-paths | tee "$@"
+	$(MF_ROOT)/pkg/protobuf/v2/bin/generate-go-include-paths | tee -a "$@"
 
 artifacts/protobuf/args/go: artifacts/protobuf/args/go-common
 	@mkdir -p "$(@D)"
