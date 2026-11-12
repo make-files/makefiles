@@ -1,1 +1,4 @@
 /test/ export-ignore
+
+# See lib/core/bin/check-for-update.
+/lib/core/etc/commit export-subst

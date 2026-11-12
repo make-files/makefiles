@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../include/common.bash"
+
+# check-for-update prints a warning if the installed makefiles come from a
+# commit other than the latest commit of the makefiles repository's "v1" branch.
+# The branch is named "v" followed by MF_VERSION.
+#
+# It does nothing if MF_BRANCH is set. The installer (https://makefiles.dev/v1)
+# reads MF_BRANCH to install a branch other than "v1", and makefiles that were
+# installed from another branch can not be compared with "v1". The installed
+# copy does not record its branch, so if MF_BRANCH is not set when make runs
+# later, the copy is compared with "v1" and reported as out of date.
+#
+# It writes only to stderr.
+#
+# The installed commit is the hash in lib/core/etc/commit. In the repository
+# that file contains only the text $Format:%H$. When GitHub builds the archive
+# that is downloaded to install the makefiles, it replaces that text with the
+# hash of the commit, because .gitattributes gives the file the "export-subst"
+# attribute. See https://git-scm.com/docs/gitattributes#_export_subst
+#
+# A copy of the makefiles that did not come from an archive, such as a clone of
+# the repository, still contains the text $Format:%H$, so it is never checked.
+#
+# The latest commit is fetched from GitHub when the last fetch was more than an
+# hour ago. Otherwise, the commit from the last successful fetch is used. The
+# time of the last fetch is stored in the installed copy of the makefiles, so
+# each project that has its own copy fetches separately.
+
+# A commit hash is 40 lowercase hexadecimal digits.
+COMMIT_PATTERN='^[0-9a-f]{40}$'
+
+INSTALLED_COMMIT_FILE="$MF_ROOT/lib/core/etc/commit"
+
+# LATEST_COMMIT_FILE contains the commit from the last successful fetch, and is
+# empty if there has not been one. Its modification time is the time of the last
+# fetch, whether or not the fetch succeeded. A failed fetch updates the
+# modification time as well, so that the next fetch is an hour later. Otherwise a
+# machine that can not reach GitHub would wait for the timeout each time make
+# runs.
+#
+# If the file can not be written, the commit is fetched each time make runs.
+LATEST_COMMIT_FILE="$MF_ROOT/lib/core/.latest-commit"
+
+FETCH_INTERVAL_MINUTES=60
+
+# make waits for this script to finish, so a fetch that takes longer than this
+# is abandoned.
+FETCH_TIMEOUT_SECONDS=3
+
+# fetch_latest_commit prints the hash of the latest commit of the branch. It
+# fails if GitHub can not be reached, or if the response is not a commit hash,
+# such as the page of a network that requires a login.
+#
+# With this "Accept" header, the GitHub API responds with the commit hash alone.
+# See https://docs.github.com/en/rest/commits/commits#get-a-commit
+function fetch_latest_commit() {
+    local commit
+
+    commit="$(
+        curl \
+            --fail \
+            --silent \
+            --max-time "$FETCH_TIMEOUT_SECONDS" \
+            --header "Accept: application/vnd.github.sha" \
+            "https://api.github.com/repos/make-files/makefiles/commits/heads/v$MF_VERSION"
+    )" || return 1
+
+    [[ "$commit" =~ $COMMIT_PATTERN ]] || return 1
+    echo "$commit"
+}
+
+[[ -z "${MF_BRANCH:-}" ]] || exit 0
+
+installed_commit="$(cat "$INSTALLED_COMMIT_FILE" 2>/dev/null || true)"
+[[ "$installed_commit" =~ $COMMIT_PATTERN ]] || exit 0
+
+# latest_commit is the latest commit that is known. It is the commit from the
+# last successful fetch, unless a newer fetch below replaces it.
+latest_commit="$(cat "$LATEST_COMMIT_FILE" 2>/dev/null || true)"
+
+if [[ -z "$(find "$LATEST_COMMIT_FILE" -mmin "-$FETCH_INTERVAL_MINUTES" 2>/dev/null)" ]]; then
+    if fetched_commit="$(fetch_latest_commit)"; then
+        latest_commit="$fetched_commit"
+        { echo "$latest_commit" > "$LATEST_COMMIT_FILE"; } 2>/dev/null || true
+    else
+        # This leaves the commit from the last successful fetch in the file, or
+        # creates an empty file if there has not been one.
+        touch "$LATEST_COMMIT_FILE" 2>/dev/null || true
+        log "could not check whether the makefiles are out of date"
+    fi
+fi
+
+if [[ "$latest_commit" =~ $COMMIT_PATTERN && "$latest_commit" != "$installed_commit" ]]; then
+    log "the makefiles are out of date (installed ${installed_commit:0:7}, latest ${latest_commit:0:7}), run \"make makefiles\" to update"
+fi

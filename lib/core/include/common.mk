@@ -42,6 +42,24 @@ else
 export MF_NON_INTERACTIVE ?= true
 endif
 
+# Warn if the installed makefiles are out of date. See
+# lib/core/bin/check-for-update.
+#
+# The check is skipped in recursive makes, so that the warning is printed once
+# rather than once for each make process.
+#
+# The check is skipped under CI, because a CI run normally downloads the
+# makefiles itself and starts without a record of an earlier check, so
+# check-for-update would contact GitHub on every run and have nothing to report.
+#
+# make reads the output of $(shell) as makefile syntax, so ">&2" sends anything
+# that check-for-update writes to stdout to stderr instead.
+ifeq ($(MAKELEVEL),0)
+ifeq ($(MF_CI),)
+$(shell PATH="$(PATH)" check-for-update >&2)
+endif
+endif
+
 # MF_TOOL_CONFIG_FILES is a space separated list of the files in which the
 # project declares the versions of its tools, if it has a tool manager. See
 # lib/core/bin/tool-exec.
